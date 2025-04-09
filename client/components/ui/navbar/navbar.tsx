@@ -5,10 +5,8 @@ import NavbarTitle from "./navbarTitle";
 import Link from "next/link";
 
 export default function Navbar() {
-  // State to manage visibility of the navbar
   const [isNavbarVisible, setNavbarVisible] = useState(true);
 
-  // Toggle the visibility of the navbar
   const toggleNavbar = () => {
     setNavbarVisible(!isNavbarVisible);
   };
@@ -31,7 +29,6 @@ export default function Navbar() {
           isNavbarVisible ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        {/* Button to hide the navbar, top right corner */}
         <button
           onClick={toggleNavbar}
           className="absolute top-4 right-4 p-2 text-[#3E2723] bg-transparent border-none cursor-pointer hover:bg-[#F1E5D8] transition"
@@ -48,10 +45,10 @@ export default function Navbar() {
           <Link href={"/admin"} className="block">
             <NavItem label="Home" Icon={Home} />
           </Link>
-          <Link href={"/admin/pages/contents"} className="block">
+          <Link href={"/admin/contents"} className="block">
             <NavItem label="Contents" Icon={FileText} />
           </Link>
-          <Link href={"/admin/pages/configure"} className="block">
+          <Link href={"/admin//configure"} className="block">
             <NavItem label="Configuration" Icon={Settings} />
           </Link>
         </div>
