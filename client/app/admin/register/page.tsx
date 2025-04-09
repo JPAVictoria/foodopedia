@@ -55,10 +55,9 @@ export default function Signup() {
 
       if (res.status === 201) {
         openSnackbar("Registration successful!", "success");
-        // Add a delay before redirecting
         setTimeout(() => {
           router.push("/admin/login");
-        }, 3000); // 3 seconds delay (3000 milliseconds)
+        }, 3000); 
       }
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message: string } } };

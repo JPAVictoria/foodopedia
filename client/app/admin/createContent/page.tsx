@@ -7,7 +7,7 @@ import ImageUploader from "@/components/ui/createContent/imageUploader";
 
 export default function CreateContent() {
   return (
-    <div className="flex min-h-screen text-[#3E2723] overflow-hidden"> {/* Hide overflow */}
+    <div className="flex min-h-screen text-[#3E2723]"> 
       <Navbar />
       <div className="flex-1 p-15 space-y-8">
         <ContentHeader />
