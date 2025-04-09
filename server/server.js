@@ -1,7 +1,10 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const authRouter = require("./api/auth/auth.route"); // Import your auth route
+
+// Import your auth routes (signup and login)
+const authRouter = require("./api/auth/register/auth.route"); // Register route
+const loginRouter = require("./api/auth/login/auth.route");   // Login route
 
 const app = express();
 
@@ -10,9 +13,10 @@ app.use(cors()); // Enable CORS
 app.use(bodyParser.json()); // Parse JSON bodies
 
 // Use the auth routes
-app.use("/admin", authRouter); // Prefix for your routes, e.g. /admin/signup
+app.use("/admin", authRouter); // /admin/signup
+app.use("/admin", loginRouter); // /admin/login
 
-// Example route to test if the server is running
+// Test route
 app.get("/", (req, res) => {
   res.send("Server is up and running!");
 });

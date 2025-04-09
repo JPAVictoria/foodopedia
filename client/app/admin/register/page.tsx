@@ -31,6 +31,14 @@ export default function Signup() {
       return;
     }
 
+    // Email validation regex
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(form.email)) {
+      openSnackbar("Please enter a valid email address", "error");
+      return;
+    }
+
+    // Password match validation
     if (form.password !== form.confirmPassword) {
       openSnackbar("Passwords do not match", "error");
       return;
@@ -47,7 +55,10 @@ export default function Signup() {
 
       if (res.status === 201) {
         openSnackbar("Registration successful!", "success");
-        router.push("/admin/login");
+        // Add a delay before redirecting
+        setTimeout(() => {
+          router.push("/admin/login");
+        }, 3000); // 3 seconds delay (3000 milliseconds)
       }
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message: string } } };

@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const { PrismaClient } = require("@prisma/client");
-const { hashPassword } = require("../../utils/hash.js");
-const { validateAdmin } = require("../../middlewares/validateAdmin"); // Adjusted for JS
+const { hashPassword } = require("../../../utils/hash.js");
+const { validateAdmin } = require("../../../middlewares/validateAdmin.js"); // Adjusted for JS
 
 const prisma = new PrismaClient();
 const router = Router();
