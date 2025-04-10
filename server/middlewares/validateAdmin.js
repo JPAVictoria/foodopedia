@@ -18,4 +18,4 @@ const validateAdmin = (req, res, next) => {
   next();
 };
 
-module.exports = { validateAdmin };  // Export the function in JS
+module.exports = { validateAdmin };  

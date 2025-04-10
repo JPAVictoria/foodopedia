@@ -6,55 +6,55 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { useRouter } from "next/navigation"; // Use this import for navigation
-import { useSnackbar } from "@/components/snackbar"; // Import the custom hook
+import { useRouter } from "next/navigation"; 
+import { useSnackbar } from "@/components/snackbar"; 
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const router = useRouter(); // Initialize useRouter
-  const { openSnackbar } = useSnackbar(); // Get openSnackbar function from context
+  const router = useRouter(); 
+  const { openSnackbar } = useSnackbar(); 
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setError(""); // Clear previous errors
+    setError(""); 
   
-    // Client-side validation for empty fields
+    
     if (!email || !password) {
       openSnackbar("Email and password are required.", "error");
       setLoading(false);
-      return; // Prevent the request from being sent if validation fails
+      return; 
     }
   
     try {
-      // Make API call to backend for login
+      
       const response = await axios.post("http://localhost:5000/admin/login", {
         email,
         password,
       });
   
-      console.log("Login response:", response); // Log the response for debugging
+      console.log("Login response:", response);
   
-      // Store the token in a cookie upon successful login
+      
       if (response.data.token) {
-        Cookies.set("token", response.data.token, { expires: 1 }); // Expires in 1 day
-        console.log("Token set in cookie"); // Log cookie setting
+        Cookies.set("token", response.data.token, { expires: 1 }); 
+        console.log("Token set in cookie"); 
   
-        // Trigger success Snackbar
+        
         openSnackbar("Login successful!", "success");
   
-        // Delay redirection to give users time to see the success message
+        
         setTimeout(() => {
-          router.push("/admin"); // Redirect to /admin or another page
+          router.push("/admin"); 
           console.log("Redirection initiated to /admin");
-        }, 2000); // 2 seconds delay for the snackbar to be visible
+        }, 2000); 
       }
     } catch (err) {
-      // No need to log the error here
-      // Remove the console.log or console.error line to prevent unnecessary logging
+      
+      
       if (axios.isAxiosError(err) && err.response) {
         openSnackbar(err.response.data.message || "Invalid email or password.", "error");
       } else {

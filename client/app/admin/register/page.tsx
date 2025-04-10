@@ -25,20 +25,17 @@ export default function Signup() {
   };
 
   const handleSubmit = async () => {
-    // Basic form validation
     if (!form.firstName || !form.lastName || !form.email || !form.password || !form.confirmPassword) {
       openSnackbar("Please fill in all fields", "error");
       return;
     }
 
-    // Email validation regex
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(form.email)) {
       openSnackbar("Please enter a valid email address", "error");
       return;
     }
 
-    // Password match validation
     if (form.password !== form.confirmPassword) {
       openSnackbar("Passwords do not match", "error");
       return;

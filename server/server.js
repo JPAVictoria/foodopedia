@@ -2,26 +2,26 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 
-// Import your auth routes (signup and login)
-const authRouter = require("./api/auth/register/auth.route"); // Register route
-const loginRouter = require("./api/auth/login/auth.route");   // Login route
+
+const authRouter = require("./api/auth/register/auth.route"); 
+const loginRouter = require("./api/auth/login/auth.route");   
 
 const app = express();
 
-// Middleware
-app.use(cors()); // Enable CORS
-app.use(bodyParser.json()); // Parse JSON bodies
 
-// Use the auth routes
-app.use("/admin", authRouter); // /admin/signup
-app.use("/admin", loginRouter); // /admin/login
+app.use(cors()); 
+app.use(bodyParser.json()); 
 
-// Test route
+
+app.use("/admin", authRouter); 
+app.use("/admin", loginRouter); 
+
+
 app.get("/", (req, res) => {
   res.send("Server is up and running!");
 });
 
-// Start the server
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
