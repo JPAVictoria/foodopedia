@@ -47,7 +47,7 @@ export const SnackbarProvider: React.FC<SnackbarProviderProps> = ({ children }) 
       {children}
       <Snackbar
         open={open}
-        autoHideDuration={3000}
+        autoHideDuration={2000}
         onClose={handleClose}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
