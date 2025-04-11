@@ -16,7 +16,7 @@ model Admin {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
-  contents  Content[]
+  contents  Content[] // A relation to the Content model
 }
 
 model Viewer {
@@ -28,7 +28,7 @@ model Viewer {
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 
-  favorites  Favorite[]
+  favorites  Favorite[] // Relation to Favorite model
 }
 
 model Content {
@@ -51,7 +51,8 @@ model Content {
   favorites   Favorite[]     // Track favorites for content
   views       Int            @default(0)  // For basic analytics (e.g., number of views)
 
-  recipes     Recipe[]       // Store recipe inputs
+  recipes     Recipe[]       // Store recipe ingredients
+  instructions RecipeInstruction[] // Store recipe instructions
 }
 
 model Media {
@@ -67,8 +68,16 @@ model Media {
 
 model Recipe {
   id          String   @id @default(uuid())
-  ingredient  String   // Simple string input for ingredients/steps
+  ingredient  String   // Simple string input for ingredients
 
+  contentId   String
+  content     Content  @relation(fields: [contentId], references: [id])
+}
+
+model RecipeInstruction {
+  id          String   @id @default(uuid())
+  instruction String   // Instruction step as a string
+  stepNumber  Int      // The order of the instruction step (e.g., 1, 2, 3...)
   contentId   String
   content     Content  @relation(fields: [contentId], references: [id])
 }
@@ -82,7 +91,7 @@ model Favorite {
   viewer     Viewer   @relation(fields: [viewerId], references: [id])
   content    Content  @relation(fields: [contentId], references: [id])
 
-  @@unique([viewerId, contentId]) // Prevent double favoriting
+  @@unique([viewerId, contentId]) // Prevent double favorites
 }
 
 enum Category {

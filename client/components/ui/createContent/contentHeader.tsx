@@ -8,7 +8,7 @@ export default function ContentHeader() {
       <div className="flex justify-between items-start">
         <div>
           <h1 className="text-[32px] font-bold text-balance pb-5 text-[#3E2723]">PC - 001</h1>
-          <div className="flex flex-col space-y-1">
+          <div className="flex flex-col space-y-5">
             <p className="text-sm text-muted-foreground">Status:</p>
             <p className="text-sm text-muted-foreground">Viewer Count:</p>
             <p className="text-sm text-muted-foreground">Likes Count:</p>

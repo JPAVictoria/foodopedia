@@ -1,34 +1,30 @@
 "use client";
 import { Home, FileText, Settings, LogOut, AlignRight, Menu } from "lucide-react";
-import { useState } from "react";
 import NavbarTitle from "./navbarTitle";
 import Link from "next/link";
+import { useNavbar } from "@/app/context/NavbarContext";
 
 export default function Navbar() {
-  const [isNavbarVisible, setNavbarVisible] = useState(true);
-
-  const toggleNavbar = () => {
-    setNavbarVisible(!isNavbarVisible);
-  };
+  const { isNavbarVisible, toggleNavbar } = useNavbar();
 
   return (
-    <div className="relative">
-      {/* Burger icon when navbar is hidden */}
+    <>
+      {/* Burger icon (shown when navbar is hidden) */}
       {!isNavbarVisible && (
         <button
           onClick={toggleNavbar}
-          className="absolute top-4 left-4 p-2 text-[#3E2723] bg-transparent border-none cursor-pointer hover:bg-[#F1E5D8] transition"
+          className="fixed top-4 left-4 p-2 text-[#3E2723] bg-transparent border-none cursor-pointer hover:bg-[#F1E5D8] z-50 transition"
         >
           <Menu className="w-6 h-6" />
         </button>
       )}
 
-      {/* Navbar Content */}
       <div
-        className={`h-screen w-64 bg-[#F5EEDC] flex flex-col p-4 border border-[#3E2723] transition-all duration-300 ${
+        className={`${
           isNavbarVisible ? "translate-x-0" : "-translate-x-full"
-        }`}
+        } fixed md:static top-0 left-0 z-40 min-h-screen md:h-auto w-64 bg-[#F5EEDC] flex flex-col p-4 border-r border-[#3E2723] transition-transform duration-300`}
       >
+        {/* Close icon */}
         <button
           onClick={toggleNavbar}
           className="absolute top-4 right-4 p-2 text-[#3E2723] bg-transparent border-none cursor-pointer hover:bg-[#F1E5D8] transition"
@@ -40,7 +36,6 @@ export default function Navbar() {
           <NavbarTitle />
         </div>
 
-        {/* Navbar Options */}
         <div className="space-y-8 mt-20 flex-grow">
           <Link href={"/admin"} className="block">
             <NavItem label="Home" Icon={Home} />
@@ -48,17 +43,16 @@ export default function Navbar() {
           <Link href={"/admin/contents"} className="block">
             <NavItem label="Contents" Icon={FileText} />
           </Link>
-          <Link href={"/admin//configure"} className="block">
+          <Link href={"/admin/configure"} className="block">
             <NavItem label="Configuration" Icon={Settings} />
           </Link>
         </div>
 
-        {/* Bottom nav item (Logout) */}
         <div>
           <NavItem label="Logout" Icon={LogOut} />
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

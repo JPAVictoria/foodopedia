@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { SnackbarProvider } from "@/components/snackbar";  // Update this to the actual path of your SnackbarProvider
+import { SnackbarProvider } from "@/app/context/SnackbarContext"; // Adjust the path if needed
+import { NavbarProvider } from "@/app/context/NavbarContext"; // Import your context
 
 const inter = Inter({
   variable: "--font-inter",
@@ -15,10 +16,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} antialiased`}>
-        {/* Wrap children with SnackbarProvider to make snackbar functionality global */}
+      <body className={`${inter.variable} antialiased min-h-screen`}>
         <SnackbarProvider>
-          {children}
+          <NavbarProvider>
+            {children}
+          </NavbarProvider>
         </SnackbarProvider>
       </body>
     </html>

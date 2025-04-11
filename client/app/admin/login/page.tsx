@@ -7,7 +7,7 @@ import Link from "next/link";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation"; 
-import { useSnackbar } from "@/components/snackbar"; 
+import { useSnackbar } from "@/app/context/SnackbarContext"; 
 
 export default function Login() {
   const [email, setEmail] = useState("");

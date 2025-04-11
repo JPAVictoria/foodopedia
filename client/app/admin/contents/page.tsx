@@ -1,13 +1,22 @@
+"use client"; // This will make sure the component runs client-side
+
 import Navbar from "@/components/ui/navbar/navbar";
 import { SquarePlus } from "lucide-react";
 import Link from "next/link";
+import { useNavbar } from "@/app/context/NavbarContext";
 
 export default function Contents() {
+  const { isNavbarVisible } = useNavbar(); // Now it works because it's in a client-side component
+
   return (
-    <div className="flex relative min-h-screen">
+    <div className="flex min-h-screen">
       <Navbar />
 
-      <div className="flex-1 pt-10 p-15">
+      <div
+        className={`transition-all duration-300 p-4 sm:p-6 lg:p-8 flex-1 ${
+          isNavbarVisible ? "ml-0" : "-ml-40"
+        }`}
+      >
         <div className="flex justify-end">
           <Link href="/admin/createContent" target="_blank" rel="noopener noreferrer">
             <div className="flex flex-col items-center hover:bg-[#c5cadc17] rounded-md p-2 cursor-pointer transition">
@@ -17,8 +26,9 @@ export default function Contents() {
           </Link>
         </div>
 
-        <h1 className="text-[24px] font-bold text-[#4CAF50] mt-4 text-center">Content Overview</h1>
-        
+        <h1 className="text-[24px] font-bold text-[#4CAF50] mt-4 text-center sm:text-[18px] md:text-[22px] lg:text-[24px]">
+          Content Overview
+        </h1>
       </div>
     </div>
   );

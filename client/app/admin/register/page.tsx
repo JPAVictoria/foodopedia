@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { useSnackbar } from "@/components/snackbar";
+import { useSnackbar } from "@/app/context/SnackbarContext";
 
 export default function Signup() {
   const router = useRouter();

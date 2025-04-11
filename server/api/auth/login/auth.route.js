@@ -6,7 +6,6 @@ const jwt = require("jsonwebtoken");
 const prisma = new PrismaClient();
 const router = Router();
 
-
 const generateToken = (admin) => {
   
   return jwt.sign(
