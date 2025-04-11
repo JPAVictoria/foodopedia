@@ -6,15 +6,16 @@ const jwt = require("jsonwebtoken");
 const prisma = new PrismaClient();
 const router = Router();
 
+// Helper function to generate JWT token
 const generateToken = (admin) => {
-  
   return jwt.sign(
     { id: admin.id, email: admin.email },
-    process.env.JWT_SECRET,
-    { expiresIn: "1h" } 
+    process.env.JWT_SECRET,  // Make sure you have your JWT_SECRET set in the .env file
+    { expiresIn: "1h" }
   );
 };
 
+// Login route
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -36,9 +37,19 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
+    // Generate JWT token
     const token = generateToken(admin);
 
-    res.status(200).json({ message: "Login successful", token });
+    // Send back the admin details along with the token
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      admin: {
+        email: admin.email,
+        firstName: admin.firstName,
+        lastName: admin.lastName,
+      },
+    });
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ message: "Internal server error" });

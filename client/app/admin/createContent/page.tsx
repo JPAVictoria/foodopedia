@@ -1,10 +1,10 @@
 "use client";
 import { useNavbar } from "@/app/context/NavbarContext";
-import Navbar from "@/components/ui/navbar/navbar";
-import RecipeList from "@/components/ui/createContent/recipeList";
-import ContentHeader from "@/components/ui/createContent/contentHeader";
-import FoodDetails from "@/components/ui/createContent/foodDetails";
-import ImageUploader from "@/components/ui/createContent/imageUploader";
+import Navbar from "@/app/components/ui/navbar/navbar";
+import RecipeList from "@/app/components/ui/createContent/recipeList";
+import ContentHeader from "@/app/components/ui/createContent/contentHeader";
+import FoodDetails from "@/app/components/ui/createContent/foodDetails";
+import ImageUploader from "@/app/components/ui/createContent/imageUploader";
 
 export default function CreateContent() {
   const { isNavbarVisible } = useNavbar();
@@ -15,7 +15,7 @@ export default function CreateContent() {
 
       <div
         className={`transition-all duration-300 p-15 flex-1 ${
-          isNavbarVisible ? "ml-0" : "-ml-40"
+          isNavbarVisible ? "ml-0" : "-ml-60"
         }`}
       >
         <div className="pb-8">

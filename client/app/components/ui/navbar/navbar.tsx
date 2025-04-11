@@ -3,13 +3,28 @@ import { Home, FileText, Settings, LogOut, AlignRight, Menu } from "lucide-react
 import NavbarTitle from "./navbarTitle";
 import Link from "next/link";
 import { useNavbar } from "@/app/context/NavbarContext";
+import Cookies from "js-cookie"; 
+import { useAuthStore } from "@/app/stores/useAuthStore"; 
 
 export default function Navbar() {
   const { isNavbarVisible, toggleNavbar } = useNavbar();
+  const clearAdmin = useAuthStore((state) => state.clearAdmin); 
+
+  const handleLogout = () => {
+    
+    Cookies.remove("token");
+    console.log("JWT token removed from cookies");
+
+    
+    clearAdmin();
+    console.log("Admin data cleared from Zustand");
+
+    
+    window.location.href = "/admin/login"; 
+  };
 
   return (
     <>
-      {/* Burger icon (shown when navbar is hidden) */}
       {!isNavbarVisible && (
         <button
           onClick={toggleNavbar}
@@ -49,7 +64,9 @@ export default function Navbar() {
         </div>
 
         <div>
-          <NavItem label="Logout" Icon={LogOut} />
+          <button onClick={handleLogout}>
+            <NavItem label="Logout" Icon={LogOut} />
+          </button>
         </div>
       </div>
     </>

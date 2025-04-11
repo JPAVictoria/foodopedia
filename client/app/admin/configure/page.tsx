@@ -1,4 +1,4 @@
-import Navbar from "@/components/ui/navbar/navbar";
+import Navbar from "@/app/components/ui/navbar/navbar";
 
 export default function Configure() {
   return (

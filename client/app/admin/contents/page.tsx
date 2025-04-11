@@ -1,6 +1,6 @@
 "use client"; // This will make sure the component runs client-side
 
-import Navbar from "@/components/ui/navbar/navbar";
+import Navbar from "@/app/components/ui/navbar/navbar";
 import { SquarePlus } from "lucide-react";
 import Link from "next/link";
 import { useNavbar } from "@/app/context/NavbarContext";
@@ -14,7 +14,7 @@ export default function Contents() {
 
       <div
         className={`transition-all duration-300 p-4 sm:p-6 lg:p-8 flex-1 ${
-          isNavbarVisible ? "ml-0" : "-ml-40"
+          isNavbarVisible ? "ml-0" : "-ml-60"
         }`}
       >
         <div className="flex justify-end">

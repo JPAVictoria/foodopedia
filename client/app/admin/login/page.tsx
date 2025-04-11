@@ -1,13 +1,15 @@
-"use client";
+"use client"; // Make sure you're using client-side code
+
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { Input } from "@/app/components/ui/input";
+import { Label } from "@/app/components/ui/label";
+import { Button } from "@/app/components/ui/button";
 import Link from "next/link";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation"; 
 import { useSnackbar } from "@/app/context/SnackbarContext"; 
+import { useAuthStore } from "@/app/stores/useAuthStore"; 
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -17,46 +19,49 @@ export default function Login() {
   const router = useRouter(); 
   const { openSnackbar } = useSnackbar(); 
 
+  const setAdmin = useAuthStore((state) => state.setAdmin); 
+
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError(""); 
-  
-    
+
     if (!email || !password) {
       openSnackbar("Email and password are required.", "error");
       setLoading(false);
       return; 
     }
-  
+
     try {
-      
       const response = await axios.post("http://localhost:5000/admin/login", {
         email,
         password,
       });
-  
-      console.log("Login response:", response);
-  
-      
-      if (response.data.token) {
-        Cookies.set("token", response.data.token, { expires: 1 }); 
-        console.log("Token set in cookie"); 
-  
-        
+
+      console.log("Login response:", response.data);
+
+    
+      if (response.data.token && response.data.admin) {
+        Cookies.set("token", response.data.token, { expires: 1 });
+        console.log("Token set in cookie");
+
+        // Set the admin in Zustand store
+        setAdmin({
+          email: response.data.admin.email,
+          firstName: response.data.admin.firstName,
+          lastName: response.data.admin.lastName,
+        });
+
         openSnackbar("Login successful!", "success");
-  
-        
+
         setTimeout(() => {
-          router.push("/admin"); 
+          router.push("/admin"); // Redirect to admin dashboard
           console.log("Redirection initiated to /admin");
         }, 2000); 
       }
     } catch (err) {
-      
-      
-      if (axios.isAxiosError(err) && err.response) {
-        openSnackbar(err.response.data.message || "Invalid email or password.", "error");
+      if (axios.isAxiosError(err)) {
+        openSnackbar(err.response?.data.message || "Invalid email or password.", "error");
       } else {
         openSnackbar("An unexpected error occurred. Please try again later.", "error");
       }
@@ -64,7 +69,6 @@ export default function Login() {
       setLoading(false);
     }
   };
-  
 
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -111,7 +115,7 @@ export default function Login() {
             </div>
           </div>
 
-          {error && <p className="text-red-500 mt-2">{error}</p>} {/* Show error message */}
+          {error && <p className="text-red-500 mt-2">{error}</p>}
 
           <div className="pt-5">
             <Button
