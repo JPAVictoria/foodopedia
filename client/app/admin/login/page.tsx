@@ -10,12 +10,14 @@ import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useSnackbar } from "@/app/context/SnackbarContext";
 import { useAuthStore } from "@/app/stores/useAuthStore";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false); // 🚨 stays true after success
+  const [showPassword, setShowPassword] = useState(false); // New state for password visibility toggle
   const router = useRouter();
   const { openSnackbar } = useSnackbar();
   const setAdmin = useAuthStore((state) => state.setAdmin);
@@ -64,6 +66,10 @@ export default function Login() {
 
   const isDisabled = loading || submitted;
 
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="grid w-full max-w-sm items-center text-center">
@@ -86,19 +92,25 @@ export default function Login() {
             />
           </div>
 
-          <div className="pt-5">
+          <div className="pt-5 relative">
             <Label htmlFor="password" className="pb-2 text-[#3E2723]">
               Password
             </Label>
             <Input
-              type="password"
+              type={showPassword ? "text" : "password"}
               id="password"
               placeholder="********"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={isDisabled}
-              className="w-full focus:outline-none focus:border-[#4CAF50] focus:shadow-sm focus:shadow-[#4CAF50]/30 transition-all duration-300"
+              className="w-full focus:outline-none focus:border-[#4CAF50] focus:shadow-sm focus:shadow-[#4CAF50]/30 transition-all duration-300 pr-10"
             />
+            <div
+              onClick={togglePasswordVisibility}
+              className="absolute inset-y-15 right-3 flex items-center cursor-pointer text-gray-500 hover:text-[#4CAF50] transition"
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </div>
             <div className="flex justify-end pt-1">
               <Link href="/admin/forgot-password">
                 <Button

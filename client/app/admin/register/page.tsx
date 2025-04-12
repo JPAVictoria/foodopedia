@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useSnackbar } from "@/app/context/SnackbarContext";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function Signup() {
   const router = useRouter();
@@ -23,10 +24,22 @@ export default function Signup() {
     confirmPassword: "",
   });
 
+  const [showPassword, setShowPassword] = useState({
+    password: false,
+    confirmPassword: false,
+  });
+
   const isDisabled = loading || submitted;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.id]: e.target.value });
+  };
+
+  const toggleVisibility = (field: "password" | "confirmPassword") => {
+    setShowPassword((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
   };
 
   const handleSubmit = async () => {
@@ -59,14 +72,14 @@ export default function Signup() {
 
       if (res.status === 201) {
         openSnackbar("Registration successful!", "success");
-        setSubmitted(true); // 💥 disable everything after success
+        setSubmitted(true);
 
         setTimeout(() => {
           router.push("/admin/login");
         }, 3000);
       }
     } catch (err: unknown) {
-      setLoading(false); // only reset loading on error
+      setLoading(false);
       const error = err as { response?: { data?: { message: string } } };
       const errorMessage = error?.response?.data?.message || "Something went wrong";
       openSnackbar(errorMessage, "error");
@@ -80,19 +93,22 @@ export default function Signup() {
           Register now
         </h1>
 
-        {["firstName", "lastName", "email", "password", "confirmPassword"].map(
-          (field, idx) => (
-            <div className="pt-5" key={idx}>
+        {["firstName", "lastName", "email", "password", "confirmPassword"].map((field, idx) => {
+          const isPassword = field.toLowerCase().includes("password");
+          const isPassField = field === "password" || field === "confirmPassword";
+          const show = showPassword[field as keyof typeof showPassword];
+
+          return (
+            <div className="pt-5 relative" key={idx}>
               <Label htmlFor={field} className="pb-2 text-[#3E2723] capitalize">
-                {field === "confirmPassword"
-                  ? "Confirm Password"
-                  : field.replace(/([A-Z])/g, " $1")}
+                {field === "confirmPassword" ? "Confirm Password" : field.replace(/([A-Z])/g, " $1")}
               </Label>
+
               <Input
-                type={field.toLowerCase().includes("password") ? "password" : "text"}
+                type={isPassword && show ? "text" : isPassword ? "password" : "text"}
                 id={field}
                 placeholder={
-                  field.toLowerCase().includes("password")
+                  isPassword
                     ? "********"
                     : field === "email"
                     ? "email@example.com"
@@ -101,11 +117,20 @@ export default function Signup() {
                 value={form[field as keyof typeof form]}
                 onChange={handleChange}
                 disabled={isDisabled}
-                className="focus:outline-none focus:border-[#4CAF50] focus:shadow-sm focus:shadow-[#4CAF50]/30 transition-all duration-300"
+                className="focus:outline-none focus:border-[#4CAF50] focus:shadow-sm focus:shadow-[#4CAF50]/30 transition-all duration-300 pr-10"
               />
+
+              {isPassField && (
+                <div
+                  onClick={() => toggleVisibility(field as "password" | "confirmPassword")}
+                  className="absolute inset-y-15 right-3 flex items-center cursor-pointer text-gray-500 hover:text-[#4CAF50] transition"
+                >
+                  {show ? <EyeOff size={18} /> : <Eye size={18} />}
+                </div>
+              )}
             </div>
-          )
-        )}
+          );
+        })}
 
         <div className="pt-5">
           <Button
