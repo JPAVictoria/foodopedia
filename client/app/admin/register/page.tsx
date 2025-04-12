@@ -42,7 +42,7 @@ export default function Signup() {
     }
 
     try {
-      const res = await axios.post("http://localhost:5000/admin/signup", {
+      const res = await axios.post("http://localhost:5000/admin/register/signup", {
         firstName: form.firstName,
         lastName: form.lastName,
         email: form.email,
