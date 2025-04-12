@@ -12,6 +12,9 @@ import { useSnackbar } from "@/app/context/SnackbarContext";
 export default function Signup() {
   const router = useRouter();
   const { openSnackbar } = useSnackbar();
+  const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -19,6 +22,8 @@ export default function Signup() {
     password: "",
     confirmPassword: "",
   });
+
+  const isDisabled = loading || submitted;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.id]: e.target.value });
@@ -41,6 +46,8 @@ export default function Signup() {
       return;
     }
 
+    setLoading(true);
+
     try {
       const res = await axios.post("http://localhost:5000/admin/register/signup", {
         firstName: form.firstName,
@@ -52,11 +59,14 @@ export default function Signup() {
 
       if (res.status === 201) {
         openSnackbar("Registration successful!", "success");
+        setSubmitted(true); // 💥 disable everything after success
+
         setTimeout(() => {
           router.push("/admin/login");
-        }, 3000); 
+        }, 3000);
       }
     } catch (err: unknown) {
+      setLoading(false); // only reset loading on error
       const error = err as { response?: { data?: { message: string } } };
       const errorMessage = error?.response?.data?.message || "Something went wrong";
       openSnackbar(errorMessage, "error");
@@ -82,10 +92,15 @@ export default function Signup() {
                 type={field.toLowerCase().includes("password") ? "password" : "text"}
                 id={field}
                 placeholder={
-                  field.toLowerCase().includes("password") ? "********" : field === "email" ? "email@example.com" : "example"
+                  field.toLowerCase().includes("password")
+                    ? "********"
+                    : field === "email"
+                    ? "email@example.com"
+                    : "example"
                 }
                 value={form[field as keyof typeof form]}
                 onChange={handleChange}
+                disabled={isDisabled}
                 className="focus:outline-none focus:border-[#4CAF50] focus:shadow-sm focus:shadow-[#4CAF50]/30 transition-all duration-300"
               />
             </div>
@@ -95,16 +110,25 @@ export default function Signup() {
         <div className="pt-5">
           <Button
             onClick={handleSubmit}
-            className="w-full bg-[#4CAF50] text-white py-5 px-4 rounded-md hover:bg-[#45a049] transition duration-200 cursor-pointer"
+            disabled={isDisabled}
+            className={`w-full text-white py-5 px-4 rounded-md transition duration-200 ${
+              isDisabled
+                ? "bg-[#A5D6A7] cursor-not-allowed"
+                : "bg-[#4CAF50] hover:bg-[#45a049] cursor-pointer"
+            }`}
           >
-            Register
+            {loading ? "Registering..." : submitted ? "Registered" : "Register"}
           </Button>
         </div>
 
         <div className="pt-8">
           <p className="font-light text-sm text-[#3E2723]">Remember your account?</p>
           <Link href="/admin/login">
-            <Button variant="link" className="cursor-pointer pt-3 text-[#3E2723]">
+            <Button
+              variant="link"
+              disabled={isDisabled}
+              className="cursor-pointer pt-3 text-[#3E2723]"
+            >
               Back to login
             </Button>
           </Link>

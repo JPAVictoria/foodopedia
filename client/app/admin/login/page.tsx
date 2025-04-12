@@ -1,4 +1,4 @@
-"use client"; // Make sure you're using client-side code
+"use client";
 
 import { useState } from "react";
 import { Input } from "@/app/components/ui/input";
@@ -7,30 +7,28 @@ import { Button } from "@/app/components/ui/button";
 import Link from "next/link";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { useRouter } from "next/navigation"; 
-import { useSnackbar } from "@/app/context/SnackbarContext"; 
-import { useAuthStore } from "@/app/stores/useAuthStore"; 
+import { useRouter } from "next/navigation";
+import { useSnackbar } from "@/app/context/SnackbarContext";
+import { useAuthStore } from "@/app/stores/useAuthStore";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const router = useRouter(); 
-  const { openSnackbar } = useSnackbar(); 
-
-  const setAdmin = useAuthStore((state) => state.setAdmin); 
+  const [submitted, setSubmitted] = useState(false); // 🚨 stays true after success
+  const router = useRouter();
+  const { openSnackbar } = useSnackbar();
+  const setAdmin = useAuthStore((state) => state.setAdmin);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
-    setError(""); 
 
     if (!email || !password) {
       openSnackbar("Email and password are required.", "error");
-      setLoading(false);
-      return; 
+      return;
     }
+
+    setLoading(true);
 
     try {
       const response = await axios.post("http://localhost:5000/admin/login/login", {
@@ -38,14 +36,9 @@ export default function Login() {
         password,
       });
 
-      console.log("Login response:", response.data);
-
-    
       if (response.data.token && response.data.admin) {
         Cookies.set("token", response.data.token, { expires: 1 });
-        console.log("Token set in cookie");
 
-        // Set the admin in Zustand store
         setAdmin({
           email: response.data.admin.email,
           firstName: response.data.admin.firstName,
@@ -53,22 +46,23 @@ export default function Login() {
         });
 
         openSnackbar("Login successful!", "success");
+        setSubmitted(true); // ✅ disables all inputs after success
 
         setTimeout(() => {
-          router.push("/admin"); // Redirect to admin dashboard
-          console.log("Redirection initiated to /admin");
-        }, 2000); 
+          router.push("/admin");
+        }, 2000);
       }
     } catch (err) {
+      setLoading(false); // only reset loading on error
       if (axios.isAxiosError(err)) {
         openSnackbar(err.response?.data.message || "Invalid email or password.", "error");
       } else {
         openSnackbar("An unexpected error occurred. Please try again later.", "error");
       }
-    } finally {
-      setLoading(false);
     }
   };
+
+  const isDisabled = loading || submitted;
 
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -87,6 +81,7 @@ export default function Login() {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={isDisabled}
               className="focus:outline-none focus:border-[#4CAF50] focus:shadow-sm focus:shadow-[#4CAF50]/30 transition-all duration-300"
             />
           </div>
@@ -101,6 +96,7 @@ export default function Login() {
               placeholder="********"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={isDisabled}
               className="w-full focus:outline-none focus:border-[#4CAF50] focus:shadow-sm focus:shadow-[#4CAF50]/30 transition-all duration-300"
             />
             <div className="flex justify-end pt-1">
@@ -108,6 +104,7 @@ export default function Login() {
                 <Button
                   variant="link"
                   className="text-[#3E2723] text-xs p-0 h-auto cursor-pointer font-medium"
+                  disabled={isDisabled}
                 >
                   Forgot Password?
                 </Button>
@@ -115,15 +112,17 @@ export default function Login() {
             </div>
           </div>
 
-          {error && <p className="text-red-500 mt-2">{error}</p>}
-
           <div className="pt-5">
             <Button
               type="submit"
-              className="w-full bg-[#4CAF50] text-white py-5 px-4 rounded-md hover:bg-[#45a049] transition duration-200 cursor-pointer"
-              disabled={loading}
+              disabled={isDisabled}
+              className={`w-full text-white py-5 px-4 rounded-md transition duration-200 ${
+                isDisabled
+                  ? "bg-[#A5D6A7] cursor-not-allowed"
+                  : "bg-[#4CAF50] hover:bg-[#45a049] cursor-pointer"
+              }`}
             >
-              {loading ? "Loading..." : "Login"}
+              {loading ? "Logging in..." : submitted ? "Logged in" : "Login"}
             </Button>
           </div>
 
@@ -135,6 +134,7 @@ export default function Login() {
               <Button
                 variant="link"
                 className="cursor-pointer pt-3 text-[#3E2723]"
+                disabled={isDisabled}
               >
                 Get Started here
               </Button>

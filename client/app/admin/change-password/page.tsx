@@ -4,17 +4,20 @@ import { Label } from "@/app/components/ui/label";
 import { Button } from "@/app/components/ui/button";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useSnackbar } from "@/app/context/SnackbarContext"; // Assuming you are using your Snackbar context
+import { useSnackbar } from "@/app/context/SnackbarContext";
+import { useRouter } from "next/navigation";
 
 export default function ChangePassword() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const { openSnackbar } = useSnackbar(); // To show success/error messages
+  const [submitted, setSubmitted] = useState(false);
   const [token, setToken] = useState<string | null>(null);
 
+  const { openSnackbar } = useSnackbar();
+  const router = useRouter();
+
   useEffect(() => {
-    // This will run after the component has mounted (client-side)
     const urlParams = new URLSearchParams(window.location.search);
     const tokenFromUrl = urlParams.get("token");
     if (tokenFromUrl) {
@@ -30,38 +33,45 @@ export default function ChangePassword() {
       return;
     }
 
+    if (password.length < 8) {
+      openSnackbar("Password must be at least 8 characters long", "error");
+      return;
+    }
+
     if (password !== confirmPassword) {
       openSnackbar("Passwords do not match", "error");
+      return;
+    }
+
+    if (!token) {
+      openSnackbar("Invalid or expired reset link", "error");
       return;
     }
 
     setLoading(true);
 
     try {
-      if (!token) {
-        openSnackbar("Invalid or expired reset link", "error");
-        return;
-      }
-
-      // Send request to change the password
       const response = await fetch("http://localhost:5000/admin/reset/reset", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({newPassword: password, token }),
+        body: JSON.stringify({ newPassword: password, token }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
         openSnackbar("Password changed successfully", "success");
-        // You can directly navigate to the login page or another action
+        setSubmitted(true);
+        setTimeout(() => {
+          router.push("/admin/login");
+        }, 2000);
       } else {
         openSnackbar(data.message || "Something went wrong", "error");
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       openSnackbar("Network error. Please try again later.", "error");
     } finally {
       setLoading(false);
@@ -84,6 +94,7 @@ export default function ChangePassword() {
               id="password"
               placeholder="********"
               value={password}
+              disabled={loading || submitted}
               onChange={(e) => setPassword(e.target.value)}
               className="focus:outline-none focus:border-[#4CAF50] focus:shadow-sm focus:shadow-[#4CAF50]/30 transition-all duration-300"
             />
@@ -97,6 +108,7 @@ export default function ChangePassword() {
               id="confirmPassword"
               placeholder="********"
               value={confirmPassword}
+              disabled={loading || submitted}
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="focus:outline-none focus:border-[#4CAF50] focus:shadow-sm focus:shadow-[#4CAF50]/30 transition-all duration-300"
             />
@@ -104,10 +116,14 @@ export default function ChangePassword() {
           <div className="pt-5">
             <Button
               type="submit"
-              disabled={loading}
-              className="w-full bg-[#4CAF50] text-white py-5 px-4 rounded-md hover:bg-[#45a049] transition duration-200 cursor-pointer"
+              disabled={loading || submitted}
+              className={`w-full text-white py-5 px-4 rounded-md transition duration-200 ${
+                loading || submitted
+                  ? "bg-[#A5D6A7] cursor-not-allowed"
+                  : "bg-[#4CAF50] hover:bg-[#45a049] cursor-pointer"
+              }`}
             >
-              {loading ? "Changing..." : "Submit"}
+              {loading ? "Changing..." : submitted ? "Submitted" : "Submit"}
             </Button>
           </div>
         </form>
