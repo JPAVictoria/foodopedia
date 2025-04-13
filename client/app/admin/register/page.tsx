@@ -14,7 +14,6 @@ export default function Signup() {
   const router = useRouter();
   const { openSnackbar } = useSnackbar();
 
-  // Accessing store data and actions
   const {
     firstName,
     lastName,
@@ -51,20 +50,25 @@ export default function Signup() {
       openSnackbar("Please fill in all fields", "error");
       return;
     }
-
+  
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA0-9]{2,}$/;
     if (!emailRegex.test(email)) {
       openSnackbar("Please enter a valid email address", "error");
       return;
     }
-
+  
     if (password !== confirmPassword) {
       openSnackbar("Passwords do not match", "error");
       return;
     }
-
+  
+    if (password.length < 8) {
+      openSnackbar("Password must be at least 8 characters long", "error");
+      return;
+    }
+  
     setLoading(true);
-
+  
     try {
       const res = await axios.post("http://localhost:5000/admin/register/signup", {
         firstName,
@@ -73,11 +77,11 @@ export default function Signup() {
         password,
         confirmPassword,
       });
-
+  
       if (res.status === 201) {
         openSnackbar("Registration successful!", "success");
         setSubmitted(true);
-
+  
         setTimeout(() => {
           router.push("/admin/login");
         }, 3000);
@@ -89,6 +93,7 @@ export default function Signup() {
       openSnackbar(errorMessage, "error");
     }
   };
+  
 
   return (
     <div className="flex items-center justify-center min-h-screen">

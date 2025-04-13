@@ -1,5 +1,4 @@
-// src/app/stores/useRegisterStore.ts
-import { create } from "zustand"; // Correct import
+import { create } from "zustand"; 
 
 interface RegisterStore {
   firstName: string;
@@ -9,7 +8,7 @@ interface RegisterStore {
   confirmPassword: string;
   loading: boolean;
   submitted: boolean;
-  setField: (field: string, value: string) => void; // No type guard
+  setField: (field: string, value: string) => void; 
   setLoading: (loading: boolean) => void;
   setSubmitted: (submitted: boolean) => void;
 }

@@ -3,19 +3,26 @@ import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
 import { Button } from "@/app/components/ui/button";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSnackbar } from "@/app/context/SnackbarContext";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import { useChangeStore } from "@/app/stores/useChangeStore";
+import axios from "axios"; 
 
 export default function ChangePassword() {
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [token, setToken] = useState<string | null>(null);
+  const {
+    password,
+    confirmPassword,
+    loading,
+    submitted,
+    setPassword,
+    setConfirmPassword,
+    setLoading,
+    setSubmitted,
+  } = useChangeStore();
 
-  // States for password visibility toggle
+  const [token, setToken] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -25,9 +32,7 @@ export default function ChangePassword() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const tokenFromUrl = urlParams.get("token");
-    if (tokenFromUrl) {
-      setToken(tokenFromUrl);
-    }
+    if (tokenFromUrl) setToken(tokenFromUrl);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,7 +44,7 @@ export default function ChangePassword() {
     }
 
     if (password.length < 8) {
-      openSnackbar("Password must be at least 8 characters long", "error");
+      openSnackbar("Password must be at least 8 characters", "error");
       return;
     }
 
@@ -53,43 +58,42 @@ export default function ChangePassword() {
       return;
     }
 
-    setLoading(true);
+    setLoading(true); 
 
     try {
-      const response = await fetch("http://localhost:5000/admin/reset/reset", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ newPassword: password, token }),
+      const res = await axios.post("http://localhost:5000/admin/reset/reset", {
+        newPassword: password,
+        token,
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        openSnackbar("Password changed successfully", "success");
+      if (res.status === 200 || res.status === 201) {
+        openSnackbar(res.data.message || "Password changed successfully", "success");
         setSubmitted(true);
-        setTimeout(() => {
-          router.push("/admin/login");
-        }, 2000);
+        setTimeout(() => router.push("/admin/login"), 2000);
       } else {
-        openSnackbar(data.message || "Something went wrong", "error");
+        openSnackbar(res.data.message || "Something went wrong", "error");
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(error);
-      openSnackbar("Network error. Please try again later.", "error");
+
+      let message = "Something went wrong. Please try again.";
+
+      if (error instanceof Error) {
+        message =
+          error.message || "An unexpected error occurred. Please try again later.";
+      }
+
+      if (axios.isAxiosError(error)) {
+        message =
+          error.response?.data?.message ||
+          error.message ||
+          "Server responded with an unknown error.";
+      }
+
+      openSnackbar(message, "error");
     } finally {
       setLoading(false);
     }
-  };
-
-  // Toggle password visibility
-  const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
-  };
-
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword((prev) => !prev);
   };
 
   return (
@@ -110,11 +114,11 @@ export default function ChangePassword() {
               value={password}
               disabled={loading || submitted}
               onChange={(e) => setPassword(e.target.value)}
-              className="focus:outline-none focus:border-[#4CAF50] focus:shadow-sm focus:shadow-[#4CAF50]/30 transition-all duration-300 pr-10"
+              className="pr-10 focus:outline-none focus:border-[#4CAF50] focus:shadow-sm focus:shadow-[#4CAF50]/30"
             />
             <div
-              onClick={togglePasswordVisibility}
-              className="absolute inset-y-10 right-3 flex items-center cursor-pointer text-gray-500 hover:text-[#4CAF50] transition"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute inset-y-10 right-3 flex items-center cursor-pointer text-gray-500 hover:text-[#4CAF50]"
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </div>
@@ -131,11 +135,11 @@ export default function ChangePassword() {
               value={confirmPassword}
               disabled={loading || submitted}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="focus:outline-none focus:border-[#4CAF50] focus:shadow-sm focus:shadow-[#4CAF50]/30 transition-all duration-300 pr-10"
+              className="pr-10 focus:outline-none focus:border-[#4CAF50] focus:shadow-sm focus:shadow-[#4CAF50]/30"
             />
             <div
-              onClick={toggleConfirmPasswordVisibility}
-              className="absolute inset-y-15 right-3 flex items-center cursor-pointer text-gray-500 hover:text-[#4CAF50] transition"
+              onClick={() => setShowConfirmPassword((prev) => !prev)}
+              className="absolute inset-y-15 right-3 flex items-center cursor-pointer text-gray-500 hover:text-[#4CAF50]"
             >
               {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </div>
@@ -155,12 +159,10 @@ export default function ChangePassword() {
             </Button>
           </div>
         </form>
+
         <div className="pt-5">
           <Link href="/admin/login">
-            <Button
-              variant="link"
-              className="cursor-pointer pt-3 text-[#3E2723]"
-            >
+            <Button variant="link" className="cursor-pointer pt-3 text-[#3E2723]">
               Go back to login
             </Button>
           </Link>

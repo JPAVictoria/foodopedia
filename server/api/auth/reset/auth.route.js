@@ -15,14 +15,10 @@ router.post("/reset", async (req, res) => {
   }
 
   try {
-    // Verify the token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const email = decoded.email;
-
-    // Hash the new password before saving it to the database
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    // Update the user's password in the database
     await prisma.admin.update({
       where: { email },
       data: { password: hashedPassword },

@@ -1,35 +1,23 @@
 import { create } from "zustand";
 
-type LoginStore = {
-  email: string;
+interface ChangeStore {
   password: string;
+  confirmPassword: string;
   loading: boolean;
   submitted: boolean;
-
-  setEmail: (email: string) => void;
   setPassword: (password: string) => void;
+  setConfirmPassword: (confirmPassword: string) => void;
   setLoading: (loading: boolean) => void;
   setSubmitted: (submitted: boolean) => void;
+}
 
-  resetLoginForm: () => void;
-};
-
-export const useLoginStore = create<LoginStore>((set) => ({
-  email: "",
+export const useChangeStore = create<ChangeStore>((set) => ({
   password: "",
+  confirmPassword: "",
   loading: false,
   submitted: false,
-
-  setEmail: (email) => set({ email }),
   setPassword: (password) => set({ password }),
+  setConfirmPassword: (confirmPassword) => set({ confirmPassword }),
   setLoading: (loading) => set({ loading }),
   setSubmitted: (submitted) => set({ submitted }),
-
-  resetLoginForm: () =>
-    set({
-      email: "",
-      password: "",
-      loading: false,
-      submitted: false,
-    }),
 }));

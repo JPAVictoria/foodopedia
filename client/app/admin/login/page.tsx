@@ -54,20 +54,17 @@ export default function Login() {
       const { token, admin } = response.data;
 
       if (token && admin) {
-        // Set the token in cookies
         Cookies.set("token", token, { expires: 1 });
 
-        // Store the admin data in localStorage
         localStorage.setItem("admin", JSON.stringify(admin));
 
         openSnackbar("Login successful!", "success");
 
         setSubmitted(true);
 
-        // Redirect after login
         setTimeout(() => {
           router.push("/admin");
-        }, 2000); // Delay to show success message
+        }, 2000); 
       }
     } catch (err) {
       setLoading(false);

@@ -1,4 +1,3 @@
-// /api/auth/forgot/forgot.route.js
 const { Router } = require("express");
 const { PrismaClient } = require("@prisma/client");
 const jwt = require("jsonwebtoken");
@@ -19,10 +18,10 @@ router.post("/forgot", async (req, res) => {
     const token = jwt.sign(
       { email: admin.email },
       process.env.JWT_SECRET,
-      { expiresIn: "15m" } // Short expiry
+      { expiresIn: "15m" } 
     );
 
-    const resetUrl = `http://localhost:3000/admin/change-password?token=${token}`; // 🔁 match your frontend
+    const resetUrl = `http://localhost:3000/admin/change-password?token=${token}`;
 
     // Send Email using nodemailer
     const transporter = nodemailer.createTransport({
