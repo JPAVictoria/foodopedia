@@ -34,7 +34,7 @@ router.post("/forgot", async (req, res) => {
     });
 
     await transporter.sendMail({
-      from: `"Cakery Support" <${process.env.EMAIL_USER}>`,
+      from: `"Foodopedia Bot" <${process.env.EMAIL_USER}>`,
       to: admin.email,
       subject: "Password Reset",
       html: `<p>You requested a password reset</p>

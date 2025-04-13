@@ -1,74 +1,52 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
 import { Button } from "@/app/components/ui/button";
 import Link from "next/link";
-import axios from "axios";
-import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useSnackbar } from "@/app/context/SnackbarContext";
-import { useAuthStore } from "@/app/stores/useAuthStore";
+import { useLoginStore } from "@/app/stores/useLoginStore";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false); // 🚨 stays true after success
-  const [showPassword, setShowPassword] = useState(false); // New state for password visibility toggle
   const router = useRouter();
   const { openSnackbar } = useSnackbar();
-  const setAdmin = useAuthStore((state) => state.setAdmin);
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  const {
+    email,
+    password,
+    loading,
+    submitted,
+    setEmail,
+    setPassword,
+    login,
+    setAdmin, 
+    resetLoginForm,
+  } = useLoginStore();
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      resetLoginForm(); 
+    };
+  }, [resetLoginForm]); 
+
+  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!email || !password) {
-      openSnackbar("Email and password are required.", "error");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const response = await axios.post("http://localhost:5000/admin/login/login", {
-        email,
-        password,
-      });
-
-      if (response.data.token && response.data.admin) {
-        Cookies.set("token", response.data.token, { expires: 1 });
-
-        setAdmin({
-          email: response.data.admin.email,
-          firstName: response.data.admin.firstName,
-          lastName: response.data.admin.lastName,
-        });
-
-        openSnackbar("Login successful!", "success");
-        setSubmitted(true); // ✅ disables all inputs after success
-
-        setTimeout(() => {
-          router.push("/admin");
-        }, 2000);
-      }
-    } catch (err) {
-      setLoading(false); // only reset loading on error
-      if (axios.isAxiosError(err)) {
-        openSnackbar(err.response?.data.message || "Invalid email or password.", "error");
-      } else {
-        openSnackbar("An unexpected error occurred. Please try again later.", "error");
-      }
-    }
+    login({
+      showSnackbar: openSnackbar,
+      onSuccess: (admin) => {
+        setAdmin(admin); 
+      },
+      onRedirect: () => router.push("/admin"),
+    });
   };
 
   const isDisabled = loading || submitted;
-
-  const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
-  };
 
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -76,6 +54,7 @@ export default function Login() {
         <h1 className="font-bold text-[32px] text-transparent bg-clip-text bg-gradient-to-r from-[#4caf50] via-[#76bf73] to-[#a0cf96]">
           Welcome back
         </h1>
+
         <form onSubmit={handleLogin} className="pt-5">
           <div>
             <Label htmlFor="email" className="pb-2 text-[#3E2723]">
@@ -106,11 +85,12 @@ export default function Login() {
               className="w-full focus:outline-none focus:border-[#4CAF50] focus:shadow-sm focus:shadow-[#4CAF50]/30 transition-all duration-300 pr-10"
             />
             <div
-              onClick={togglePasswordVisibility}
+              onClick={() => setShowPassword((prev) => !prev)}
               className="absolute inset-y-15 right-3 flex items-center cursor-pointer text-gray-500 hover:text-[#4CAF50] transition"
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </div>
+
             <div className="flex justify-end pt-1">
               <Link href="/admin/forgot-password">
                 <Button
@@ -123,6 +103,8 @@ export default function Login() {
               </Link>
             </div>
           </div>
+
+         
 
           <div className="pt-5">
             <Button
