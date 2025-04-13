@@ -1,24 +1,21 @@
-"use client";
-
 import { Home, FileText, Settings, LogOut, AlignRight, Menu } from "lucide-react";
 import NavbarTitle from "./navbarTitle";
 import Link from "next/link";
 import { useNavbar } from "@/app/context/NavbarContext";
 import Cookies from "js-cookie";
-import { useLoginStore } from "@/app/stores/useLoginStore"; 
 
 export default function Navbar() {
   const { isNavbarVisible, toggleNavbar } = useNavbar();
-  const clearAdmin = useLoginStore((state) => state.clearAdmin); 
 
   const handleLogout = () => {
     Cookies.remove("token");
     console.log("JWT token removed from cookies");
 
-    clearAdmin(); 
-    console.log("Admin data cleared from Zustand");
+    // Manually remove admin data from localStorage
+    localStorage.removeItem("admin");
+    console.log("Admin data cleared from localStorage");
 
-    window.location.href = "/admin/login"; 
+    window.location.href = "/admin/login"; // Redirect to login page
   };
 
   return (

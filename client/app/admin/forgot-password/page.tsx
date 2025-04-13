@@ -4,11 +4,11 @@ import { Label } from "@/app/components/ui/label";
 import { Button } from "@/app/components/ui/button";
 import Link from "next/link";
 import { useState } from "react";
-import { useSnackbar } from "@/app/context/SnackbarContext"; 
+import { useSnackbar } from "@/app/context/SnackbarContext"; // Assuming you are using your Snackbar context
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
-  const { openSnackbar } = useSnackbar(); 
+  const { openSnackbar } = useSnackbar(); // To show success/error messages
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {

@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
@@ -8,12 +7,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSnackbar } from "@/app/context/SnackbarContext";
 import { useLoginStore } from "@/app/stores/useLoginStore";
+import Cookies from "js-cookie";
+import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
   const router = useRouter();
   const { openSnackbar } = useSnackbar();
 
+  // Zustand store values (only login-related state)
   const {
     email,
     password,
@@ -21,8 +23,8 @@ export default function Login() {
     submitted,
     setEmail,
     setPassword,
-    login,
-    setAdmin, 
+    setLoading,
+    setSubmitted,
     resetLoginForm,
   } = useLoginStore();
 
@@ -30,20 +32,53 @@ export default function Login() {
 
   useEffect(() => {
     return () => {
-      resetLoginForm(); 
+      resetLoginForm();
     };
-  }, [resetLoginForm]); 
+  }, [resetLoginForm]);
 
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    login({
-      showSnackbar: openSnackbar,
-      onSuccess: (admin) => {
-        setAdmin(admin); 
-      },
-      onRedirect: () => router.push("/admin"),
-    });
+    if (!email || !password) {
+      openSnackbar("Email and password are required.", "error");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await axios.post("http://localhost:5000/admin/login/login", {
+        email,
+        password,
+      });
+
+      const { token, admin } = response.data;
+
+      if (token && admin) {
+        // Set the token in cookies
+        Cookies.set("token", token, { expires: 1 });
+
+        // Store the admin data in localStorage
+        localStorage.setItem("admin", JSON.stringify(admin));
+
+        openSnackbar("Login successful!", "success");
+
+        setSubmitted(true);
+
+        // Redirect after login
+        setTimeout(() => {
+          router.push("/admin");
+        }, 2000); // Delay to show success message
+      }
+    } catch (err) {
+      setLoading(false);
+
+      const msg = axios.isAxiosError(err)
+        ? err.response?.data?.message || "Invalid email or password."
+        : "An unexpected error occurred.";
+
+      openSnackbar(msg, "error");
+    }
   };
 
   const isDisabled = loading || submitted;
@@ -103,8 +138,6 @@ export default function Login() {
               </Link>
             </div>
           </div>
-
-         
 
           <div className="pt-5">
             <Button
