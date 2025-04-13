@@ -1,4 +1,4 @@
-import { FolderOpenDot, BookPlus, Trash2 } from "lucide-react";
+import { FolderOpenDot, BookPlus } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 
 export default function ContentHeader() {
@@ -18,7 +18,6 @@ export default function ContentHeader() {
         <div className="flex space-x-4">
           {[{ icon: <FolderOpenDot className="w-5 h-5 text-[#3E2723]" />, label: "Draft" },
             { icon: <BookPlus className="w-5 h-5 text-[#3E2723]" />, label: "Publish" },
-            { icon: <Trash2 className="w-5 h-5 text-[#3E2723]" />, label: "Delete" },
           ].map(({ icon, label }, index) => (
             <div key={index} className=" rounded-md transition cursor-pointer">
               <Button
