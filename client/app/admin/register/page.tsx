@@ -1,28 +1,32 @@
 "use client";
-
 import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
 import { Button } from "@/app/components/ui/button";
 import Link from "next/link";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useSnackbar } from "@/app/context/SnackbarContext";
 import { Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
+import { useRegisterStore } from "@/app/stores/useRegisterStore";
 
 export default function Signup() {
   const router = useRouter();
   const { openSnackbar } = useSnackbar();
-  const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
 
-  const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+  // Accessing store data and actions
+  const {
+    firstName,
+    lastName,
+    email,
+    password,
+    confirmPassword,
+    loading,
+    submitted,
+    setField,
+    setLoading,
+    setSubmitted,
+  } = useRegisterStore();
 
   const [showPassword, setShowPassword] = useState({
     password: false,
@@ -32,29 +36,30 @@ export default function Signup() {
   const isDisabled = loading || submitted;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.id]: e.target.value });
+    // No type guard here, but it will still work as long as the fields are valid
+    setField(e.target.id, e.target.value);
   };
 
   const toggleVisibility = (field: "password" | "confirmPassword") => {
-    setShowPassword((prev) => ({
+    setShowPassword((prev: { password: boolean; confirmPassword: boolean }) => ({
       ...prev,
       [field]: !prev[field],
     }));
   };
 
   const handleSubmit = async () => {
-    if (!form.firstName || !form.lastName || !form.email || !form.password || !form.confirmPassword) {
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
       openSnackbar("Please fill in all fields", "error");
       return;
     }
 
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!emailRegex.test(form.email)) {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA0-9]{2,}$/;
+    if (!emailRegex.test(email)) {
       openSnackbar("Please enter a valid email address", "error");
       return;
     }
 
-    if (form.password !== form.confirmPassword) {
+    if (password !== confirmPassword) {
       openSnackbar("Passwords do not match", "error");
       return;
     }
@@ -63,11 +68,11 @@ export default function Signup() {
 
     try {
       const res = await axios.post("http://localhost:5000/admin/register/signup", {
-        firstName: form.firstName,
-        lastName: form.lastName,
-        email: form.email,
-        password: form.password,
-        confirmPassword: form.confirmPassword,
+        firstName,
+        lastName,
+        email,
+        password,
+        confirmPassword,
       });
 
       if (res.status === 201) {
@@ -114,7 +119,7 @@ export default function Signup() {
                     ? "email@example.com"
                     : "example"
                 }
-                value={form[field as keyof typeof form]}
+                value={field === "firstName" ? firstName : field === "lastName" ? lastName : field === "email" ? email : field === "password" ? password : confirmPassword}
                 onChange={handleChange}
                 disabled={isDisabled}
                 className="focus:outline-none focus:border-[#4CAF50] focus:shadow-sm focus:shadow-[#4CAF50]/30 transition-all duration-300 pr-10"

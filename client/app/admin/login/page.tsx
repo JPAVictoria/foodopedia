@@ -15,7 +15,6 @@ export default function Login() {
   const router = useRouter();
   const { openSnackbar } = useSnackbar();
 
-  // Zustand store values (only login-related state)
   const {
     email,
     password,
