@@ -3,13 +3,13 @@ import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
 import { Button } from "@/app/components/ui/button";
 import Link from "next/link";
-import { useState } from "react";
-import { useSnackbar } from "@/app/context/SnackbarContext"; // Assuming you are using your Snackbar context
+import axios from "axios";
+import { useSnackbar } from "@/app/context/SnackbarContext";
+import { useForgotPasswordStore } from "@/app/stores/useForgotStore";
 
 export default function ForgotPassword() {
-  const [email, setEmail] = useState("");
-  const { openSnackbar } = useSnackbar(); // To show success/error messages
-  const [loading, setLoading] = useState(false);
+  const { openSnackbar } = useSnackbar();
+  const { email, loading, setEmail, setLoading } = useForgotPasswordStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,25 +22,28 @@ export default function ForgotPassword() {
     setLoading(true);
 
     try {
-      // Directly using the API URL
-      const response = await fetch("http://localhost:5000/admin/forgot/forgot", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      });
+      const res = await axios.post("http://localhost:5000/admin/forgot/forgot", { email });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        openSnackbar(data.message, "success"); // Show success message
+      if (res.status === 200 || res.status === 201) {
+        openSnackbar(res.data.message, "success");
       } else {
-        openSnackbar(data.message || "Something went wrong", "error");
+        openSnackbar(res.data.message || "Something went wrong", "error");
       }
     } catch (error) {
-      console.log(error);
-      openSnackbar("Network error. Please try again later.", "error");
+      console.error(error);
+
+      let message = "Something went wrong. Please try again.";
+
+      if (axios.isAxiosError(error)) {
+        message =
+          error.response?.data?.message ||
+          error.message ||
+          "Server responded with an unknown error.";
+      } else if (error instanceof Error) {
+        message = error.message;
+      }
+
+      openSnackbar(message, "error");
     } finally {
       setLoading(false);
     }

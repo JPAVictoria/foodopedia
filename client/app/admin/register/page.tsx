@@ -36,7 +36,6 @@ export default function Signup() {
   const isDisabled = loading || submitted;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // No type guard here, but it will still work as long as the fields are valid
     setField(e.target.id, e.target.value);
   };
 
