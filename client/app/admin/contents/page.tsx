@@ -4,11 +4,7 @@ import Navbar from "@/app/components/ui/navbar/navbar";
 import { SquarePlus, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useNavbar } from "@/app/context/NavbarContext";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
-import { useSnackbar } from "@/app/context/SnackbarContext";
-import axios from "axios";
+import { useState } from "react";
 import {
   DataGrid,
   GridColDef,
@@ -25,45 +21,28 @@ interface ContentItem {
 }
 
 export default function Contents() {
-  const router = useRouter();
-  const { openSnackbar } = useSnackbar();
   const { isNavbarVisible } = useNavbar();
 
-  const [rows, setRows] = useState<ContentItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  // 🔧 Mock data (replace with real later)
+  const mockRows: ContentItem[] = [
+    {
+      uuid: "abc123",
+      title: "Chocolate Cake",
+      category: "DESSERT",
+      status: "PUBLISHED",
+      createdAt: "2025-04-14T12:34:56Z",
+    },
+    {
+      uuid: "def456",
+      title: "Grilled Salmon",
+      category: "MAIN",
+      status: "DRAFT",
+      createdAt: "2025-04-13T10:21:00Z",
+    },
+  ];
 
-  useEffect(() => {
-    const token = Cookies.get("token");
-
-    if (!token) {
-      openSnackbar("Token is missing", "error");
-
-      const timer = setTimeout(() => {
-        router.push("/admin/login");
-      }, 2000);
-
-      return () => clearTimeout(timer);
-    }
-
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:5000/admin/content",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        setRows(response.data); // Assuming data is an array of ContentItem
-      } catch (error: unknown) {
-        console.error("Error fetching content:", error);
-        openSnackbar("Failed to load content.", "error");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [router, openSnackbar]);
+  const [rows] = useState<ContentItem[]>(mockRows);
+  const [loading] = useState<boolean>(false);
 
   const columns: GridColDef[] = [
     {

@@ -25,7 +25,7 @@ export default function CreateContent() {
   const [mediaFiles, setMediaFiles] = useState<(File | null)[]>([null, null, null]);
   const fileInputRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)];
 
-  const classifications = ["Dessert", "Appetizer", "Entrée", "Beverages"];
+  const classifications = ["DESSERT", "APPETIZER", "ENTREE", "BEVERAGES"];  // Uppercase enum values
 
   const handleAddField = () => setRecipes([...recipes, ""]);
   const handleInputChange = (index: number, value: string) => setRecipes(prev => prev.map((item, i) => i === index ? value : item));
@@ -56,19 +56,23 @@ export default function CreateContent() {
   const handleSubmit = async (selectedStatus: string) => {
     try {
       const formData = new FormData();
-      formData.append("foodName", foodName);
-      formData.append("shortDescription", shortDescription);
-      formData.append("classification", selectedClassification);
+      formData.append("title", foodName);
+      formData.append("shortDesc", shortDescription);
+      formData.append("category", selectedClassification);
       formData.append("status", selectedStatus);
 
+      // Include recipes and instructions in the form data
       recipes.forEach((recipe, i) => formData.append(`recipes[${i}]`, recipe));
       instructions.forEach((inst, i) => formData.append(`instructions[${i}]`, inst));
 
-      // Fix: Removed the unused index 'i' for mediaFiles
+      // Append media files to form data
       mediaFiles.forEach((file) => {
-        if (file) formData.append("media", file);
+        if (file) {
+          formData.append("media", file);
+        }
       });
 
+      // Post the form data using Axios
       await axios.post("http://localhost:5000/admin/content/create", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
@@ -234,41 +238,35 @@ export default function CreateContent() {
             </div>
 
             <div className="bg-[#fffaec] p-8 rounded-sm border border-[#2d2d2d4e]">
-              <Label className="mb-3 block">Images & Videos:</Label>
-              <div className="grid grid-cols-3 gap-4 mt-2">
-                {mediaFiles.map((file, i) => (
-                  <div
-                    key={i}
-                    className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-sm p-2 transition cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleUploadClick(i)}
-                  >
-                    <FolderOpenDot className="w-6 h-6 text-gray-500" />
-                    {file ? (
-                      <span className="text-xs text-gray-700 bg-white mt-2 px-1 rounded-sm text-center">{file.name}</span>
-                    ) : (
-                      <span className="text-xs text-gray-500 mt-2">Upload</span>
+              <Label className="mb-3 block">Media:</Label>
+              <div className="grid grid-cols-3 gap-4">
+                {mediaFiles.map((file, index) => (
+                  <div key={index} className="text-center">
+                    <div
+                      className="cursor-pointer bg-[#efefef] border p-8 border-[#2d2d2d4e] rounded-sm"
+                      onClick={() => handleUploadClick(index)}
+                    >
+                      <FolderOpenDot size={24} />
+                    </div>
+                    {file && (
+                      <div className="mt-2">
+                        <span className="text-sm">{file.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteFile(index)}
+                          className="text-[#3E2723] ml-2"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     )}
                     <input
-                      ref={fileInputRefs[i]}
+                      ref={fileInputRefs[index]}
                       type="file"
-                      className="hidden"
-                      onChange={(e) => {
-                        if (e.target.files && e.target.files[0]) {
-                          handleFileChange(i, e.target.files[0]);
-                        }
-                      }}
+                      accept="image/*,video/*"
+                      onChange={(e) => e.target.files && handleFileChange(index, e.target.files[0])}
+                      hidden
                     />
-                    {file && (
-                      <button
-                        className="text-xs text-red-500 mt-2"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteFile(i);
-                        }}
-                      >
-                        Delete
-                      </button>
-                    )}
                   </div>
                 ))}
               </div>

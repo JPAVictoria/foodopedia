@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "./node_modules/.prisma/client"
+  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -37,7 +37,6 @@ model Content {
   title       String
   slug        String         @unique
   shortDesc   String         // Short description
-  body        String         // Full content (instructions)
   category    Category
   status      ContentStatus  @default(DRAFT) // Enum for content status (draft, published, deleted)
   createdAt   DateTime       @default(now())
