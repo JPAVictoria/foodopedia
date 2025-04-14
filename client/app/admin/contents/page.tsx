@@ -4,7 +4,8 @@ import Navbar from "@/app/components/ui/navbar/navbar";
 import { SquarePlus, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useNavbar } from "@/app/context/NavbarContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios"; // Import axios
 import {
   DataGrid,
   GridColDef,
@@ -23,30 +24,29 @@ interface ContentItem {
 export default function Contents() {
   const { isNavbarVisible } = useNavbar();
 
-  // 🔧 Mock data (replace with real later)
-  const mockRows: ContentItem[] = [
-    {
-      uuid: "abc123",
-      title: "Chocolate Cake",
-      category: "DESSERT",
-      status: "PUBLISHED",
-      createdAt: "2025-04-14T12:34:56Z",
-    },
-    {
-      uuid: "def456",
-      title: "Grilled Salmon",
-      category: "MAIN",
-      status: "DRAFT",
-      createdAt: "2025-04-13T10:21:00Z",
-    },
-  ];
+  // State to hold real content data
+  const [rows, setRows] = useState<ContentItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true); // Loading state
 
-  const [rows] = useState<ContentItem[]>(mockRows);
-  const [loading] = useState<boolean>(false);
+  // Fetch data from the API when the component mounts
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/admin/content"); // Correct API endpoint
+        setRows(response.data); // Set the real data into the state
+      } catch (error) {
+        console.error("Error fetching content data", error);
+      } finally {
+        setLoading(false); // Stop loading once the data is fetched
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const columns: GridColDef[] = [
     {
-      field: "uuid",
+      field: "id",
       headerName: "Product Code",
       width: 220,
       renderCell: (params: GridRenderCellParams) => (
@@ -165,7 +165,7 @@ export default function Contents() {
 
         <Box sx={{ height: 500, width: "100%", marginTop: 5 }}>
           <DataGrid
-            getRowId={(row) => row.uuid}
+            getRowId={(row) => row.id}  
             rows={rows}
             columns={columns}
             loading={loading}
