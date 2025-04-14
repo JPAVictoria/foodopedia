@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "./node_modules/.prisma/client"
 }
 
 datasource db {
@@ -41,6 +42,7 @@ model Content {
   status      ContentStatus  @default(DRAFT) // Enum for content status (draft, published, deleted)
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
+  deleted     Boolean        @default(false)
 
   adminId     String
   admin       Admin          @relation(fields: [adminId], references: [id])
@@ -57,9 +59,9 @@ model Content {
 
 model Media {
   id          String   @id @default(uuid())
-  image1Url   String
-  image2Url   String
-  videoUrl    String
+  image1Url   String?
+  image2Url   String?
+  videoUrl    String?
   uploadedAt  DateTime @default(now())
 
   content     Content? @relation(fields: [contentId], references: [id])
