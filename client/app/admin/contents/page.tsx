@@ -9,7 +9,6 @@ import axios from "axios"; // Import axios
 import {
   DataGrid,
   GridColDef,
-  GridRenderCellParams,
 } from "@mui/x-data-grid";
 import { Box, Button, Stack, Typography } from "@mui/material";
 
@@ -45,17 +44,6 @@ export default function Contents() {
   }, []);
 
   const columns: GridColDef[] = [
-    {
-      field: "id",
-      headerName: "Product Code",
-      width: 220,
-      renderCell: (params: GridRenderCellParams) => (
-        <span style={{ color: "#3E2723" }}>{params.value}</span>
-      ),
-      headerAlign: "center",
-      align: "center",
-      headerClassName: "bold-header",
-    },
     {
       field: "title",
       headerName: "Food Name",
