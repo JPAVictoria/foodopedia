@@ -8,15 +8,13 @@ const fs = require('fs');
 const prisma = new PrismaClient();
 const router = express.Router();
 
-const SECRET = process.env.JWT_SECRET || "foodopedia"; // Use your actual secret in prod
+const SECRET = process.env.JWT_SECRET || "foodopedia"; // Use your actual secret in production
 
-// Ensure uploads folder exists
 const uploadDir = path.join(__dirname, '..', 'uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Multer setup for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
@@ -25,14 +23,11 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + path.extname(file.originalname));  // Generate a unique filename
   },
 });
+
 const upload = multer({ storage });
 
-/**
- * POST /admin/content/create
- * Create new content (with optional image/video upload)
- */
+
 router.post("/create", upload.array('media', 3), async (req, res) => {
-  // ✅ Inline JWT token verification
   const token = req.cookies?.token;
   if (!token) return res.status(401).json({ message: "No token provided" });
 
@@ -44,10 +39,8 @@ router.post("/create", upload.array('media', 3), async (req, res) => {
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 
-  // Extract body content (including ingredients and instructions)
   const { title, shortDesc, category, ingredients, instructions } = req.body;
 
-  // Validate title
   if (!title || typeof title !== 'string') {
     return res.status(400).json({ message: "Title is required and must be a string." });
   }
@@ -58,10 +51,8 @@ router.post("/create", upload.array('media', 3), async (req, res) => {
   if (!adminId) return res.status(401).json({ message: "Unauthorized" });
 
   try {
-    // Handle file URLs (media file names)
     const mediaUrls = req.files?.map(file => `/uploads/${file.filename}`) || [];
 
-    // Save media URLs in the DB
     const media = await prisma.media.create({
       data: {
         image1Url: mediaUrls[0] || null,
@@ -70,7 +61,6 @@ router.post("/create", upload.array('media', 3), async (req, res) => {
       },
     });
 
-    // Create content
     const newContent = await prisma.content.create({
       data: {
         title,
@@ -82,7 +72,6 @@ router.post("/create", upload.array('media', 3), async (req, res) => {
       },
     });
 
-    // Save recipe ingredients
     const savedIngredients = ingredients?.map(ingredient => ({
       ingredient,
       contentId: newContent.id,
@@ -90,11 +79,10 @@ router.post("/create", upload.array('media', 3), async (req, res) => {
 
     const savedInstructions = instructions?.map((instruction, index) => ({
       instruction,
-      stepNumber: index + 1, // Ensure steps are ordered
+      stepNumber: index + 1, 
       contentId: newContent.id,
     })) || [];
 
-    // Create recipes and instructions in the DB
     await prisma.recipe.createMany({
       data: savedIngredients,
     });
@@ -110,10 +98,6 @@ router.post("/create", upload.array('media', 3), async (req, res) => {
   }
 });
 
-/**
- * GET /admin/content
- * Get all content (excluding soft-deleted)
- */
 router.get("/", async (req, res) => {
   try {
     const contents = await prisma.content.findMany({

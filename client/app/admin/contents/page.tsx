@@ -5,7 +5,7 @@ import { SquarePlus, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useNavbar } from "@/app/context/NavbarContext";
 import { useState, useEffect } from "react";
-import axios from "axios"; // Import axios
+import axios from "axios"; 
 import {
   DataGrid,
   GridColDef,
@@ -23,20 +23,18 @@ interface ContentItem {
 export default function Contents() {
   const { isNavbarVisible } = useNavbar();
 
-  // State to hold real content data
   const [rows, setRows] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true); // Loading state
 
-  // Fetch data from the API when the component mounts
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/admin/content"); // Correct API endpoint
-        setRows(response.data); // Set the real data into the state
+        const response = await axios.get("http://localhost:5000/admin/content"); 
+        setRows(response.data); 
       } catch (error) {
         console.error("Error fetching content data", error);
       } finally {
-        setLoading(false); // Stop loading once the data is fetched
+        setLoading(false); 
       }
     };
 
@@ -47,7 +45,7 @@ export default function Contents() {
     {
       field: "title",
       headerName: "Food Name",
-      width: 200,
+      width: 250,
       headerAlign: "center",
       align: "center",
       headerClassName: "bold-header",
@@ -55,7 +53,7 @@ export default function Contents() {
     {
       field: "category",
       headerName: "Category",
-      width: 150,
+      width: 200,
       headerAlign: "center",
       align: "center",
       headerClassName: "bold-header",
@@ -63,7 +61,7 @@ export default function Contents() {
     {
       field: "status",
       headerName: "Status",
-      width: 120,
+      width: 200,
       headerAlign: "center",
       align: "center",
       headerClassName: "bold-header",
@@ -71,7 +69,7 @@ export default function Contents() {
     {
       field: "createdAt",
       headerName: "Created At",
-      width: 180,
+      width: 250,
       headerAlign: "center",
       align: "center",
       headerClassName: "bold-header",
@@ -79,7 +77,7 @@ export default function Contents() {
     {
       field: "actions",
       headerName: "Action",
-      width: 300,
+      width: 350,
       sortable: false,
       filterable: false,
       headerAlign: "center",

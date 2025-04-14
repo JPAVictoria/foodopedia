@@ -25,17 +25,22 @@ export default function CreateContent() {
   const [mediaFiles, setMediaFiles] = useState<(File | null)[]>([null, null, null]);
   const fileInputRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)];
 
-  const classifications = ["DESSERT", "APPETIZER", "ENTREE", "BEVERAGES"];  // Uppercase enum values
+  const classifications = ["DESSERT", "APPETIZER", "ENTREE", "BEVERAGES"];
 
   const handleAddField = () => setRecipes([...recipes, ""]);
-  const handleInputChange = (index: number, value: string) => setRecipes(prev => prev.map((item, i) => i === index ? value : item));
-  const handleDeleteField = (index: number) => setRecipes(recipes.filter((_, i) => i !== index));
+  const handleInputChange = (index: number, value: string) =>
+    setRecipes((prev) => prev.map((item, i) => (i === index ? value : item)));
+  const handleDeleteField = (index: number) =>
+    setRecipes((prev) => prev.filter((_, i) => i !== index));
 
   const handleAddInstructionField = () => setInstructions([...instructions, ""]);
-  const handleInputInstructionChange = (index: number, value: string) => setInstructions(prev => prev.map((item, i) => i === index ? value : item));
-  const handleDeleteInstructionField = (index: number) => setInstructions(instructions.filter((_, i) => i !== index));
+  const handleInputInstructionChange = (index: number, value: string) =>
+    setInstructions((prev) => prev.map((item, i) => (i === index ? value : item)));
+  const handleDeleteInstructionField = (index: number) =>
+    setInstructions((prev) => prev.filter((_, i) => i !== index));
 
-  const handleClassificationChange = (event: React.ChangeEvent<HTMLInputElement>) => setSelectedClassification(event.target.value);
+  const handleClassificationChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setSelectedClassification(e.target.value);
 
   const handleFileChange = (index: number, file: File) => {
     const updated = [...mediaFiles];
@@ -53,7 +58,27 @@ export default function CreateContent() {
     fileInputRefs[index].current?.click();
   };
 
+  const validateForm = () => {
+    const errorList: string[] = [];
+
+    if (!foodName.trim()) errorList.push("Food name is required.");
+    if (!selectedClassification) errorList.push("Classification is required.");
+    if (!shortDescription.trim()) errorList.push("Short description is required.");
+
+    if (recipes.some((r) => !r.trim())) errorList.push("All recipe fields must be filled.");
+    if (instructions.some((i) => !i.trim())) errorList.push("All instruction fields must be filled.");
+
+    if (errorList.length > 0) {
+      openSnackbar(errorList.join(" "), "error");
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (selectedStatus: string) => {
+    if (!validateForm()) return;
+
     try {
       const formData = new FormData();
       formData.append("title", foodName);
@@ -61,18 +86,10 @@ export default function CreateContent() {
       formData.append("category", selectedClassification);
       formData.append("status", selectedStatus);
 
-      // Include recipes and instructions in the form data
-      recipes.forEach((recipe, i) => formData.append(`recipes[${i}]`, recipe));
-      instructions.forEach((inst, i) => formData.append(`instructions[${i}]`, inst));
+      recipes.forEach((r, i) => formData.append(`recipes[${i}]`, r));
+      instructions.forEach((ins, i) => formData.append(`instructions[${i}]`, ins));
+      mediaFiles.forEach((file) => file && formData.append("media", file));
 
-      // Append media files to form data
-      mediaFiles.forEach((file) => {
-        if (file) {
-          formData.append("media", file);
-        }
-      });
-
-      // Post the form data using Axios
       await axios.post("http://localhost:5000/admin/content/create", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
@@ -110,14 +127,16 @@ export default function CreateContent() {
                 <p className="text-sm text-muted-foreground">Likes Count:</p>
               </div>
             </div>
-
             <div className="flex space-x-4">
               {["Draft", "Publish"].map((type, index) => (
                 <div key={index} className="rounded-md transition cursor-pointer">
                   <Button
                     variant="ghost"
                     className="flex flex-col items-center p-4 min-h-[3rem] hover:bg-[#c5cadc17] cursor-pointer"
-                    onClick={() => { setStatus(type); handleSubmit(type); }}
+                    onClick={() => {
+                      setStatus(type);
+                      handleSubmit(type);
+                    }}
                   >
                     {type === "Draft" ? (
                       <FolderOpenDot className="w-5 h-5 text-[#3E2723]" />
