@@ -68,7 +68,7 @@ export default function Contents() {
     {
       field: "category",
       headerName: "Category",
-      width: 200,
+      width: 150,
       headerAlign: "center",
       align: "center",
       headerClassName: "bold-header",
@@ -76,7 +76,7 @@ export default function Contents() {
     {
       field: "status",
       headerName: "Status",
-      width: 200,
+      width: 150,
       headerAlign: "center",
       align: "center",
       headerClassName: "bold-header",
@@ -198,7 +198,17 @@ export default function Contents() {
   return (
     <div className="flex min-h-screen">
       <Navbar />
-      <div className={`transition-all duration-300 p-4 sm:p-6 lg:p-8 flex-1 ${isNavbarVisible ? "ml-0" : "-ml-60"}`}>
+      <div
+        className={`transition-all duration-300 p-4 sm:p-6 lg:p-8 flex-1 ${
+          isNavbarVisible ? "ml-0" : "-ml-60"
+        }`}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          minWidth: 0,  
+          flex: 1,
+        }}
+      >
         <div className="flex justify-end">
           <Link href="/admin/createContent" target="_blank" rel="noopener noreferrer">
             <div className="flex flex-col items-center rounded-md p-2 cursor-pointer transition">
@@ -207,12 +217,12 @@ export default function Contents() {
             </div>
           </Link>
         </div>
-
+  
         <h1 className="text-[24px] font-bold text-[#4CAF50] mt-4 text-center sm:text-[18px] md:text-[22px] lg:text-[24px]">
           Content Overview
         </h1>
-
-        <Box sx={{ height: 500, width: "auto", marginTop: 5 }}>
+  
+        <Box sx={{ height: 500, width: "100%", marginTop: 5 , overflowX: "hidden" }}>
           <DataGrid
             getRowId={(row) => row.id}
             rows={rows}
@@ -250,4 +260,5 @@ export default function Contents() {
       </div>
     </div>
   );
+  
 }
