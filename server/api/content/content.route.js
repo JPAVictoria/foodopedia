@@ -33,14 +33,30 @@ router.post("/create", upload.array('media', 3), async (req, res) => {
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 
-  const { title, shortDesc, category, ingredients, instructions } = req.body;
+  const { title, shortDesc, category } = req.body;
+  
+  let ingredients = [];
+  let instructions = [];
+  
+  try {
+    ingredients = JSON.parse(req.body.ingredients || "[]");
+  } catch (err) {
+    return res.status(400).json({ message: "Invalid JSON for ingredients." });
+  }
+
+  try {
+    instructions = JSON.parse(req.body.instructions || "[]");
+  } catch (err) {
+    return res.status(400).json({ message: "Invalid JSON for instructions." });
+  }
+
+  const rawStatus = req.body.status;
+
   if (!title || typeof title !== 'string') {
     return res.status(400).json({ message: "Title is required and must be a string." });
   }
 
   let slug = title.toLowerCase().replace(/\s+/g, "-");
-
-  // Check if slug exists and make it unique
   let slugExists = await prisma.content.findFirst({ where: { slug } });
   if (slugExists) {
     slug = `${slug}-${Date.now()}`;
@@ -60,6 +76,15 @@ router.post("/create", upload.array('media', 3), async (req, res) => {
       },
     });
 
+    const allowedStatuses = ['DRAFT', 'PUBLISHED'];
+    let validatedStatus = 'DRAFT';
+    if (rawStatus && typeof rawStatus === 'string') {
+      const s = rawStatus.toString().trim().toUpperCase();
+      if (allowedStatuses.includes(s)) {
+        validatedStatus = s;
+      }
+    }
+
     const newContent = await prisma.content.create({
       data: {
         title,
@@ -68,33 +93,43 @@ router.post("/create", upload.array('media', 3), async (req, res) => {
         category,
         mediaId: media.id,
         adminId,
+        status: validatedStatus,
         deleted: false,
       },
     });
 
+    // FIXED: Proper ingredient format
     const savedIngredients = ingredients?.map(ingredient => ({
-      ingredient,
+      ingredient: typeof ingredient === 'object' ? ingredient.ingredient : ingredient,
       contentId: newContent.id,
-    })) || [];
+    })).filter(i => i.ingredient) || []; // Filter out empty ingredients
 
+    // FIXED: Proper instructions format
     const savedInstructions = instructions?.map((instruction, index) => ({
-      instruction,
+      instruction: typeof instruction === 'object' ? instruction.instruction : instruction,
       stepNumber: index + 1,
       contentId: newContent.id,
-    })) || [];
+    })).filter(i => i.instruction) || []; // Filter out empty instructions
 
     if (savedIngredients.length) {
-      await prisma.recipe.createMany({ data: savedIngredients });
+      await prisma.recipe.createMany({ 
+        data: savedIngredients 
+      });
     }
 
     if (savedInstructions.length) {
-      await prisma.recipeInstruction.createMany({ data: savedInstructions });
+      await prisma.recipeInstruction.createMany({ 
+        data: savedInstructions 
+      });
     }
 
     res.status(201).json(newContent);
   } catch (err) {
     console.error("Create error:", err);
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ 
+      message: "Internal Server Error",
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
   }
 });
 
@@ -109,7 +144,7 @@ router.get("/:id", async (req, res) => {
         media: true,
         admin: { select: { firstName: true, lastName: true, email: true } },
         recipes: true,
-        instructions: true,
+        instructions: { orderBy: { stepNumber: 'asc' } },
       },
     });
 
@@ -119,11 +154,13 @@ router.get("/:id", async (req, res) => {
 
     res.json(content);
   } catch (err) {
-    console.error("Error retrieving content:", err); // Log the entire error
-    res.status(500).json({ message: "Failed to retrieve content", error: err.message });
+    console.error("Error retrieving content:", err);
+    res.status(500).json({ 
+      message: "Failed to retrieve content",
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
   }
 });
-
 
 // UPDATE
 router.put("/:id", upload.array('media', 3), async (req, res) => {
@@ -138,15 +175,31 @@ router.put("/:id", upload.array('media', 3), async (req, res) => {
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 
-  const { title, shortDesc, category, ingredients, instructions, status } = req.body;
+  const { title, shortDesc, category } = req.body;
+  
+  let ingredients = [];
+  let instructions = [];
+  
+  try {
+    ingredients = JSON.parse(req.body.ingredients || "[]");
+  } catch (err) {
+    return res.status(400).json({ message: "Invalid JSON for ingredients." });
+  }
+
+  try {
+    instructions = JSON.parse(req.body.instructions || "[]");
+  } catch (err) {
+    return res.status(400).json({ message: "Invalid JSON for instructions." });
+  }
+
+  const rawStatus = req.body.status;
+
   if (!title || typeof title !== 'string') {
     return res.status(400).json({ message: "Title is required and must be a string." });
   }
 
   let slug = title.toLowerCase().replace(/\s+/g, "-");
-
-  // Check if slug exists and make it unique
-  let slugExists = await prisma.content.findFirst({ where: { slug } });
+  let slugExists = await prisma.content.findFirst({ where: { slug, id: { not: id } } });
   if (slugExists) {
     slug = `${slug}-${Date.now()}`;
   }
@@ -157,7 +210,6 @@ router.put("/:id", upload.array('media', 3), async (req, res) => {
       return res.status(404).json({ message: "Content not found or has been deleted" });
     }
 
-    // Check for duplicate title/slug in *other* records
     const duplicate = await prisma.content.findFirst({
       where: {
         id: { not: id },
@@ -169,14 +221,25 @@ router.put("/:id", upload.array('media', 3), async (req, res) => {
     }
 
     const mediaUrls = req.files?.map(file => `/uploads/${file.filename}`) || [];
-    await prisma.media.update({
-      where: { id: content.mediaId },
-      data: {
-        image1Url: mediaUrls[0] || undefined,
-        image2Url: mediaUrls[1] || undefined,
-        videoUrl: mediaUrls[2] || undefined,
-      },
-    });
+    if (content.mediaId) {
+      await prisma.media.update({
+        where: { id: content.mediaId },
+        data: {
+          image1Url: mediaUrls[0] || undefined,
+          image2Url: mediaUrls[1] || undefined,
+          videoUrl: mediaUrls[2] || undefined,
+        },
+      });
+    }
+
+    const allowedStatuses = ['DRAFT', 'PUBLISHED'];
+    let validatedStatus = content.status;
+    if (rawStatus && typeof rawStatus === 'string') {
+      const s = rawStatus.toString().trim().toUpperCase();
+      if (allowedStatuses.includes(s)) {
+        validatedStatus = s;
+      }
+    }
 
     const updatedContent = await prisma.content.update({
       where: { id },
@@ -185,38 +248,45 @@ router.put("/:id", upload.array('media', 3), async (req, res) => {
         slug,
         shortDesc,
         category,
-        status: status ? status.toUpperCase() : content.status,
+        status: validatedStatus,
       },
     });
 
-    // Cleanup old ingredients & instructions
     await prisma.recipe.deleteMany({ where: { contentId: id } });
     await prisma.recipeInstruction.deleteMany({ where: { contentId: id } });
 
-    // Reinsert updated ones
+    // FIXED: Proper ingredient format
     const newIngredients = ingredients?.map(ingredient => ({
-      ingredient,
+      ingredient: typeof ingredient === 'object' ? ingredient.ingredient : ingredient,
       contentId: id,
-    })) || [];
+    })).filter(i => i.ingredient) || [];
 
+    // FIXED: Proper instructions format
     const newInstructions = instructions?.map((instruction, index) => ({
-      instruction,
+      instruction: typeof instruction === 'object' ? instruction.instruction : instruction,
       stepNumber: index + 1,
       contentId: id,
-    })) || [];
+    })).filter(i => i.instruction) || [];
 
     if (newIngredients.length) {
-      await prisma.recipe.createMany({ data: newIngredients });
+      await prisma.recipe.createMany({ 
+        data: newIngredients 
+      });
     }
 
     if (newInstructions.length) {
-      await prisma.recipeInstruction.createMany({ data: newInstructions });
+      await prisma.recipeInstruction.createMany({ 
+        data: newInstructions 
+      });
     }
 
     res.status(200).json(updatedContent);
   } catch (err) {
     console.error("Update error:", err);
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ 
+      message: "Internal Server Error",
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
   }
 });
 
@@ -232,7 +302,10 @@ router.put("/softDelete/:id", async (req, res) => {
 
     res.status(200).json({ message: "Content soft deleted successfully", content });
   } catch (err) {
-    res.status(500).json({ message: "Failed to soft delete content" });
+    res.status(500).json({ 
+      message: "Failed to soft delete content",
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
   }
 });
 
@@ -250,7 +323,10 @@ router.get("/", async (req, res) => {
 
     res.json(contents);
   } catch (err) {
-    res.status(500).json({ message: "Failed to retrieve content" });
+    res.status(500).json({ 
+      message: "Failed to retrieve content",
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
   }
 });
 

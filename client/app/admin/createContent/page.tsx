@@ -78,28 +78,35 @@ export default function CreateContent() {
 
   const handleSubmit = async (selectedStatus: string) => {
     if (!validateForm()) return;
-
+  
     try {
       const formData = new FormData();
       formData.append("title", foodName);
       formData.append("shortDesc", shortDescription);
       formData.append("category", selectedClassification);
-      formData.append("status", selectedStatus);
-
-      recipes.forEach((r, i) => formData.append(`recipes[${i}]`, r));
-      instructions.forEach((ins, i) => formData.append(`instructions[${i}]`, ins));
-      mediaFiles.forEach((file) => file && formData.append("media", file));
-
+      formData.append("status", selectedStatus.toUpperCase());
+      formData.append("ingredients", JSON.stringify(recipes));
+      formData.append("instructions", JSON.stringify(instructions));
+      
+      mediaFiles.forEach((file) => {
+        if (file) formData.append('media', file);
+      });
+  
       await axios.post("http://localhost:5000/admin/content/create", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
-
+  
       openSnackbar(`Content ${selectedStatus.toLowerCase()}ed successfully`, "success");
       setTimeout(() => router.push("/admin/contents"), 2000);
-    } catch (err) {
-      console.log(err);
-      openSnackbar("An error occurred while creating content", "error");
+    } catch (error) {
+      console.error("Submission error:", error);
+      openSnackbar(
+        axios.isAxiosError(error) 
+          ? error.response?.data?.message || "Failed to create content"
+          : "An unexpected error occurred",
+        "error"
+      );
     }
   };
 

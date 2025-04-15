@@ -39,6 +39,16 @@ export default function UpdateContent() {
 
   const handleClassificationChange = (e: React.ChangeEvent<HTMLInputElement>) => setSelectedClassification(e.target.value);
 
+
+  interface Recipe {
+    ingredient: string;
+  }
+  
+  interface Instruction {
+    instruction: string;
+    stepNumber: number;
+  }
+
   const handleFileChange = (index: number, file: File) => {
     const updated = [...mediaFiles];
     updated[index] = file;
@@ -82,30 +92,38 @@ export default function UpdateContent() {
 
   const handleSubmit = async (selectedStatus: string) => {
     if (!validateForm()) return;
-
+  
     try {
       const formData = new FormData();
       formData.append("title", foodName);
       formData.append("shortDesc", shortDescription);
       formData.append("category", selectedClassification);
-      formData.append("status", selectedStatus);
-
-      recipes.forEach((r, i) => formData.append(`recipes[${i}]`, r));
-      instructions.forEach((ins, i) => formData.append(`instructions[${i}]`, ins));
+      formData.append("status", selectedStatus.toUpperCase());
+  
+      // Convert to backend-expected format
+      formData.append("ingredients", JSON.stringify(
+        recipes.map(ingredient => ({ ingredient }))
+      ));
+      
+      formData.append("instructions", JSON.stringify(
+        instructions.map((instruction, index) => ({
+          instruction,
+          stepNumber: index + 1
+        }))
+      ));
+  
       mediaFiles.forEach((file) => file && formData.append("media", file));
-
+  
       await axios.put(`http://localhost:5000/admin/content/${contentId}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
-
-      openSnackbar(`Content ${selectedStatus.toLowerCase()}ed successfully`, "success");
-      setTimeout(() => {
-        router.push("/admin/contents");
-      }, 2000);
+  
+      openSnackbar(`Content updated successfully`, "success");
+      setTimeout(() => router.push("/admin/contents"), 2000);
     } catch (err) {
       console.error(err);
-      openSnackbar("An error occurred", "error");
+      openSnackbar("Failed to update content", "error");
     }
   };
 
@@ -119,28 +137,33 @@ export default function UpdateContent() {
   }, [router, openSnackbar]);
 
   useEffect(() => {
-    const fetchContent = async () => {
-      try {
-        const res = await axios.get(`http://localhost:5000/admin/content/${contentId}`, {
-          withCredentials: true,
-        });
-        const data = res.data;
+const fetchContent = async () => {
+  try {
+    const res = await axios.get(`http://localhost:5000/admin/content/${contentId}`, {
+      withCredentials: true,
+    });
+    const data = res.data;
 
-        setFoodName(data.title || "");
-        setShortDescription(data.shortDesc || "");
-        setSelectedClassification(data.category || "");
-        setStatus(data.status || "Draft");
+    setFoodName(data.title || "");
+    setShortDescription(data.shortDesc || "");
+    setSelectedClassification(data.category || "");
+    setStatus(data.status || "Draft");
 
-        // fallback to at least one empty field if array is empty
-        setRecipes(data.recipes?.length ? data.recipes : [""]);
-        setInstructions(data.instructions?.length ? data.instructions : [""]);
+    // Properly typed recipe transformation
+    const recipeStrings = data.recipes?.map((r: Recipe) => r.ingredient) || [""];
+    setRecipes(recipeStrings.length ? recipeStrings : [""]);
 
-        // we don’t preload media files here (they’re file objects), user has to reupload if needed
-      } catch (err) {
-        console.error(err);
-        openSnackbar("Failed to fetch content", "error");
-      }
-    };
+    // Properly typed instruction transformation
+    const instructionStrings = data.instructions
+      ?.sort((a: Instruction, b: Instruction) => a.stepNumber - b.stepNumber)
+      ?.map((i: Instruction) => i.instruction) || [""];
+    setInstructions(instructionStrings.length ? instructionStrings : [""]);
+
+  } catch (err) {
+    console.error(err);
+    openSnackbar("Failed to fetch content", "error");
+  }
+};
 
     if (contentId) {
       fetchContent();
