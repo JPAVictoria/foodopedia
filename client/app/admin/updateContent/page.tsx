@@ -4,7 +4,7 @@ import Navbar from "@/app/components/ui/navbar/navbar";
 import { FolderOpenDot, BookPlus, Trash2, Plus } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Cookies from "js-cookie";
 import { useSnackbar } from "@/app/context/SnackbarContext";
 import { Label } from "@/app/components/ui/label";
@@ -13,6 +13,8 @@ import axios from "axios";
 
 export default function UpdateContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const contentId = searchParams.get("id"); // grab ID from URL
   const { openSnackbar } = useSnackbar();
   const { isNavbarVisible } = useNavbar();
 
@@ -59,9 +61,16 @@ export default function UpdateContent() {
     if (!foodName.trim()) errorList.push("Food name is required.");
     if (!selectedClassification) errorList.push("Classification is required.");
     if (!shortDescription.trim()) errorList.push("Short description is required.");
-
-    if (recipes.some((r) => !r.trim())) errorList.push("All recipe fields must be filled.");
-    if (instructions.some((i) => !i.trim())) errorList.push("All instruction fields must be filled.");
+    if (recipes.some((i) => typeof i !== "string" || i.trim() === "")) {
+        openSnackbar("Please fill in all recipes", "error");
+        return;
+      }
+      
+      if (instructions.some((i) => typeof i !== "string" || i.trim() === "")) {
+        openSnackbar("Please fill in all instructions", "error");
+        return;
+      }
+      
 
     if (errorList.length > 0) {
       openSnackbar(errorList.join(" "), "error");
@@ -85,7 +94,7 @@ export default function UpdateContent() {
       instructions.forEach((ins, i) => formData.append(`instructions[${i}]`, ins));
       mediaFiles.forEach((file) => file && formData.append("media", file));
 
-      await axios.put("http://localhost:5000/admin/content/update", formData, {
+      await axios.put(`http://localhost:5000/admin/content/${contentId}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
@@ -95,7 +104,7 @@ export default function UpdateContent() {
         router.push("/admin/contents");
       }, 2000);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       openSnackbar("An error occurred", "error");
     }
   };
@@ -108,6 +117,35 @@ export default function UpdateContent() {
       return () => clearTimeout(timer);
     }
   }, [router, openSnackbar]);
+
+  useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5000/admin/content/${contentId}`, {
+          withCredentials: true,
+        });
+        const data = res.data;
+
+        setFoodName(data.title || "");
+        setShortDescription(data.shortDesc || "");
+        setSelectedClassification(data.category || "");
+        setStatus(data.status || "Draft");
+
+        // fallback to at least one empty field if array is empty
+        setRecipes(data.recipes?.length ? data.recipes : [""]);
+        setInstructions(data.instructions?.length ? data.instructions : [""]);
+
+        // we don’t preload media files here (they’re file objects), user has to reupload if needed
+      } catch (err) {
+        console.error(err);
+        openSnackbar("Failed to fetch content", "error");
+      }
+    };
+
+    if (contentId) {
+      fetchContent();
+    }
+  }, [contentId, openSnackbar]);
 
   return (
     <div className="flex min-h-screen text-[#3E2723]">

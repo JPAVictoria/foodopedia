@@ -1,11 +1,11 @@
 "use client";
+
 import { useNavbar } from "@/app/context/NavbarContext";
 import Navbar from "@/app/components/ui/navbar/navbar";
 import { FolderOpenDot, BookPlus, Trash2, Plus } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation"; // Use useRouter from next/navigation
-import { useSearchParams } from "next/navigation"; // For query parameters
+import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { useSnackbar } from "@/app/context/SnackbarContext";
 import { Label } from "@/app/components/ui/label";
@@ -13,8 +13,7 @@ import { Input } from "@/app/components/ui/input";
 import axios from "axios";
 
 export default function CreateContent() {
-  const router = useRouter(); // Use the router from next/navigation
-  const searchParams = useSearchParams(); // Get query parameters
+  const router = useRouter();
   const { openSnackbar } = useSnackbar();
   const { isNavbarVisible } = useNavbar();
 
@@ -25,7 +24,6 @@ export default function CreateContent() {
   const [shortDescription, setShortDescription] = useState<string>("");
   const [status, setStatus] = useState<string>("Draft");
   const [mediaFiles, setMediaFiles] = useState<(File | null)[]>([null, null, null]);
-  const [contentId, setContentId] = useState<string | null>(null); // Track content ID for update
   const fileInputRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)];
 
   const classifications = ["DESSERT", "APPETIZER", "ENTREE", "BEVERAGES"];
@@ -67,7 +65,6 @@ export default function CreateContent() {
     if (!foodName.trim()) errorList.push("Food name is required.");
     if (!selectedClassification) errorList.push("Classification is required.");
     if (!shortDescription.trim()) errorList.push("Short description is required.");
-
     if (recipes.some((r) => !r.trim())) errorList.push("All recipe fields must be filled.");
     if (instructions.some((i) => !i.trim())) errorList.push("All instruction fields must be filled.");
 
@@ -93,27 +90,16 @@ export default function CreateContent() {
       instructions.forEach((ins, i) => formData.append(`instructions[${i}]`, ins));
       mediaFiles.forEach((file) => file && formData.append("media", file));
 
-      // If contentId exists, make a PUT request to update the content
-      if (contentId) {
-        await axios.put(`http://localhost:5000/admin/content/update/${contentId}`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-          withCredentials: true,
-        });
-      } else {
-        // Otherwise, make a POST request to create new content
-        await axios.post("http://localhost:5000/admin/content/create", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-          withCredentials: true,
-        });
-      }
+      await axios.post("http://localhost:5000/admin/content/create", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true,
+      });
 
       openSnackbar(`Content ${selectedStatus.toLowerCase()}ed successfully`, "success");
-      setTimeout(() => {
-        router.push("/admin/contents");
-      }, 2000);
+      setTimeout(() => router.push("/admin/contents"), 2000);
     } catch (err) {
       console.log(err);
-      openSnackbar("An error occurred", "error");
+      openSnackbar("An error occurred while creating content", "error");
     }
   };
 
@@ -124,28 +110,7 @@ export default function CreateContent() {
       const timer = setTimeout(() => router.push("/admin/login"), 2000);
       return () => clearTimeout(timer);
     }
-
-    const contentIdFromUrl = searchParams.get("id");
-    if (contentIdFromUrl) {
-      setContentId(contentIdFromUrl);
-      // Fetch existing content data if updating
-      axios.get(`http://localhost:5000/admin/content/${contentIdFromUrl}`, { withCredentials: true })
-        .then((response) => {
-          const data = response.data;
-          setFoodName(data.title);
-          setShortDescription(data.shortDesc);
-          setSelectedClassification(data.category);
-          setRecipes(data.recipes || []);
-          setInstructions(data.instructions || []);
-          setStatus(data.status || "Draft");
-          // You may need to set media files as well, depending on your API response
-        })
-        .catch((error) => {
-          openSnackbar("Failed to load content", "error");
-          console.error(error);
-        });
-    }
-  }, [searchParams, router, openSnackbar]);
+  }, [router, openSnackbar]);
 
   return (
     <div className="flex min-h-screen text-[#3E2723]">
@@ -164,8 +129,8 @@ export default function CreateContent() {
               </div>
             </div>
             <div className="flex space-x-4">
-              {["Draft", "Publish"].map((type, index) => (
-                <div key={index} className="rounded-md transition cursor-pointer">
+              {["Draft", "Publish"].map((type) => (
+                <div key={type} className="rounded-md transition cursor-pointer">
                   <Button
                     variant="ghost"
                     className="flex flex-col items-center p-4 min-h-[3rem] hover:bg-[#c5cadc17] cursor-pointer"
@@ -210,7 +175,6 @@ export default function CreateContent() {
                       value={type}
                       checked={selectedClassification === type}
                       onChange={handleClassificationChange}
-                      className="text-sm"
                     />
                     <span>{type}</span>
                   </label>
@@ -293,34 +257,30 @@ export default function CreateContent() {
             </div>
 
             <div className="bg-[#fffaec] p-8 rounded-sm border border-[#2d2d2d4e]">
-              <Label className="mb-3 block">Media:</Label>
-              <div className="grid grid-cols-3 gap-4">
+              <Label className="mb-3 block">Upload Media</Label>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 {mediaFiles.map((file, index) => (
-                  <div key={index} className="text-center">
-                    <div
-                      className="cursor-pointer bg-[#f0f0f0] rounded-md p-4"
-                      onClick={() => handleUploadClick(index)}
-                    >
-                      {file ? (
-                        <span className="block">{file.name}</span>
-                      ) : (
-                        <span className="text-xs text-gray-500">Upload file</span>
-                      )}
+                  <div key={index} className="space-y-2">
+                    <div className="cursor-pointer" onClick={() => handleUploadClick(index)}>
+                      <FolderOpenDot className="w-12 h-12 text-[#3E2723]" />
+                      <input
+                        ref={fileInputRefs[index]}
+                        type="file"
+                        onChange={(e) => e.target.files && handleFileChange(index, e.target.files[0])}
+                        hidden
+                      />
                     </div>
-                    <input
-                      ref={fileInputRefs[index]}
-                      type="file"
-                      className="hidden"
-                      onChange={(e) => e.target.files && handleFileChange(index, e.target.files[0])}
-                    />
                     {file && (
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteFile(index)}
-                        className="mt-2 text-xs text-red-500"
-                      >
-                        Delete
-                      </button>
+                      <div className="flex justify-between items-center">
+                        <span>{file.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteFile(index)}
+                          className="text-[#3E2723] hover:text-[#3e2723a0] ml-2 cursor-pointer"
+                        >
+                          <Trash2 size={20} />
+                        </button>
+                      </div>
                     )}
                   </div>
                 ))}
