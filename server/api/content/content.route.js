@@ -338,9 +338,27 @@ router.get("/:id", async (req, res) => {
 
 
 router.get("/", async (req, res) => {
+  const token = req.cookies?.token;
+  if (!token) return res.status(401).json({ message: "No token provided" });
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, SECRET);
+  } catch (err) {
+    return res.status(401).json({ message: "Invalid or expired token" });
+  }
+
+  const adminId = decoded?.id;
+  if (!adminId) {
+    return res.status(403).json({ message: "Unauthorized or invalid admin" });
+  }
+
   try {
     const contents = await prisma.content.findMany({
-      where: { deleted: false },
+      where: {
+        deleted: false,
+        adminId, // only fetch content owned by this admin
+      },
       include: {
         media: true,
         admin: { select: { firstName: true, lastName: true, email: true } },
@@ -355,12 +373,14 @@ router.get("/", async (req, res) => {
 
     res.json(formattedContents);
   } catch (err) {
-    res.status(500).json({ 
+    console.error("Error fetching admin-specific content:", err);
+    res.status(500).json({
       message: "Failed to retrieve content",
       error: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
   }
 });
+
 
 
 module.exports = router;
