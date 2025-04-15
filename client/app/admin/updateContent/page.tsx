@@ -98,7 +98,7 @@ export default function UpdateContent() {
       formData.append("title", foodName);
       formData.append("shortDesc", shortDescription);
       formData.append("category", selectedClassification);
-      formData.append("status", selectedStatus.toUpperCase());
+      formData.append("status", selectedStatus === 'Publish' ? 'PUBLISHED' : 'DRAFT');
   
       // Convert to backend-expected format
       formData.append("ingredients", JSON.stringify(
@@ -137,33 +137,35 @@ export default function UpdateContent() {
   }, [router, openSnackbar]);
 
   useEffect(() => {
-const fetchContent = async () => {
-  try {
-    const res = await axios.get(`http://localhost:5000/admin/content/${contentId}`, {
-      withCredentials: true,
-    });
-    const data = res.data;
-
-    setFoodName(data.title || "");
-    setShortDescription(data.shortDesc || "");
-    setSelectedClassification(data.category || "");
-    setStatus(data.status || "Draft");
-
-    // Properly typed recipe transformation
-    const recipeStrings = data.recipes?.map((r: Recipe) => r.ingredient) || [""];
-    setRecipes(recipeStrings.length ? recipeStrings : [""]);
-
-    // Properly typed instruction transformation
-    const instructionStrings = data.instructions
-      ?.sort((a: Instruction, b: Instruction) => a.stepNumber - b.stepNumber)
-      ?.map((i: Instruction) => i.instruction) || [""];
-    setInstructions(instructionStrings.length ? instructionStrings : [""]);
-
-  } catch (err) {
-    console.error(err);
-    openSnackbar("Failed to fetch content", "error");
-  }
-};
+    const fetchContent = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5000/admin/content/${contentId}`, {
+          withCredentials: true,
+        });
+        const data = res.data;
+    
+        setFoodName(data.title || "");
+        setShortDescription(data.shortDesc || "");
+        setSelectedClassification(data.category || "");
+        
+        // Fix: Convert backend status to frontend display format
+        setStatus(data.status === 'PUBLISHED' ? 'Publish' : 'Draft');
+    
+        // Properly typed recipe transformation
+        const recipeStrings = data.recipes?.map((r: Recipe) => r.ingredient) || [""];
+        setRecipes(recipeStrings.length ? recipeStrings : [""]);
+    
+        // Properly typed instruction transformation
+        const instructionStrings = data.instructions
+          ?.sort((a: Instruction, b: Instruction) => a.stepNumber - b.stepNumber)
+          ?.map((i: Instruction) => i.instruction) || [""];
+        setInstructions(instructionStrings.length ? instructionStrings : [""]);
+    
+      } catch (err) {
+        console.error(err);
+        openSnackbar("Failed to fetch content", "error");
+      }
+    };
 
     if (contentId) {
       fetchContent();

@@ -84,7 +84,7 @@ export default function CreateContent() {
       formData.append("title", foodName);
       formData.append("shortDesc", shortDescription);
       formData.append("category", selectedClassification);
-      formData.append("status", selectedStatus.toUpperCase());
+      formData.append("status", selectedStatus === 'Publish' ? 'PUBLISHED' : 'DRAFT');
       formData.append("ingredients", JSON.stringify(recipes));
       formData.append("instructions", JSON.stringify(instructions));
       
