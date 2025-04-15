@@ -3,6 +3,7 @@
 import Navbar from "@/app/components/ui/navbar/navbar";
 import { SquarePlus, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { Chip, Box, Button, Stack, Typography } from "@mui/material";
 import { useNavbar } from "@/app/context/NavbarContext";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -10,8 +11,7 @@ import {
   DataGrid,
   GridColDef,
 } from "@mui/x-data-grid";
-import { Box, Button, Stack, Typography } from "@mui/material";
-import { useSnackbar } from "@/app/context/SnackbarContext"; // Add Snackbar context
+import { useSnackbar } from "@/app/context/SnackbarContext";
 
 interface ContentItem {
   id: string;
@@ -23,10 +23,10 @@ interface ContentItem {
 
 export default function Contents() {
   const { isNavbarVisible } = useNavbar();
-  const { openSnackbar } = useSnackbar(); // Get the snackbar function
+  const { openSnackbar } = useSnackbar();
 
   const [rows, setRows] = useState<ContentItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(true); // Loading state
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,17 +34,27 @@ export default function Contents() {
         const response = await axios.get("http://localhost:5000/admin/content", {
           withCredentials: true,
         });
-        
-        setRows(response.data); 
+        setRows(response.data);
       } catch (error) {
         console.error("Error fetching content data", error);
       } finally {
-        setLoading(false); 
+        setLoading(false);
       }
     };
 
     fetchData();
   }, []);
+
+  const handleDelete = async (id: string) => {
+    try {
+      await axios.put(`http://localhost:5000/admin/content/softDelete/${id}`, {}, { withCredentials: true });
+      setRows((prevRows) => prevRows.filter((row) => row.id !== id));
+      openSnackbar("Content deleted successfully", "success");
+    } catch (error) {
+      console.error("Error deleting content", error);
+      openSnackbar("Failed to delete content", "error");
+    }
+  };
 
   const columns: GridColDef[] = [
     {
@@ -70,6 +80,52 @@ export default function Contents() {
       headerAlign: "center",
       align: "center",
       headerClassName: "bold-header",
+      renderCell: (params) => {
+        const status = params.value.toLowerCase();
+
+        const getChipProps = (status: string) => {
+          const normalized = status.toLowerCase();
+        
+          switch (normalized) {
+            case "draft":
+              return {
+                label: "Draft",
+                sx: {
+                  backgroundColor: "#FFF8E1",
+                  color: "#FBC02D",
+                  fontWeight: 600,
+                  fontSize: "0.75rem",
+                  textTransform: "capitalize",
+                },
+              };
+            case "published":
+              return {
+                label: "Published",
+                sx: {
+                  backgroundColor: "#E8F5E9",
+                  color: "#4CAF50",
+                  fontWeight: 600,
+                  fontSize: "0.75rem",
+                  textTransform: "capitalize",
+                },
+              };
+            default:
+              return {
+                label: status,
+                sx: {
+                  backgroundColor: "#ECEFF1",
+                  color: "#607D8B",
+                  fontWeight: 600,
+                  fontSize: "0.75rem",
+                  textTransform: "capitalize",
+                },
+              };
+          }
+        };
+        
+
+        return <Chip size="medium" {...getChipProps(status)} />;
+      },
     },
     {
       field: "createdAt",
@@ -127,7 +183,7 @@ export default function Contents() {
               width: 100,
               height: "100%",
             }}
-            onClick={() => handleDelete(params.row.id)} // Add the delete handler
+            onClick={() => handleDelete(params.row.id)}
           >
             <Trash2 className="w-4 h-4" />
             <Typography variant="caption" sx={{ color: "#3E2723", fontSize: "0.7rem", marginTop: "4px", textTransform: "none" }}>
@@ -139,25 +195,9 @@ export default function Contents() {
     },
   ];
 
-  const handleDelete = async (id: string) => {
-    try {
-      // Perform a soft delete by updating the status to "deleted"
-      await axios.put(`http://localhost:5000/admin/content/softDelete/${id}`, {}, { withCredentials: true });
-      
-      // Update the rows state to reflect the change
-      setRows((prevRows) => prevRows.filter((row) => row.id !== id));
-
-      openSnackbar("Content deleted successfully", "success");
-    } catch (error) {
-      console.error("Error deleting content", error);
-      openSnackbar("Failed to delete content", "error");
-    }
-  };
-
   return (
     <div className="flex min-h-screen">
       <Navbar />
-
       <div className={`transition-all duration-300 p-4 sm:p-6 lg:p-8 flex-1 ${isNavbarVisible ? "ml-0" : "-ml-60"}`}>
         <div className="flex justify-end">
           <Link href="/admin/createContent" target="_blank" rel="noopener noreferrer">
@@ -174,7 +214,7 @@ export default function Contents() {
 
         <Box sx={{ height: 500, width: "auto", marginTop: 5 }}>
           <DataGrid
-            getRowId={(row) => row.id}  
+            getRowId={(row) => row.id}
             rows={rows}
             columns={columns}
             loading={loading}
