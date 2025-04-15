@@ -95,7 +95,7 @@ export default function UpdateContent() {
   
     try {
       const formData = new FormData();
-      formData.append("title", foodName);
+      formData.append("title", foodName.trim());
       formData.append("shortDesc", shortDescription);
       formData.append("category", selectedClassification);
       formData.append("status", selectedStatus === 'Publish' ? 'PUBLISHED' : 'DRAFT');
@@ -123,7 +123,18 @@ export default function UpdateContent() {
       setTimeout(() => router.push("/admin/contents"), 2000);
     } catch (err) {
       console.error(err);
-      openSnackbar("Failed to update content", "error");
+      if (axios.isAxiosError(err)) {
+        if (err.response?.status === 409) {
+          openSnackbar(err.response.data.message, "error");
+        } else {
+          openSnackbar(
+            err.response?.data?.message || "Failed to update content", 
+            "error"
+          );
+        }
+      } else {
+        openSnackbar("An unexpected error occurred", "error");
+      }
     }
   };
 

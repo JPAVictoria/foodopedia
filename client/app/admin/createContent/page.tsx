@@ -81,7 +81,7 @@ export default function CreateContent() {
   
     try {
       const formData = new FormData();
-      formData.append("title", foodName);
+      formData.append("title", foodName.trim()); // Add trim() to remove whitespace
       formData.append("shortDesc", shortDescription);
       formData.append("category", selectedClassification);
       formData.append("status", selectedStatus === 'Publish' ? 'PUBLISHED' : 'DRAFT');
@@ -97,18 +97,41 @@ export default function CreateContent() {
         withCredentials: true,
       });
   
-      openSnackbar(`Content ${selectedStatus.toLowerCase()}ed successfully`, "success");
+      openSnackbar(
+        `Content ${selectedStatus.toLowerCase()}ed successfully!`, 
+        "success"
+      );
       setTimeout(() => router.push("/admin/contents"), 2000);
     } catch (error) {
       console.error("Submission error:", error);
-      openSnackbar(
-        axios.isAxiosError(error) 
-          ? error.response?.data?.message || "Failed to create content"
-          : "An unexpected error occurred",
-        "error"
-      );
+      
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 409) {
+          openSnackbar(
+            `"${foodName}" already exists. Please choose a different name.`,
+            "error",
+          );
+        } else {
+          openSnackbar(
+            error.response?.data?.message || "Failed to create content",
+            "error"
+          );
+        }
+      } else {
+        openSnackbar("An unexpected error occurred", "error");
+      }
     }
   };
+  
+  // In your useEffect, no changes are needed as it's just handling authentication
+  useEffect(() => {
+    const token = Cookies.get("token");
+    if (!token) {
+      openSnackbar("Token is missing", "error");
+      const timer = setTimeout(() => router.push("/admin/login"), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [router, openSnackbar]);
 
   useEffect(() => {
     const token = Cookies.get("token");

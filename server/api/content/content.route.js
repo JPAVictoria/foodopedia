@@ -33,8 +33,21 @@ router.post("/create", upload.array('media', 3), async (req, res) => {
   } catch (err) {
     return res.status(401).json({ message: "Invalid or expired token" });
   }
-
   const { title, shortDesc, category } = req.body;
+
+  const existing = await prisma.content.findFirst({
+    where: {
+      title: { equals: title.trim(), mode: 'insensitive' },
+      deleted: false
+    }
+  });
+
+  if (existing) {
+    return res.status(409).json({ 
+      message: `A recipe named "${title}" already exists` 
+    });
+  }
+
   
   let ingredients = [];
   let instructions = [];
@@ -134,36 +147,6 @@ router.post("/create", upload.array('media', 3), async (req, res) => {
   }
 });
 
-// GET BY ID
-router.get("/:id", async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const content = await prisma.content.findUnique({
-      where: { id },
-      include: {
-        media: true,
-        admin: { select: { firstName: true, lastName: true, email: true } },
-        recipes: true,
-        instructions: { orderBy: { stepNumber: 'asc' } },
-      },
-    });
-
-    if (!content || content.deleted) {
-      return res.status(404).json({ message: "Content not found or has been deleted" });
-    }
-
-    res.json(content);
-  } catch (err) {
-    console.error("Error retrieving content:", err);
-    res.status(500).json({ 
-      message: "Failed to retrieve content",
-      error: process.env.NODE_ENV === 'development' ? err.message : undefined
-    });
-  }
-});
-
-// UPDATE
 router.put("/:id", upload.array('media', 3), async (req, res) => {
   const { id } = req.params;
   const token = req.cookies?.token;
@@ -177,6 +160,20 @@ router.put("/:id", upload.array('media', 3), async (req, res) => {
   }
 
   const { title, shortDesc, category } = req.body;
+
+  const existing = await prisma.content.findFirst({
+    where: {
+      title: { equals: title.trim(), mode: 'insensitive' },
+      deleted: false,
+      NOT: { id } // Exclude current content from duplicate check
+    }
+  });
+
+  if (existing) {
+    return res.status(409).json({ 
+      message: `A recipe named "${title}" already exists` 
+    });
+  }
   
   let ingredients = [];
   let instructions = [];
@@ -309,6 +306,36 @@ router.put("/softDelete/:id", async (req, res) => {
     });
   }
 });
+
+// GET BY ID
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const content = await prisma.content.findUnique({
+      where: { id },
+      include: {
+        media: true,
+        admin: { select: { firstName: true, lastName: true, email: true } },
+        recipes: true,
+        instructions: { orderBy: { stepNumber: 'asc' } },
+      },
+    });
+
+    if (!content || content.deleted) {
+      return res.status(404).json({ message: "Content not found or has been deleted" });
+    }
+
+    res.json(content);
+  } catch (err) {
+    console.error("Error retrieving content:", err);
+    res.status(500).json({ 
+      message: "Failed to retrieve content",
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+  }
+});
+
 
 router.get("/", async (req, res) => {
   try {
