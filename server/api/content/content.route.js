@@ -4,6 +4,7 @@ const path = require('path');
 const { PrismaClient } = require('@prisma/client');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
+const { format } = require('date-fns');
 
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -309,7 +310,6 @@ router.put("/softDelete/:id", async (req, res) => {
   }
 });
 
-// GET ALL
 router.get("/", async (req, res) => {
   try {
     const contents = await prisma.content.findMany({
@@ -321,7 +321,12 @@ router.get("/", async (req, res) => {
       orderBy: { createdAt: 'desc' },
     });
 
-    res.json(contents);
+    const formattedContents = contents.map(content => ({
+      ...content,
+      createdAt: format(new Date(content.createdAt), 'MMMM dd, yyyy HH:mm:ss'),
+    }));
+
+    res.json(formattedContents);
   } catch (err) {
     res.status(500).json({ 
       message: "Failed to retrieve content",
@@ -329,5 +334,6 @@ router.get("/", async (req, res) => {
     });
   }
 });
+
 
 module.exports = router;
