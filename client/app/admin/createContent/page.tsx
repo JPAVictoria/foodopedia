@@ -11,6 +11,7 @@ import { useSnackbar } from "@/app/context/SnackbarContext";
 import { Label } from "@/app/components/ui/label";
 import { Input } from "@/app/components/ui/input";
 import axios from "axios";
+import { Chip } from "@mui/material";
 
 export default function CreateContent() {
   const router = useRouter();
@@ -19,12 +20,21 @@ export default function CreateContent() {
 
   const [recipes, setRecipes] = useState<string[]>([""]);
   const [instructions, setInstructions] = useState<string[]>([""]);
-  const [selectedClassification, setSelectedClassification] = useState<string>("");
+  const [selectedClassification, setSelectedClassification] =
+    useState<string>("");
   const [foodName, setFoodName] = useState<string>("");
   const [shortDescription, setShortDescription] = useState<string>("");
   const [status, setStatus] = useState<string>("Draft");
-  const [mediaFiles, setMediaFiles] = useState<(File | null)[]>([null, null, null]);
-  const fileInputRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)];
+  const [mediaFiles, setMediaFiles] = useState<(File | null)[]>([
+    null,
+    null,
+    null,
+  ]);
+  const fileInputRefs = [
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+  ];
 
   const classifications = ["DESSERT", "APPETIZER", "ENTREE", "BEVERAGES"];
 
@@ -34,9 +44,12 @@ export default function CreateContent() {
   const handleDeleteField = (index: number) =>
     setRecipes((prev) => prev.filter((_, i) => i !== index));
 
-  const handleAddInstructionField = () => setInstructions([...instructions, ""]);
+  const handleAddInstructionField = () =>
+    setInstructions([...instructions, ""]);
   const handleInputInstructionChange = (index: number, value: string) =>
-    setInstructions((prev) => prev.map((item, i) => (i === index ? value : item)));
+    setInstructions((prev) =>
+      prev.map((item, i) => (i === index ? value : item))
+    );
   const handleDeleteInstructionField = (index: number) =>
     setInstructions((prev) => prev.filter((_, i) => i !== index));
 
@@ -64,9 +77,12 @@ export default function CreateContent() {
 
     if (!foodName.trim()) errorList.push("Food name is required.");
     if (!selectedClassification) errorList.push("Classification is required.");
-    if (!shortDescription.trim()) errorList.push("Short description is required.");
-    if (recipes.some((r) => !r.trim())) errorList.push("All recipe fields must be filled.");
-    if (instructions.some((i) => !i.trim())) errorList.push("All instruction fields must be filled.");
+    if (!shortDescription.trim())
+      errorList.push("Short description is required.");
+    if (recipes.some((r) => !r.trim()))
+      errorList.push("All recipe fields must be filled.");
+    if (instructions.some((i) => !i.trim()))
+      errorList.push("All instruction fields must be filled.");
 
     if (errorList.length > 0) {
       openSnackbar(errorList.join(" "), "error");
@@ -78,38 +94,41 @@ export default function CreateContent() {
 
   const handleSubmit = async (selectedStatus: string) => {
     if (!validateForm()) return;
-  
+
     try {
       const formData = new FormData();
       formData.append("title", foodName.trim()); // Add trim() to remove whitespace
       formData.append("shortDesc", shortDescription);
       formData.append("category", selectedClassification);
-      formData.append("status", selectedStatus === 'Publish' ? 'PUBLISHED' : 'DRAFT');
+      formData.append(
+        "status",
+        selectedStatus === "Publish" ? "PUBLISHED" : "DRAFT"
+      );
       formData.append("ingredients", JSON.stringify(recipes));
       formData.append("instructions", JSON.stringify(instructions));
-      
+
       mediaFiles.forEach((file) => {
-        if (file) formData.append('media', file);
+        if (file) formData.append("media", file);
       });
-  
+
       await axios.post("http://localhost:5000/admin/content/create", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
-  
+
       openSnackbar(
-        `Content ${selectedStatus.toLowerCase()}ed successfully!`, 
+        `Content ${selectedStatus.toLowerCase()}ed successfully!`,
         "success"
       );
       setTimeout(() => router.push("/admin/contents"), 2000);
     } catch (error) {
       console.error("Submission error:", error);
-      
+
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 409) {
           openSnackbar(
             `"${foodName}" already exists. Please choose a different name.`,
-            "error",
+            "error"
           );
         } else {
           openSnackbar(
@@ -122,7 +141,7 @@ export default function CreateContent() {
       }
     }
   };
-  
+
   // In your useEffect, no changes are needed as it's just handling authentication
   useEffect(() => {
     const token = Cookies.get("token");
@@ -145,7 +164,11 @@ export default function CreateContent() {
   return (
     <div className="flex min-h-screen text-[#3E2723]">
       <Navbar />
-      <div className={`transition-all duration-300 p-15 flex-1 ${isNavbarVisible ? "ml-0" : "-ml-60"}`}>
+      <div
+        className={`transition-all duration-300 p-15 flex-1 ${
+          isNavbarVisible ? "ml-0" : "-ml-60"
+        }`}
+      >
         <div className="pb-8">
           <div className="flex justify-between items-start">
             <div>
@@ -153,14 +176,27 @@ export default function CreateContent() {
                 {foodName || ""}
               </h1>
               <div className="flex flex-col space-y-5">
-                <p className="text-sm text-muted-foreground">Status: {status}</p>
+                <div className="text-sm text-muted-foreground">
+                  <span>Status:</span>
+                  <Chip
+                    label={status}
+                    sx={{
+                      marginLeft: "8px", // Space between text and chip
+                      backgroundColor:
+                        status === "Draft" ? "#FFF8E1" : "#E8F5E9", // Custom color for Draft/Publish
+                      color: status === "Draft" ? "#FBC02D" : "#4CAF50", // Text color depending on the status
+                      borderRadius: "12px", // Rounded corners for the chip
+                      padding: "4px 12px", // Padding inside the chip
+                    }}
+                  />
+                </div>
                 <p className="text-sm text-muted-foreground">Viewer Count:</p>
                 <p className="text-sm text-muted-foreground">Likes Count:</p>
               </div>
             </div>
             <div className="flex space-x-4">
               {["Draft", "Publish"].map((type) => (
-                <div key={type} className="rounded-md transition cursor-pointer">
+                <div key={type} className="transition cursor-pointer">
                   <Button
                     variant="ghost"
                     className="flex flex-col items-center p-4 min-h-[3rem] hover:bg-[#c5cadc17] cursor-pointer"
@@ -185,7 +221,9 @@ export default function CreateContent() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-4 bg-[#fffaec] p-8 border border-[#2d2d2d4e] rounded-sm">
             <div>
-              <Label htmlFor="food-name" className="mb-2 block">Food Name</Label>
+              <Label htmlFor="food-name" className="mb-2 block">
+                Food Name
+              </Label>
               <Input
                 id="food-name"
                 value={foodName}
@@ -198,7 +236,10 @@ export default function CreateContent() {
               <Label className="mt-5 mb-1 block">Classification:</Label>
               <div className="flex flex-wrap justify-between pt-3">
                 {classifications.map((type) => (
-                  <label key={type} className="flex items-center space-x-2 text-sm w-full sm:w-auto">
+                  <label
+                    key={type}
+                    className="flex items-center space-x-2 text-sm w-full sm:w-auto"
+                  >
                     <input
                       type="radio"
                       name="classification"
@@ -213,7 +254,9 @@ export default function CreateContent() {
             </div>
 
             <div>
-              <Label htmlFor="short-description" className="mt-5 mb-1 block">Short Description</Label>
+              <Label htmlFor="short-description" className="mt-5 mb-1 block">
+                Short Description
+              </Label>
               <textarea
                 id="short-description"
                 value={shortDescription}
@@ -223,13 +266,17 @@ export default function CreateContent() {
             </div>
 
             <div>
-              <Label htmlFor="instructions" className="mt-6 mb-4 block">Instructions</Label>
+              <Label htmlFor="instructions" className="mt-6 mb-4 block">
+                Instructions
+              </Label>
               <div className="space-y-4">
                 {instructions.map((instruction, index) => (
                   <div key={index} className="flex items-center space-x-2">
                     <input
                       value={instruction}
-                      onChange={(e) => handleInputInstructionChange(index, e.target.value)}
+                      onChange={(e) =>
+                        handleInputInstructionChange(index, e.target.value)
+                      }
                       className="w-full bg-white border border-[#2d2d2d4e] p-2 resize-none h-8 rounded-none"
                     />
                     {instructions.length > 1 && (
@@ -291,12 +338,18 @@ export default function CreateContent() {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 {mediaFiles.map((file, index) => (
                   <div key={index} className="space-y-2">
-                    <div className="cursor-pointer" onClick={() => handleUploadClick(index)}>
+                    <div
+                      className="cursor-pointer"
+                      onClick={() => handleUploadClick(index)}
+                    >
                       <FolderOpenDot className="w-12 h-12 text-[#3E2723]" />
                       <input
                         ref={fileInputRefs[index]}
                         type="file"
-                        onChange={(e) => e.target.files && handleFileChange(index, e.target.files[0])}
+                        onChange={(e) =>
+                          e.target.files &&
+                          handleFileChange(index, e.target.files[0])
+                        }
                         hidden
                       />
                     </div>

@@ -93,7 +93,7 @@ export default function Contents() {
                 sx: {
                   backgroundColor: "#FFF8E1",
                   color: "#FBC02D",
-                  fontWeight: 600,
+                  fontWeight: 400,
                   fontSize: "0.75rem",
                   textTransform: "capitalize",
                 },
@@ -104,7 +104,7 @@ export default function Contents() {
                 sx: {
                   backgroundColor: "#E8F5E9",
                   color: "#4CAF50",
-                  fontWeight: 600,
+                  fontWeight: 400,
                   fontSize: "0.75rem",
                   textTransform: "capitalize",
                 },

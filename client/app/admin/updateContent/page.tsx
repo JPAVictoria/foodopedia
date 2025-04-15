@@ -10,6 +10,8 @@ import { useSnackbar } from "@/app/context/SnackbarContext";
 import { Label } from "@/app/components/ui/label";
 import { Input } from "@/app/components/ui/input";
 import axios from "axios";
+import { Chip } from "@mui/material";
+
 
 export default function UpdateContent() {
   const router = useRouter();
@@ -187,41 +189,53 @@ export default function UpdateContent() {
     <div className="flex min-h-screen text-[#3E2723]">
       <Navbar />
       <div className={`transition-all duration-300 p-15 flex-1 ${isNavbarVisible ? "ml-0" : "-ml-60"}`}>
-        <div className="pb-8">
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-[32px] font-bold text-balance pb-5 text-[#3E2723]">
-                {foodName || ""}
-              </h1>
-              <div className="flex flex-col space-y-5">
-                <p className="text-sm text-muted-foreground">Status: {status}</p>
-                <p className="text-sm text-muted-foreground">Viewer Count:</p>
-                <p className="text-sm text-muted-foreground">Likes Count:</p>
-              </div>
-            </div>
-            <div className="flex space-x-4">
-              {["Draft", "Publish"].map((type, index) => (
-                <div key={index} className="rounded-md transition cursor-pointer">
-                  <Button
-                    variant="ghost"
-                    className="flex flex-col items-center p-4 min-h-[3rem] hover:bg-[#c5cadc17] cursor-pointer"
-                    onClick={() => {
-                      setStatus(type);
-                      handleSubmit(type);
-                    }}
-                  >
-                    {type === "Draft" ? (
-                      <FolderOpenDot className="w-5 h-5 text-[#3E2723]" />
-                    ) : (
-                      <BookPlus className="w-5 h-5 text-[#3E2723]" />
-                    )}
-                    <span className="text-xs text-[#3E2723]">{type}</span>
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
+      <div className="pb-8">
+  <div className="flex justify-between items-start">
+    <div>
+      <h1 className="text-[32px] font-bold text-balance pb-5 text-[#3E2723]">
+        {foodName || ""}
+      </h1>
+      <div className="flex flex-col space-y-5">
+        <div className="text-sm text-muted-foreground">
+          <span>Status:</span>
+          <Chip
+            label={status}
+            sx={{
+              marginLeft: "8px", // Space between text and chip
+              backgroundColor: status === "Draft" ? "#FFF8E1" : "#E8F5E9", // Custom color for Draft/Publish
+              color: status === "Draft" ? "#FBC02D" : "#4CAF50", // Text color depending on the status
+              borderRadius: "12px", // Rounded corners for the chip
+              padding: "4px 12px", // Padding inside the chip
+            }}
+          />
         </div>
+        <p className="text-sm text-muted-foreground">Viewer Count:</p>
+        <p className="text-sm text-muted-foreground">Likes Count:</p>
+      </div>
+    </div>
+    <div className="flex space-x-4">
+      {["Draft", "Publish"].map((type) => (
+        <div key={type} className="transition cursor-pointer">
+          <Button
+            variant="ghost"
+            className="flex flex-col items-center p-4 min-h-[3rem] hover:bg-[#c5cadc17] cursor-pointer"
+            onClick={() => {
+              setStatus(type);
+              handleSubmit(type);
+            }}
+          >
+            {type === "Draft" ? (
+              <FolderOpenDot className="w-5 h-5 text-[#3E2723]" />
+            ) : (
+              <BookPlus className="w-5 h-5 text-[#3E2723]" />
+            )}
+            <span className="text-xs text-[#3E2723]">{type}</span>
+          </Button>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-4 bg-[#fffaec] p-8 border border-[#2d2d2d4e] rounded-sm">
