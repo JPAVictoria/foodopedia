@@ -335,14 +335,14 @@ export default function CreateContent() {
 
             <div className="bg-[#fffaec] p-8 rounded-sm border border-[#2d2d2d4e]">
               <Label className="mb-3 block">Upload Media</Label>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <div className="grid grid-cols-3 gap-4 mt-6">
                 {mediaFiles.map((file, index) => (
-                  <div key={index} className="space-y-2">
+                  <div key={index} className="space-y-">
                     <div
-                      className="cursor-pointer"
+                      className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-sm p-8 cursor-pointer hover:bg-gray-100 transition"
                       onClick={() => handleUploadClick(index)}
                     >
-                      <FolderOpenDot className="w-12 h-12 text-[#3E2723]" />
+                      <FolderOpenDot className="w-6 h-6 text-gray-500" />
                       <input
                         ref={fileInputRefs[index]}
                         type="file"
@@ -354,7 +354,7 @@ export default function CreateContent() {
                       />
                     </div>
                     {file && (
-                      <div className="flex justify-between items-center">
+                      <div className="mt-5 flex flex-col gap-y-3 justify-center items-center">
                         <span>{file.name}</span>
                         <button
                           type="button"
