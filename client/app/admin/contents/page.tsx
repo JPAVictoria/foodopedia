@@ -5,15 +5,16 @@ import { SquarePlus, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useNavbar } from "@/app/context/NavbarContext";
 import { useState, useEffect } from "react";
-import axios from "axios"; 
+import axios from "axios";
 import {
   DataGrid,
   GridColDef,
 } from "@mui/x-data-grid";
 import { Box, Button, Stack, Typography } from "@mui/material";
+import { useSnackbar } from "@/app/context/SnackbarContext"; // Add Snackbar context
 
 interface ContentItem {
-  uuid: string;
+  id: string;
   title: string;
   category: string;
   status: string;
@@ -22,6 +23,7 @@ interface ContentItem {
 
 export default function Contents() {
   const { isNavbarVisible } = useNavbar();
+  const { openSnackbar } = useSnackbar(); // Get the snackbar function
 
   const [rows, setRows] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true); // Loading state
@@ -29,7 +31,7 @@ export default function Contents() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/admin/content"); 
+        const response = await axios.get("http://localhost:5000/admin/content");
         setRows(response.data); 
       } catch (error) {
         console.error("Error fetching content data", error);
@@ -83,28 +85,30 @@ export default function Contents() {
       headerAlign: "center",
       align: "center",
       disableColumnMenu: true,
-      renderCell: () => (
+      renderCell: (params) => (
         <Stack direction="row" spacing={2} justifyContent="center" alignItems="center" sx={{ height: "100%" }}>
-          <Button
-            size="medium"
-            variant="text"
-            sx={{
-              minWidth: "auto",
-              padding: "8px 16px",
-              color: "#3E2723",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              width: 100,
-              height: "100%",
-            }}
-          >
-            <Pencil className="w-4 h-4" />
-            <Typography variant="caption" sx={{ color: "#3E2723", fontSize: "0.7rem", marginTop: "4px", textTransform: "none" }}>
-              Edit
-            </Typography>
-          </Button>
+          <Link href={`/admin/updateContent?id=${params.row.id}`}>
+            <Button
+              size="medium"
+              variant="text"
+              sx={{
+                minWidth: "auto",
+                padding: "8px 16px",
+                color: "#3E2723",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 100,
+                height: "100%",
+              }}
+            >
+              <Pencil className="w-4 h-4" />
+              <Typography variant="caption" sx={{ color: "#3E2723", fontSize: "0.7rem", marginTop: "4px", textTransform: "none" }}>
+                Edit
+              </Typography>
+            </Button>
+          </Link>
 
           <Button
             size="medium"
@@ -120,6 +124,7 @@ export default function Contents() {
               width: 100,
               height: "100%",
             }}
+            onClick={() => handleDelete(params.row.id)} // Add the delete handler
           >
             <Trash2 className="w-4 h-4" />
             <Typography variant="caption" sx={{ color: "#3E2723", fontSize: "0.7rem", marginTop: "4px", textTransform: "none" }}>
@@ -130,6 +135,21 @@ export default function Contents() {
       ),
     },
   ];
+
+  const handleDelete = async (id: string) => {
+    try {
+      // Perform a soft delete by updating the status to "deleted"
+      await axios.put(`http://localhost:5000/admin/content/softDelete/${id}`, {}, { withCredentials: true });
+      
+      // Update the rows state to reflect the change
+      setRows((prevRows) => prevRows.filter((row) => row.id !== id));
+
+      openSnackbar("Content deleted successfully", "success");
+    } catch (error) {
+      console.error("Error deleting content", error);
+      openSnackbar("Failed to delete content", "error");
+    }
+  };
 
   return (
     <div className="flex min-h-screen">
@@ -149,7 +169,7 @@ export default function Contents() {
           Content Overview
         </h1>
 
-        <Box sx={{ height: 500, width: "100%", marginTop: 5 }}>
+        <Box sx={{ height: 500, width: "auto", marginTop: 5 }}>
           <DataGrid
             getRowId={(row) => row.id}  
             rows={rows}

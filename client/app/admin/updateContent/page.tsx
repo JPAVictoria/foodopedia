@@ -4,17 +4,15 @@ import Navbar from "@/app/components/ui/navbar/navbar";
 import { FolderOpenDot, BookPlus, Trash2, Plus } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation"; // Use useRouter from next/navigation
-import { useSearchParams } from "next/navigation"; // For query parameters
+import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { useSnackbar } from "@/app/context/SnackbarContext";
 import { Label } from "@/app/components/ui/label";
 import { Input } from "@/app/components/ui/input";
 import axios from "axios";
 
-export default function CreateContent() {
-  const router = useRouter(); // Use the router from next/navigation
-  const searchParams = useSearchParams(); // Get query parameters
+export default function UpdateContent() {
+  const router = useRouter();
   const { openSnackbar } = useSnackbar();
   const { isNavbarVisible } = useNavbar();
 
@@ -25,25 +23,19 @@ export default function CreateContent() {
   const [shortDescription, setShortDescription] = useState<string>("");
   const [status, setStatus] = useState<string>("Draft");
   const [mediaFiles, setMediaFiles] = useState<(File | null)[]>([null, null, null]);
-  const [contentId, setContentId] = useState<string | null>(null); // Track content ID for update
   const fileInputRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)];
 
   const classifications = ["DESSERT", "APPETIZER", "ENTREE", "BEVERAGES"];
 
   const handleAddField = () => setRecipes([...recipes, ""]);
-  const handleInputChange = (index: number, value: string) =>
-    setRecipes((prev) => prev.map((item, i) => (i === index ? value : item)));
-  const handleDeleteField = (index: number) =>
-    setRecipes((prev) => prev.filter((_, i) => i !== index));
+  const handleInputChange = (index: number, value: string) => setRecipes((prev) => prev.map((item, i) => (i === index ? value : item)));
+  const handleDeleteField = (index: number) => setRecipes((prev) => prev.filter((_, i) => i !== index));
 
   const handleAddInstructionField = () => setInstructions([...instructions, ""]);
-  const handleInputInstructionChange = (index: number, value: string) =>
-    setInstructions((prev) => prev.map((item, i) => (i === index ? value : item)));
-  const handleDeleteInstructionField = (index: number) =>
-    setInstructions((prev) => prev.filter((_, i) => i !== index));
+  const handleInputInstructionChange = (index: number, value: string) => setInstructions((prev) => prev.map((item, i) => (i === index ? value : item)));
+  const handleDeleteInstructionField = (index: number) => setInstructions((prev) => prev.filter((_, i) => i !== index));
 
-  const handleClassificationChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setSelectedClassification(e.target.value);
+  const handleClassificationChange = (e: React.ChangeEvent<HTMLInputElement>) => setSelectedClassification(e.target.value);
 
   const handleFileChange = (index: number, file: File) => {
     const updated = [...mediaFiles];
@@ -93,19 +85,10 @@ export default function CreateContent() {
       instructions.forEach((ins, i) => formData.append(`instructions[${i}]`, ins));
       mediaFiles.forEach((file) => file && formData.append("media", file));
 
-      // If contentId exists, make a PUT request to update the content
-      if (contentId) {
-        await axios.put(`http://localhost:5000/admin/content/update/${contentId}`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-          withCredentials: true,
-        });
-      } else {
-        // Otherwise, make a POST request to create new content
-        await axios.post("http://localhost:5000/admin/content/create", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-          withCredentials: true,
-        });
-      }
+      await axios.put("http://localhost:5000/admin/content/update", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true,
+      });
 
       openSnackbar(`Content ${selectedStatus.toLowerCase()}ed successfully`, "success");
       setTimeout(() => {
@@ -124,28 +107,7 @@ export default function CreateContent() {
       const timer = setTimeout(() => router.push("/admin/login"), 2000);
       return () => clearTimeout(timer);
     }
-
-    const contentIdFromUrl = searchParams.get("id");
-    if (contentIdFromUrl) {
-      setContentId(contentIdFromUrl);
-      // Fetch existing content data if updating
-      axios.get(`http://localhost:5000/admin/content/${contentIdFromUrl}`, { withCredentials: true })
-        .then((response) => {
-          const data = response.data;
-          setFoodName(data.title);
-          setShortDescription(data.shortDesc);
-          setSelectedClassification(data.category);
-          setRecipes(data.recipes || []);
-          setInstructions(data.instructions || []);
-          setStatus(data.status || "Draft");
-          // You may need to set media files as well, depending on your API response
-        })
-        .catch((error) => {
-          openSnackbar("Failed to load content", "error");
-          console.error(error);
-        });
-    }
-  }, [searchParams, router, openSnackbar]);
+  }, [router, openSnackbar]);
 
   return (
     <div className="flex min-h-screen text-[#3E2723]">
@@ -298,30 +260,30 @@ export default function CreateContent() {
                 {mediaFiles.map((file, index) => (
                   <div key={index} className="text-center">
                     <div
-                      className="cursor-pointer bg-[#f0f0f0] rounded-md p-4"
+                      className="cursor-pointer bg-[#efefef] border p-8 border-[#2d2d2d4e] rounded-sm"
                       onClick={() => handleUploadClick(index)}
                     >
-                      {file ? (
-                        <span className="block">{file.name}</span>
-                      ) : (
-                        <span className="text-xs text-gray-500">Upload file</span>
-                      )}
+                      <FolderOpenDot size={24} />
                     </div>
+                    {file && (
+                      <div className="mt-2">
+                        <span className="text-sm">{file.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteFile(index)}
+                          className="text-[#3E2723] ml-2"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    )}
                     <input
                       ref={fileInputRefs[index]}
                       type="file"
-                      className="hidden"
+                      accept="image/*,video/*"
                       onChange={(e) => e.target.files && handleFileChange(index, e.target.files[0])}
+                      hidden
                     />
-                    {file && (
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteFile(index)}
-                        className="mt-2 text-xs text-red-500"
-                      >
-                        Delete
-                      </button>
-                    )}
                   </div>
                 ))}
               </div>
