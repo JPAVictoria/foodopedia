@@ -142,7 +142,6 @@ export default function CreateContent() {
     }
   };
 
-  // In your useEffect, no changes are needed as it's just handling authentication
   useEffect(() => {
     const token = Cookies.get("token");
     if (!token) {
@@ -181,12 +180,12 @@ export default function CreateContent() {
                   <Chip
                     label={status}
                     sx={{
-                      marginLeft: "8px", // Space between text and chip
+                      marginLeft: "8px",
                       backgroundColor:
-                        status === "Draft" ? "#FFF8E1" : "#E8F5E9", // Custom color for Draft/Publish
-                      color: status === "Draft" ? "#FBC02D" : "#4CAF50", // Text color depending on the status
-                      borderRadius: "12px", // Rounded corners for the chip
-                      padding: "4px 12px", // Padding inside the chip
+                        status === "Draft" ? "#FFF8E1" : "#E8F5E9", 
+                      color: status === "Draft" ? "#FBC02D" : "#4CAF50", 
+                      borderRadius: "12px", 
+                      padding: "4px 12px", 
                     }}
                   />
                 </div>
