@@ -8,7 +8,7 @@ import axios from "axios";
 import { useSnackbar } from "@/app/context/SnackbarContext";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
-import { useRegisterStore } from "@/app/stores/useRegisterStore";
+import { useRegisterStore } from "@/app/stores/adminStores/useRegisterStore";
 
 export default function Signup() {
   const router = useRouter();

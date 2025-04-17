@@ -6,7 +6,7 @@ import { Button } from "@/app/components/ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSnackbar } from "@/app/context/SnackbarContext";
-import { useLoginStore } from "@/app/stores/useLoginStore";
+import { useLoginStore } from "@/app/stores/adminStores/useLoginStore";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";

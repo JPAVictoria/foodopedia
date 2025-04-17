@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { useSnackbar } from "@/app/context/SnackbarContext";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
-import { useChangeStore } from "@/app/stores/useChangeStore";
+import { useChangeStore } from "@/app/stores/adminStores/useChangeStore";
 import axios from "axios"; 
 
 export default function ChangePassword() {

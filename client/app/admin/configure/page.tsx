@@ -11,14 +11,15 @@ import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
 import { Button } from "@/app/components/ui/button";
 import { Eye, EyeOff } from "lucide-react";
-import { useConfigureStore } from "@/app/stores/useConfigureStore"; 
+import { useConfigureStore } from "@/app/stores/adminStores/useConfigureStore";
 
 export default function Configure() {
   const router = useRouter();
   const { openSnackbar } = useSnackbar();
   const { isNavbarVisible } = useNavbar();
 
-  const { firstName, lastName, setFirstName, setLastName } = useConfigureStore();
+  const { firstName, lastName, setFirstName, setLastName } =
+    useConfigureStore();
 
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
@@ -59,13 +60,19 @@ export default function Configure() {
         }
       );
 
-      openSnackbar(res.data.message || "Password updated successfully.", "success");
+      openSnackbar(
+        res.data.message || "Password updated successfully.",
+        "success"
+      );
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        openSnackbar(err.response?.data?.message || "Failed to update password.", "error");
+        openSnackbar(
+          err.response?.data?.message || "Failed to update password.",
+          "error"
+        );
       } else {
         openSnackbar("An unexpected error occurred.", "error");
       }
@@ -96,7 +103,10 @@ export default function Configure() {
       }, 2000);
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        openSnackbar(err.response?.data?.message || "Failed to update name.", "error");
+        openSnackbar(
+          err.response?.data?.message || "Failed to update name.",
+          "error"
+        );
       } else {
         openSnackbar("An unexpected error occurred.", "error");
       }
@@ -118,9 +128,15 @@ export default function Configure() {
               Change Password
             </h1>
             <div className="w-full space-y-4 bg-[#fffaec] p-8 border border-[#2d2d2d4e] rounded-sm">
-              <form onSubmit={handlePasswordSubmit} className="flex flex-col gap-7">
+              <form
+                onSubmit={handlePasswordSubmit}
+                className="flex flex-col gap-7"
+              >
                 <div className="relative">
-                  <Label htmlFor="current-password" className="pb-2 text-[#3E2723]">
+                  <Label
+                    htmlFor="current-password"
+                    className="pb-2 text-[#3E2723]"
+                  >
                     Current Password
                   </Label>
                   <Input
@@ -158,7 +174,10 @@ export default function Configure() {
                 </div>
 
                 <div className="relative">
-                  <Label htmlFor="confirm-password" className="pb-2 text-[#3E2723]">
+                  <Label
+                    htmlFor="confirm-password"
+                    className="pb-2 text-[#3E2723]"
+                  >
                     Confirm Password
                   </Label>
                   <Input
@@ -176,7 +195,10 @@ export default function Configure() {
                   </div>
                 </div>
 
-                <Button type="submit" className="mt-2 bg-[#4CAF50] hover:bg-[#45a049] text-white">
+                <Button
+                  type="submit"
+                  className="mt-2 bg-[#4CAF50] hover:bg-[#45a049] text-white"
+                >
                   Submit
                 </Button>
               </form>
@@ -213,7 +235,10 @@ export default function Configure() {
                   />
                 </div>
 
-                <Button type="submit" className="mt-2 bg-[#4CAF50] hover:bg-[#45a049] text-white">
+                <Button
+                  type="submit"
+                  className="mt-2 bg-[#4CAF50] hover:bg-[#45a049] text-white"
+                >
                   Submit
                 </Button>
               </form>

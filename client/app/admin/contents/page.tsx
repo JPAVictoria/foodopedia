@@ -5,10 +5,11 @@ import { SquarePlus, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { Chip, Box, Button, Stack, Typography } from "@mui/material";
 import { useNavbar } from "@/app/context/NavbarContext";
-import { useState, useEffect } from "react";
-import axios from "axios";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useSnackbar } from "@/app/context/SnackbarContext";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { useContentStore } from "@/app/stores/adminStores/useContentStore";
 
 interface ContentItem {
   id: string;
@@ -21,40 +22,41 @@ interface ContentItem {
 export default function Contents() {
   const { isNavbarVisible } = useNavbar();
   const { openSnackbar } = useSnackbar();
+  const queryClient = useQueryClient();
+  const { contents, setContents } = useContentStore();
 
-  const [rows, setRows] = useState<ContentItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const { data, isLoading } = useQuery<ContentItem[]>({
+    queryKey: ['contents'],
+    queryFn: async () => {
+      const response = await axios.get("http://localhost:5000/admin/content", {
+        withCredentials: true,
+      });
+      setContents(response.data); 
+      return response.data;
+    },
+  });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/admin/content", {
-          withCredentials: true,
-        });
-        setRows(response.data);
-      } catch (error) {
-        console.error("Error fetching content data", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const handleDelete = async (id: string) => {
-    try {
-      await axios.put(
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => 
+      axios.put(
         `http://localhost:5000/admin/content/softDelete/${id}`,
         {},
         { withCredentials: true }
+      ),
+    onSuccess: (_, id) => {
+      queryClient.setQueryData<ContentItem[]>(['contents'], (old) => 
+        old?.filter(item => item.id !== id) || []
       );
-      setRows((prevRows) => prevRows.filter((row) => row.id !== id));
+      setContents(contents.filter(item => item.id !== id));
       openSnackbar("Content deleted successfully", "success");
-    } catch (error) {
-      console.error("Error deleting content", error);
+    },
+    onError: () => {
       openSnackbar("Failed to delete content", "error");
     }
+  });
+
+  const handleDelete = (id: string) => {
+    deleteMutation.mutate(id);
   };
 
   const columns: GridColDef[] = [
@@ -198,6 +200,7 @@ export default function Contents() {
               height: "100%",
             }}
             onClick={() => handleDelete(params.row.id)}
+            disabled={deleteMutation.isPending}
           >
             <Trash2 className="w-4 h-4" />
             <Typography 
@@ -209,7 +212,7 @@ export default function Contents() {
                 textTransform: "none" 
               }}
             >
-              Delete
+              {deleteMutation.isPending ? "Deleting..." : "Delete"}
             </Typography>
           </Button>
         </Stack>
@@ -252,9 +255,9 @@ export default function Contents() {
         }}>
           <DataGrid
             getRowId={(row) => row.id}
-            rows={rows}
+            rows={data || []}
             columns={columns}
-            loading={loading}
+            loading={isLoading}
             pagination
             pageSizeOptions={[5, 10, 20]}
             disableColumnMenu
