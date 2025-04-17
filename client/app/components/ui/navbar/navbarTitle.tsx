@@ -8,7 +8,7 @@ export default function NavbarTitle() {
     if (storedAdmin) {
       setAdmin(JSON.parse(storedAdmin));
     }
-  }, []); // Initial load from localStorage
+  }, []); 
 
   useEffect(() => {
     const handleStorageChange = () => {
@@ -23,7 +23,7 @@ export default function NavbarTitle() {
     return () => {
       window.removeEventListener("storage", handleStorageChange);
     };
-  }, []); // Listen for changes to localStorage
+  }, []);
 
   return (
     <div className="bg-[#F3E7C7] p-4 rounded-md text-[#3E2723]">

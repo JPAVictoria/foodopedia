@@ -1,4 +1,3 @@
-// /api/auth/change/change.route.js
 const { Router } = require("express");
 const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcryptjs");

@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useSnackbar } from "@/app/context/SnackbarContext";
 import { Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
 import { useRegisterStore } from "@/app/stores/adminStores/useRegisterStore";
 
 export default function Signup() {
@@ -22,15 +21,14 @@ export default function Signup() {
     confirmPassword,
     loading,
     submitted,
+    showPassword,
+    showConfirmPassword,
     setField,
     setLoading,
     setSubmitted,
+    toggleShowPassword,
+    toggleShowConfirmPassword,
   } = useRegisterStore();
-
-  const [showPassword, setShowPassword] = useState({
-    password: false,
-    confirmPassword: false,
-  });
 
   const isDisabled = loading || submitted;
 
@@ -38,37 +36,30 @@ export default function Signup() {
     setField(e.target.id, e.target.value);
   };
 
-  const toggleVisibility = (field: "password" | "confirmPassword") => {
-    setShowPassword((prev: { password: boolean; confirmPassword: boolean }) => ({
-      ...prev,
-      [field]: !prev[field],
-    }));
-  };
-
   const handleSubmit = async () => {
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
       openSnackbar("Please fill in all fields", "error");
       return;
     }
-  
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA0-9]{2,}$/;
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(email)) {
       openSnackbar("Please enter a valid email address", "error");
       return;
     }
-  
+
     if (password !== confirmPassword) {
       openSnackbar("Passwords do not match", "error");
       return;
     }
-  
+
     if (password.length < 8) {
       openSnackbar("Password must be at least 8 characters long", "error");
       return;
     }
-  
+
     setLoading(true);
-  
+
     try {
       const res = await axios.post("http://localhost:5000/admin/register/signup", {
         firstName,
@@ -77,23 +68,20 @@ export default function Signup() {
         password,
         confirmPassword,
       });
-  
+
       if (res.status === 201) {
         openSnackbar("Registration successful!", "success");
         setSubmitted(true);
-  
-        setTimeout(() => {
-          router.push("/admin/login");
-        }, 3000);
+        setTimeout(() => router.push("/admin/login"), 3000);
       }
     } catch (err: unknown) {
-      setLoading(false);
       const error = err as { response?: { data?: { message: string } } };
       const errorMessage = error?.response?.data?.message || "Something went wrong";
       openSnackbar(errorMessage, "error");
+    } finally {
+      setLoading(false);
     }
   };
-  
 
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -102,44 +90,59 @@ export default function Signup() {
           Register now
         </h1>
 
-        {["firstName", "lastName", "email", "password", "confirmPassword"].map((field, idx) => {
-          const isPassword = field.toLowerCase().includes("password");
-          const isPassField = field === "password" || field === "confirmPassword";
-          const show = showPassword[field as keyof typeof showPassword];
+        {[
+          { id: "firstName", label: "First Name", value: firstName, type: "text" },
+          { id: "lastName", label: "Last Name", value: lastName, type: "text" },
+          { id: "email", label: "Email", value: email, type: "email" },
+          {
+            id: "password",
+            label: "Password",
+            value: password,
+            type: showPassword ? "text" : "password",
+            isPassword: true,
+            toggle: toggleShowPassword,
+            show: showPassword,
+          },
+          {
+            id: "confirmPassword",
+            label: "Confirm Password",
+            value: confirmPassword,
+            type: showConfirmPassword ? "text" : "password",
+            isPassword: true,
+            toggle: toggleShowConfirmPassword,
+            show: showConfirmPassword,
+          },
+        ].map((field, idx) => (
+          <div className="pt-5 relative" key={idx}>
+            <Label htmlFor={field.id} className="pb-2 text-[#3E2723]">
+              {field.label}
+            </Label>
+            <Input
+              id={field.id}
+              type={field.type}
+              value={field.value}
+              onChange={handleChange}
+              disabled={isDisabled}
+              placeholder={
+                field.id === "email"
+                  ? "email@example.com"
+                  : field.isPassword
+                  ? "********"
+                  : "example"
+              }
+              className="focus:outline-none focus:border-[#4CAF50] focus:shadow-sm focus:shadow-[#4CAF50]/30 transition-all duration-300 pr-10"
+            />
 
-          return (
-            <div className="pt-5 relative" key={idx}>
-              <Label htmlFor={field} className="pb-2 text-[#3E2723] capitalize">
-                {field === "confirmPassword" ? "Confirm Password" : field.replace(/([A-Z])/g, " $1")}
-              </Label>
-
-              <Input
-                type={isPassword && show ? "text" : isPassword ? "password" : "text"}
-                id={field}
-                placeholder={
-                  isPassword
-                    ? "********"
-                    : field === "email"
-                    ? "email@example.com"
-                    : "example"
-                }
-                value={field === "firstName" ? firstName : field === "lastName" ? lastName : field === "email" ? email : field === "password" ? password : confirmPassword}
-                onChange={handleChange}
-                disabled={isDisabled}
-                className="focus:outline-none focus:border-[#4CAF50] focus:shadow-sm focus:shadow-[#4CAF50]/30 transition-all duration-300 pr-10"
-              />
-
-              {isPassField && (
-                <div
-                  onClick={() => toggleVisibility(field as "password" | "confirmPassword")}
-                  className="absolute inset-y-15 right-3 flex items-center cursor-pointer text-gray-500 hover:text-[#4CAF50] transition"
-                >
-                  {show ? <EyeOff size={18} /> : <Eye size={18} />}
-                </div>
-              )}
-            </div>
-          );
-        })}
+            {field.isPassword && (
+              <div
+                onClick={field.toggle}
+                className="absolute inset-y-15 right-3 flex items-center cursor-pointer text-gray-500 hover:text-[#4CAF50] transition"
+              >
+                {field.show ? <EyeOff size={18} /> : <Eye size={18} />}
+              </div>
+            )}
+          </div>
+        ))}
 
         <div className="pt-5">
           <Button

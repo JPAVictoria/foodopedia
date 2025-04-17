@@ -5,12 +5,10 @@ const bcrypt = require("bcrypt");
 const prisma = new PrismaClient();
 const router = Router();
 
-// Sign up route
 router.post("/signup", async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
 
   try {
-    // Check if the admin with this email already exists
     const existingAdmin = await prisma.admin.findUnique({
       where: { email },
     });
@@ -19,7 +17,6 @@ router.post("/signup", async (req, res) => {
       return res.status(400).json({ message: "Email already exists" });
     }
 
-    // Hash the password using bcrypt
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
@@ -33,7 +30,6 @@ router.post("/signup", async (req, res) => {
       },
     });
 
-    // Return the created admin object (excluding password for security)
     res.status(201).json({
       id: admin.id,
       firstName: admin.firstName,

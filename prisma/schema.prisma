@@ -34,7 +34,7 @@ model Content {
   id          String         @id @default(uuid())
   title       String
   slug        String         @unique
-  shortDesc   String         // Short description
+  shortDesc   String         
   category    Category
   status      ContentStatus  @default(DRAFT) 
   createdAt   DateTime       @default(now())

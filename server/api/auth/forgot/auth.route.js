@@ -23,7 +23,6 @@ router.post("/forgot", async (req, res) => {
 
     const resetUrl = `http://localhost:3000/admin/change-password?token=${token}`;
 
-    // Send Email using nodemailer
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {

@@ -85,18 +85,18 @@ router.post("/create", async (req, res) => {
       },
     });
 
-    // FIXED: Proper ingredient format
+    
     const savedIngredients = ingredients?.map(ingredient => ({
       ingredient: typeof ingredient === 'object' ? ingredient.ingredient : ingredient,
       contentId: newContent.id,
-    })).filter(i => i.ingredient) || []; // Filter out empty ingredients
+    })).filter(i => i.ingredient) || []; 
 
-    // FIXED: Proper instructions format
+    
     const savedInstructions = instructions?.map((instruction, index) => ({
       instruction: typeof instruction === 'object' ? instruction.instruction : instruction,
       stepNumber: index + 1,
       contentId: newContent.id,
-    })).filter(i => i.instruction) || []; // Filter out empty instructions
+    })).filter(i => i.instruction) || []; 
 
     if (savedIngredients.length) {
       await prisma.recipe.createMany({ 
@@ -138,7 +138,7 @@ router.put("/:id", async (req, res) => {
     where: {
       title: { equals: title.trim(), mode: 'insensitive' },
       deleted: false,
-      NOT: { id } // Exclude current content from duplicate check
+      NOT: { id } 
     }
   });
 
@@ -214,13 +214,13 @@ router.put("/:id", async (req, res) => {
     await prisma.recipe.deleteMany({ where: { contentId: id } });
     await prisma.recipeInstruction.deleteMany({ where: { contentId: id } });
 
-    // FIXED: Proper ingredient format
+    
     const newIngredients = ingredients?.map(ingredient => ({
       ingredient: typeof ingredient === 'object' ? ingredient.ingredient : ingredient,
       contentId: id,
     })).filter(i => i.ingredient) || [];
 
-    // FIXED: Proper instructions format
+    
     const newInstructions = instructions?.map((instruction, index) => ({
       instruction: typeof instruction === 'object' ? instruction.instruction : instruction,
       stepNumber: index + 1,
@@ -249,7 +249,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// SOFT DELETE
+
 router.put("/softDelete/:id", async (req, res) => {
   const { id } = req.params;
 
@@ -268,7 +268,7 @@ router.put("/softDelete/:id", async (req, res) => {
   }
 });
 
-// GET BY ID
+
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
 

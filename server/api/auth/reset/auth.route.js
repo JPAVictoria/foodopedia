@@ -1,4 +1,3 @@
-// /api/auth/reset/reset.route.js
 const { Router } = require("express");
 const { PrismaClient } = require("@prisma/client");
 const jwt = require("jsonwebtoken");

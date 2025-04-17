@@ -17,12 +17,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Create a single instance of QueryClient for the app
   const [queryClient] = useState(() => new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 60 * 1000, // 1 minute
-        retry: 3, // Will retry failed requests 3 times before displaying an error
+        staleTime: 60 * 1000, 
+        retry: 3, 
       },
     },
   }));
@@ -30,9 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} antialiased min-h-screen`}>
-        {/* Wrap with QueryClientProvider first */}
         <QueryClientProvider client={queryClient}>
-          {/* Then wrap with your existing providers */}
           <SnackbarProvider>
             <NavbarProvider>
               {children}

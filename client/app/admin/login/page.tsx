@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
 import { Button } from "@/app/components/ui/button";
@@ -25,10 +25,11 @@ export default function Login() {
     setPassword,
     setLoading,
     setSubmitted,
-    resetLoginForm,
+    resetLoginForm, 
+    showPassword, 
+    toggleShowPassword
   } = useLoginStore();
 
-  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -117,7 +118,7 @@ export default function Login() {
               className="w-full focus:outline-none focus:border-[#4CAF50] focus:shadow-sm focus:shadow-[#4CAF50]/30 transition-all duration-300 pr-10"
             />
             <div
-              onClick={() => setShowPassword((prev) => !prev)}
+              onClick={toggleShowPassword}
               className="absolute inset-y-15 right-3 flex items-center cursor-pointer text-gray-500 hover:text-[#4CAF50] transition"
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
