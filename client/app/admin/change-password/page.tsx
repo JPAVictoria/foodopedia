@@ -7,27 +7,28 @@ import { useEffect, useState } from "react";
 import { useSnackbar } from "@/app/context/SnackbarContext";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
-import { useChangeStore } from "@/app/stores/adminStores/useChangeStore";
-import axios from "axios"; 
+import { useToggleStore } from "@/app/stores/adminStores/useToggleStore"; 
+import { useStateStore } from "@/app/stores/adminStores/useStateStore"; 
+import axios from "axios";
 
 export default function ChangePassword() {
   const {
-    password,
+    newPassword,
     confirmPassword,
-    loading,
-    submitted,
-    setPassword,
+    showNew,
+    showConfirm,
+    setNewPassword,
     setConfirmPassword,
-    setLoading,
-    setSubmitted,
-  } = useChangeStore();
+    toggleShowNew,
+    toggleShowConfirm,
+  } = useToggleStore();
+
+  const { loading, setLoading, submitted, setSubmitted } = useStateStore();
 
   const [token, setToken] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
   const { openSnackbar } = useSnackbar();
   const router = useRouter();
+
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -38,17 +39,17 @@ export default function ChangePassword() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!password || !confirmPassword) {
+    if (!newPassword || !confirmPassword) {
       openSnackbar("Please fill in both fields", "error");
       return;
     }
 
-    if (password.length < 8) {
+    if (newPassword.length < 8) {
       openSnackbar("Password must be at least 8 characters", "error");
       return;
     }
 
-    if (password !== confirmPassword) {
+    if (newPassword !== confirmPassword) {
       openSnackbar("Passwords do not match", "error");
       return;
     }
@@ -58,11 +59,11 @@ export default function ChangePassword() {
       return;
     }
 
-    setLoading(true); 
+    setLoading(true);
 
     try {
       const res = await axios.post("http://localhost:5000/admin/reset/reset", {
-        newPassword: password,
+        newPassword,
         token,
       });
 
@@ -108,19 +109,19 @@ export default function ChangePassword() {
               New Password
             </Label>
             <Input
-              type={showPassword ? "text" : "password"}
+              type={showNew ? "text" : "password"}
               id="password"
               placeholder="********"
-              value={password}
+              value={newPassword}
               disabled={loading || submitted}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => setNewPassword(e.target.value)}
               className="pr-10 focus:outline-none focus:border-[#4CAF50] focus:shadow-sm focus:shadow-[#4CAF50]/30"
             />
             <div
-              onClick={() => setShowPassword((prev) => !prev)}
+              onClick={toggleShowNew}
               className="absolute inset-y-10 right-3 flex items-center cursor-pointer text-gray-500 hover:text-[#4CAF50]"
             >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              {showNew ? <EyeOff size={18} /> : <Eye size={18} />}
             </div>
           </div>
 
@@ -129,7 +130,7 @@ export default function ChangePassword() {
               Confirm New Password
             </Label>
             <Input
-              type={showConfirmPassword ? "text" : "password"}
+              type={showConfirm ? "text" : "password"}
               id="confirmPassword"
               placeholder="********"
               value={confirmPassword}
@@ -138,10 +139,10 @@ export default function ChangePassword() {
               className="pr-10 focus:outline-none focus:border-[#4CAF50] focus:shadow-sm focus:shadow-[#4CAF50]/30"
             />
             <div
-              onClick={() => setShowConfirmPassword((prev) => !prev)}
+              onClick={toggleShowConfirm}
               className="absolute inset-y-15 right-3 flex items-center cursor-pointer text-gray-500 hover:text-[#4CAF50]"
             >
-              {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
             </div>
           </div>
 
