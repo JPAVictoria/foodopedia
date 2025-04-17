@@ -4,93 +4,96 @@ import { useNavbar } from "@/app/context/NavbarContext";
 import Navbar from "@/app/components/ui/navbar/navbar";
 import { FolderOpenDot, BookPlus, Trash2, Plus } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
 import { useSnackbar } from "@/app/context/SnackbarContext";
 import { Label } from "@/app/components/ui/label";
 import { Input } from "@/app/components/ui/input";
-import axios from "axios";
 import { Chip } from "@mui/material";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { useCreateStore } from "@/app/stores/adminStores/useCreateStore";
+
+type Classification = "DESSERT" | "APPETIZER" | "ENTREE" | "BEVERAGES";
 
 export default function CreateContent() {
   const router = useRouter();
   const { openSnackbar } = useSnackbar();
   const { isNavbarVisible } = useNavbar();
+  const queryClient = useQueryClient();
+  
+  const {
+    recipes,
+    instructions,
+    selectedClassification,
+    foodName,
+    shortDescription,
+    status,
+    setRecipes,
+    setInstructions,
+    setSelectedClassification,
+    setFoodName,
+    setShortDescription,
+    setStatus,
+  } = useCreateStore();
 
-  const [recipes, setRecipes] = useState<string[]>([""]);
-  const [instructions, setInstructions] = useState<string[]>([""]);
-  const [selectedClassification, setSelectedClassification] = 
-    useState<string>("");
-  const [foodName, setFoodName] = useState<string>("");
-  const [shortDescription, setShortDescription] = useState<string>("");
-  const [status, setStatus] = useState<string>("Draft");
-
-  const classifications = ["DESSERT", "APPETIZER", "ENTREE", "BEVERAGES"];
+  const classifications: Classification[] = ["DESSERT", "APPETIZER", "ENTREE", "BEVERAGES"];
 
   const handleAddField = () => setRecipes([...recipes, ""]);
   const handleInputChange = (index: number, value: string) =>
-    setRecipes((prev) => prev.map((item, i) => (i === index ? value : item)));
+    setRecipes(recipes.map((item, i) => (i === index ? value : item)));
   const handleDeleteField = (index: number) =>
-    setRecipes((prev) => prev.filter((_, i) => i !== index));
+    setRecipes(recipes.filter((_, i) => i !== index));
 
-  const handleAddInstructionField = () =>
-    setInstructions([...instructions, ""]);
+  const handleAddInstructionField = () => setInstructions([...instructions, ""]);
   const handleInputInstructionChange = (index: number, value: string) =>
-    setInstructions((prev) =>
-      prev.map((item, i) => (i === index ? value : item))
-    );
+    setInstructions(instructions.map((item, i) => (i === index ? value : item)));
   const handleDeleteInstructionField = (index: number) =>
-    setInstructions((prev) => prev.filter((_, i) => i !== index));
+    setInstructions(instructions.filter((_, i) => i !== index));
 
   const handleClassificationChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setSelectedClassification(e.target.value);
+    setSelectedClassification(e.target.value as Classification);
 
   const validateForm = () => {
     const errorList: string[] = [];
 
     if (!foodName.trim()) errorList.push("Food name is required.");
     if (!selectedClassification) errorList.push("Classification is required.");
-    if (!shortDescription.trim())
-      errorList.push("Short description is required.");
-    if (recipes.some((r) => !r.trim()))
-      errorList.push("All recipe fields must be filled.");
-    if (instructions.some((i) => !i.trim()))
-      errorList.push("All instruction fields must be filled.");
+    if (!shortDescription.trim()) errorList.push("Short description is required.");
+    if (recipes.some((r) => !r.trim())) errorList.push("All recipe fields must be filled.");
+    if (instructions.some((i) => !i.trim())) errorList.push("All instruction fields must be filled.");
 
     if (errorList.length > 0) {
       openSnackbar(errorList.join(" "), "error");
       return false;
     }
-
     return true;
   };
 
-  const handleSubmit = async (selectedStatus: string) => {
-    if (!validateForm()) return;
-
-    try {
+  const createMutation = useMutation({
+    mutationFn: async (selectedStatus: string) => {
       const payload = {
         title: foodName.trim(),
         shortDesc: shortDescription,
         category: selectedClassification,
         status: selectedStatus === "Publish" ? "PUBLISHED" : "DRAFT",
-        ingredients: JSON.stringify(recipes.filter(r => r.trim())), // Filter empty and stringify
-        instructions: JSON.stringify(instructions.filter(i => i.trim())) // Filter empty and stringify
+        ingredients: JSON.stringify(recipes.filter(r => r.trim())),
+        instructions: JSON.stringify(instructions.filter(i => i.trim()))
       };
 
-      await axios.post("http://localhost:5000/admin/content/create", payload, {
+      return axios.post("http://localhost:5000/admin/content/create", payload, {
         withCredentials: true,
       });
-
+    },
+    onSuccess: (_, selectedStatus) => {
       openSnackbar(
         `Content ${selectedStatus.toLowerCase()}ed successfully!`,
         "success"
       );
+      queryClient.invalidateQueries({ queryKey: ['contents'] });
       setTimeout(() => router.push("/admin/contents"), 2000);
-    } catch (error) {
+    },
+    onError: (error) => {
       console.error("Submission error:", error);
-
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 409) {
           openSnackbar(
@@ -107,16 +110,13 @@ export default function CreateContent() {
         openSnackbar("An unexpected error occurred", "error");
       }
     }
-  };
+  });
 
-  useEffect(() => {
-    const token = Cookies.get("token");
-    if (!token) {
-      openSnackbar("Token is missing", "error");
-      const timer = setTimeout(() => router.push("/admin/login"), 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [router, openSnackbar]);
+  const handleSubmit = (selectedStatus: string) => {
+    if (!validateForm()) return;
+    setStatus(selectedStatus);
+    createMutation.mutate(selectedStatus);
+  };
 
   return (
     <div className="flex min-h-screen text-[#3E2723]">
