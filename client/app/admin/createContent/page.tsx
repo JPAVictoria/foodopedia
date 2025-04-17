@@ -11,7 +11,7 @@ import { Input } from "@/app/components/ui/input";
 import { Chip } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { useCreateStore } from "@/app/stores/adminStores/useCreateStore";
+import { useInformationStore } from "@/app/stores/adminStores/useInformationStore";
 
 type Classification = "DESSERT" | "APPETIZER" | "ENTREE" | "BEVERAGES";
 
@@ -34,7 +34,7 @@ export default function CreateContent() {
     setFoodName,
     setShortDescription,
     setStatus,
-  } = useCreateStore();
+  } = useInformationStore();
 
   const classifications: Classification[] = ["DESSERT", "APPETIZER", "ENTREE", "BEVERAGES"];
 

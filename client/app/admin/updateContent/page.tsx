@@ -3,160 +3,154 @@ import { useNavbar } from "@/app/context/NavbarContext";
 import Navbar from "@/app/components/ui/navbar/navbar";
 import { FolderOpenDot, BookPlus, Trash2, Plus } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
-import { useEffect, useState} from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Cookies from "js-cookie";
 import { useSnackbar } from "@/app/context/SnackbarContext";
 import { Label } from "@/app/components/ui/label";
 import { Input } from "@/app/components/ui/input";
-import axios from "axios";
 import { Chip } from "@mui/material";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { useInformationStore } from "@/app/stores/adminStores/useInformationStore";
 
+type Classification = "DESSERT" | "APPETIZER" | "ENTREE" | "BEVERAGES";
+
+interface Recipe {
+  ingredient: string;
+}
+
+interface Instruction {
+  instruction: string;
+  stepNumber: number;
+}
+
+interface ContentResponse {
+  title: string;
+  shortDesc: string;
+  category: Classification;
+  status: "PUBLISHED" | "DRAFT";
+  recipes: Recipe[];
+  instructions: Instruction[];
+}
 
 export default function UpdateContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const contentId = searchParams.get("id"); // grab ID from URL
+  const contentId = searchParams.get("id");
   const { openSnackbar } = useSnackbar();
   const { isNavbarVisible } = useNavbar();
+  const queryClient = useQueryClient();
 
-  const [recipes, setRecipes] = useState<string[]>([""]);
-  const [instructions, setInstructions] = useState<string[]>([""]);
-  const [selectedClassification, setSelectedClassification] = useState<string>("");
-  const [foodName, setFoodName] = useState<string>("");
-  const [shortDescription, setShortDescription] = useState<string>("");
-  const [status, setStatus] = useState<string>("Draft");
-  const classifications = ["DESSERT", "APPETIZER", "ENTREE", "BEVERAGES"];
+  const {
+    recipes,
+    instructions,
+    selectedClassification,
+    foodName,
+    shortDescription,
+    status,
+    setRecipes,
+    setInstructions,
+    setSelectedClassification,
+    setFoodName,
+    setShortDescription,
+    setStatus,
+  } = useInformationStore();
+
+  const classifications: Classification[] = ["DESSERT", "APPETIZER", "ENTREE", "BEVERAGES"];
 
   const handleAddField = () => setRecipes([...recipes, ""]);
-  const handleInputChange = (index: number, value: string) => setRecipes((prev) => prev.map((item, i) => (i === index ? value : item)));
-  const handleDeleteField = (index: number) => setRecipes((prev) => prev.filter((_, i) => i !== index));
+  const handleInputChange = (index: number, value: string) =>
+    setRecipes(recipes.map((item, i) => (i === index ? value : item)));
+  const handleDeleteField = (index: number) =>
+    setRecipes(recipes.filter((_, i) => i !== index));
 
   const handleAddInstructionField = () => setInstructions([...instructions, ""]);
-  const handleInputInstructionChange = (index: number, value: string) => setInstructions((prev) => prev.map((item, i) => (i === index ? value : item)));
-  const handleDeleteInstructionField = (index: number) => setInstructions((prev) => prev.filter((_, i) => i !== index));
+  const handleInputInstructionChange = (index: number, value: string) =>
+    setInstructions(instructions.map((item, i) => (i === index ? value : item)));
+  const handleDeleteInstructionField = (index: number) =>
+    setInstructions(instructions.filter((_, i) => i !== index));
 
-  const handleClassificationChange = (e: React.ChangeEvent<HTMLInputElement>) => setSelectedClassification(e.target.value);
+  const handleClassificationChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setSelectedClassification(e.target.value as Classification);
 
+  const {  } = useQuery({
+    queryKey: ["content", contentId],
+    queryFn: async (): Promise<ContentResponse> => {
+      const res = await axios.get(`http://localhost:5000/admin/content/${contentId}`, {
+        withCredentials: true,
+      });
+      const data: ContentResponse = res.data;
 
-  interface Recipe {
-    ingredient: string;
-  }
-  
-  interface Instruction {
-    instruction: string;
-    stepNumber: number;
-  }
+      setFoodName(data.title || "");
+      setShortDescription(data.shortDesc || "");
+      setSelectedClassification(data.category || "");
+      setStatus(data.status === "PUBLISHED" ? "Publish" : "Draft");
 
- 
+      const recipeStrings = data.recipes?.map((r) => r.ingredient) || [""];
+      setRecipes(recipeStrings.length ? recipeStrings : [""]);
+
+      const instructionStrings = data.instructions
+        ?.sort((a, b) => a.stepNumber - b.stepNumber)
+        ?.map((i) => i.instruction) || [""];
+      setInstructions(instructionStrings.length ? instructionStrings : [""]);
+
+      return data;
+    },
+    enabled: !!contentId,
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async (selectedStatus: string) => {
+      const payload = {
+        title: foodName.trim(),
+        shortDesc: shortDescription,
+        category: selectedClassification,
+        status: selectedStatus === "Publish" ? "PUBLISHED" : "DRAFT",
+        ingredients: JSON.stringify(recipes.filter((r) => r.trim())),
+        instructions: JSON.stringify(instructions.filter((i) => i.trim())),
+      };
+
+      return axios.put(`http://localhost:5000/admin/content/${contentId}`, payload, {
+        withCredentials: true,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["contents"] });
+      openSnackbar("Content updated successfully", "success");
+      setTimeout(() => router.push("/admin/contents"), 2000);
+    },
+    onError: (error: unknown) => {
+      console.error(error);
+      if (axios.isAxiosError(error)) {
+        openSnackbar(error.response?.data?.message || "Failed to update content", "error");
+      } else {
+        openSnackbar("An unexpected error occurred", "error");
+      }
+    },
+  });
+
   const validateForm = () => {
     const errorList: string[] = [];
 
     if (!foodName.trim()) errorList.push("Food name is required.");
     if (!selectedClassification) errorList.push("Classification is required.");
     if (!shortDescription.trim()) errorList.push("Short description is required.");
-    if (recipes.some((i) => typeof i !== "string" || i.trim() === "")) {
-        openSnackbar("Please fill in all recipes", "error");
-        return;
-      }
-      
-      if (instructions.some((i) => typeof i !== "string" || i.trim() === "")) {
-        openSnackbar("Please fill in all instructions", "error");
-        return;
-      }
-      
+    if (recipes.some((i) => !i.trim())) errorList.push("All recipes must be filled.");
+    if (instructions.some((i) => !i.trim())) errorList.push("All instructions must be filled.");
 
     if (errorList.length > 0) {
       openSnackbar(errorList.join(" "), "error");
       return false;
     }
-
     return true;
   };
 
-  const handleSubmit = async (selectedStatus: string) => {
+  const handleSubmit = (selectedStatus: string) => {
     if (!validateForm()) return;
-  
-    try {
-      const payload = {
-        title: foodName.trim(),
-        shortDesc: shortDescription,
-        category: selectedClassification,
-        status: selectedStatus === 'Publish' ? 'PUBLISHED' : 'DRAFT',
-        ingredients: JSON.stringify(recipes.filter(r => r.trim())), // Filter empty and stringify
-        instructions: JSON.stringify(instructions.filter(i => i.trim())) // Filter empty and stringify
-      };
-  
-      await axios.put(`http://localhost:5000/admin/content/${contentId}`, payload, {
-        headers: { 
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      });
-  
-      openSnackbar(`Content updated successfully`, "success");
-      setTimeout(() => router.push("/admin/contents"), 2000);
-    } catch (err) {
-      console.error(err);
-      if (axios.isAxiosError(err)) {
-        if (err.response?.status === 409) {
-          openSnackbar(err.response.data.message, "error");
-        } else {
-          openSnackbar(
-            err.response?.data?.message || "Failed to update content", 
-            "error"
-          );
-        }
-      } else {
-        openSnackbar("An unexpected error occurred", "error");
-      }
-    }
+    setStatus(selectedStatus);
+    updateMutation.mutate(selectedStatus);
   };
 
-  useEffect(() => {
-    const token = Cookies.get("token");
-    if (!token) {
-      openSnackbar("Token is missing", "error");
-      const timer = setTimeout(() => router.push("/admin/login"), 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [router, openSnackbar]);
 
-  useEffect(() => {
-    const fetchContent = async () => {
-      try {
-        const res = await axios.get(`http://localhost:5000/admin/content/${contentId}`, {
-          withCredentials: true,
-        });
-        const data = res.data;
-    
-        setFoodName(data.title || "");
-        setShortDescription(data.shortDesc || "");
-        setSelectedClassification(data.category || "");
-        
-        // Fix: Convert backend status to frontend display format
-        setStatus(data.status === 'PUBLISHED' ? 'Publish' : 'Draft');
-    
-        // Properly typed recipe transformation
-        const recipeStrings = data.recipes?.map((r: Recipe) => r.ingredient) || [""];
-        setRecipes(recipeStrings.length ? recipeStrings : [""]);
-    
-        // Properly typed instruction transformation
-        const instructionStrings = data.instructions
-          ?.sort((a: Instruction, b: Instruction) => a.stepNumber - b.stepNumber)
-          ?.map((i: Instruction) => i.instruction) || [""];
-        setInstructions(instructionStrings.length ? instructionStrings : [""]);
-    
-      } catch (err) {
-        console.error(err);
-        openSnackbar("Failed to fetch content", "error");
-      }
-    };
-
-    if (contentId) {
-      fetchContent();
-    }
-  }, [contentId, openSnackbar]);
 
   return (
     <div className="flex min-h-screen text-[#3E2723]">
@@ -174,11 +168,11 @@ export default function UpdateContent() {
           <Chip
             label={status}
             sx={{
-              marginLeft: "8px", // Space between text and chip
-              backgroundColor: status === "Draft" ? "#FFF8E1" : "#E8F5E9", // Custom color for Draft/Publish
-              color: status === "Draft" ? "#FBC02D" : "#4CAF50", // Text color depending on the status
-              borderRadius: "12px", // Rounded corners for the chip
-              padding: "4px 12px", // Padding inside the chip
+              marginLeft: "8px",
+              backgroundColor: status === "Draft" ? "#FFF8E1" : "#E8F5E9", 
+              color: status === "Draft" ? "#FBC02D" : "#4CAF50", 
+              borderRadius: "12px", 
+              padding: "4px 12px", 
             }}
           />
         </div>

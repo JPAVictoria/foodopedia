@@ -17,7 +17,7 @@ interface ContentFormState {
   setStatus: (status: string) => void;
 }
 
-export const useCreateStore = create<ContentFormState>((set) => ({
+export const useInformationStore = create<ContentFormState>((set) => ({
   recipes: [""],
   instructions: [""],
   selectedClassification: "",
