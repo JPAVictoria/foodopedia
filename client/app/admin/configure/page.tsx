@@ -108,6 +108,11 @@ export default function Configure() {
       openSnackbar("New and confirm password do not match.", "error");
       return;
     }
+
+    if (newPassword.length < 8 || confirmPassword.length < 8) {
+      openSnackbar("Password must have a minimum of 8 characters.", "error");
+      return;
+    }
     passwordMutation.mutate();
   };
 

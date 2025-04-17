@@ -9,7 +9,10 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { useToggleStore } from "@/app/stores/adminStores/useToggleStore"; 
 import { useStateStore } from "@/app/stores/adminStores/useStateStore"; 
+import { useLoading } from "@/app/context/LoaderContext";
+
 import axios from "axios";
+
 
 export default function ChangePassword() {
   const {
@@ -24,7 +27,7 @@ export default function ChangePassword() {
   } = useToggleStore();
 
   const { loading, setLoading, submitted, setSubmitted } = useStateStore();
-
+  const { setLoading: setGlobalLoading } = useLoading(); 
   const [token, setToken] = useState<string | null>(null);
   const { openSnackbar } = useSnackbar();
   const router = useRouter();
@@ -60,6 +63,7 @@ export default function ChangePassword() {
     }
 
     setLoading(true);
+    setGlobalLoading(true);
 
     try {
       const res = await axios.post("http://localhost:5000/admin/reset/reset", {
@@ -94,6 +98,7 @@ export default function ChangePassword() {
       openSnackbar(message, "error");
     } finally {
       setLoading(false);
+      setTimeout(() => setGlobalLoading(false), 2500);
     }
   };
 

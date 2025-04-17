@@ -13,7 +13,7 @@ import { useLoading } from "@/app/context/LoaderContext";
 export default function Signup() {
   const router = useRouter();
   const { openSnackbar } = useSnackbar();
-  const { setLoading: setGlobalLoading } = useLoading(); // Global loader
+  const { setLoading: setGlobalLoading } = useLoading(); 
 
   const {
     firstName,
