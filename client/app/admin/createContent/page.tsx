@@ -20,7 +20,7 @@ export default function CreateContent() {
   const { openSnackbar } = useSnackbar();
   const { isNavbarVisible } = useNavbar();
   const queryClient = useQueryClient();
-  
+
   const {
     recipes,
     instructions,
@@ -139,11 +139,10 @@ export default function CreateContent() {
                     label={status}
                     sx={{
                       marginLeft: "8px",
-                      backgroundColor:
-                        status === "Draft" ? "#FFF8E1" : "#E8F5E9", 
-                      color: status === "Draft" ? "#FBC02D" : "#4CAF50", 
-                      borderRadius: "12px", 
-                      padding: "4px 12px", 
+                      backgroundColor: status === "Draft" ? "#FFF8E1" : "#E8F5E9",
+                      color: status === "Draft" ? "#FBC02D" : "#4CAF50",
+                      borderRadius: "12px",
+                      padding: "4px 12px",
                     }}
                   />
                 </div>

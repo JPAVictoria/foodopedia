@@ -235,7 +235,7 @@ export default function Contents() {
         }}
       >
         <div className="flex justify-end">
-          <Link href="/admin/createContent">
+          <Link href="/admin/createContent" target="_blank">
             <div className="flex flex-col items-center rounded-md p-2 cursor-pointer transition">
               <SquarePlus className="w-5 h-5 text-[#3E2723]" />
               <span className="text-xs text-[#3E2723] mt-1">Create</span>
