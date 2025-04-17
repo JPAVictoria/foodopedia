@@ -1,7 +1,7 @@
 "use client";
 
 import Navbar from "@/app/components/ui/navbar/navbar";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import axios from "axios";
@@ -12,26 +12,85 @@ import { Label } from "@/app/components/ui/label";
 import { Button } from "@/app/components/ui/button";
 import { Eye, EyeOff } from "lucide-react";
 import { useConfigureStore } from "@/app/stores/adminStores/useConfigureStore";
+import { useToggleStore } from "@/app/stores/adminStores/useToggleStore";
+import { useMutation } from "@tanstack/react-query";
 
 export default function Configure() {
   const router = useRouter();
   const { openSnackbar } = useSnackbar();
   const { isNavbarVisible } = useNavbar();
 
-  const { firstName, lastName, setFirstName, setLastName } =
-    useConfigureStore();
+  const { firstName, lastName, setFirstName, setLastName } = useConfigureStore();
 
-  const [showCurrent, setShowCurrent] = useState(false);
-  const [showNew, setShowNew] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
+  const {
+    currentPassword,
+    newPassword,
+    confirmPassword,
+    showCurrent,
+    showNew,
+    showConfirm,
+    setCurrentPassword,
+    setNewPassword,
+    setConfirmPassword,
+    toggleShowCurrent,
+    toggleShowNew,
+    toggleShowConfirm,
+    resetPasswordForm
+  } = useToggleStore();
 
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const passwordMutation = useMutation({
+    mutationFn: async () => {
+      const token = Cookies.get("token");
+      return axios.put(
+        "http://localhost:5000/admin/change/change-password",
+        { currentPassword, newPassword },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+    },
+    onSuccess: (res) => {
+      openSnackbar(res.data.message || "Password updated successfully.", "success");
+      resetPasswordForm();
+    },
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        openSnackbar(
+          error.response?.data?.message || "Failed to update password.",
+          "error"
+        );
+      } else {
+        openSnackbar("An unexpected error occurred.", "error");
+      }
+    }
+  });
+
+  const nameMutation = useMutation({
+    mutationFn: async () => {
+      const token = Cookies.get("token");
+      return axios.put(
+        "http://localhost:5000/admin/change/change-name",
+        { firstName, lastName },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+    },
+    onSuccess: (res) => {
+      localStorage.setItem("admin", JSON.stringify({ firstName, lastName }));
+      openSnackbar(res.data.message || "Name updated successfully.", "success");
+      setTimeout(() => window.location.reload(), 1000);
+    },
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        openSnackbar(
+          error.response?.data?.message || "Failed to update name.",
+          "error"
+        );
+      } else {
+        openSnackbar("An unexpected error occurred.", "error");
+      }
+    }
+  });
 
   useEffect(() => {
     const token = Cookies.get("token");
-
     if (!token) {
       openSnackbar("Token is missing", "error");
       const timer = setTimeout(() => router.push("/admin/login"), 2000);
@@ -39,167 +98,66 @@ export default function Configure() {
     }
   }, [router, openSnackbar]);
 
-  const handlePasswordSubmit = async (e: React.FormEvent) => {
+  const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     if (newPassword !== confirmPassword) {
       openSnackbar("New and confirm password do not match.", "error");
       return;
     }
-
-    try {
-      const token = Cookies.get("token");
-
-      const res = await axios.put(
-        "http://localhost:5000/admin/change/change-password",
-        { currentPassword, newPassword },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      openSnackbar(
-        res.data.message || "Password updated successfully.",
-        "success"
-      );
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        openSnackbar(
-          err.response?.data?.message || "Failed to update password.",
-          "error"
-        );
-      } else {
-        openSnackbar("An unexpected error occurred.", "error");
-      }
-    }
+    passwordMutation.mutate();
   };
 
-  const handleNameSubmit = async (e: React.FormEvent) => {
+  const handleNameSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    try {
-      const token = Cookies.get("token");
-
-      const res = await axios.put(
-        "http://localhost:5000/admin/change/change-name",
-        { firstName, lastName },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      localStorage.setItem("admin", JSON.stringify({ firstName, lastName }));
-      openSnackbar(res.data.message || "Name updated successfully.", "success");
-
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        openSnackbar(
-          err.response?.data?.message || "Failed to update name.",
-          "error"
-        );
-      } else {
-        openSnackbar("An unexpected error occurred.", "error");
-      }
-    }
+    nameMutation.mutate();
   };
 
   return (
     <div className="flex min-h-screen">
       <Navbar />
-
-      <div
-        className={`transition-all mt-20 duration-300 flex-1 p-10 ${
-          isNavbarVisible ? "ml-0" : "-ml-54"
-        }`}
-      >
+      <div className={`transition-all mt-20 duration-300 flex-1 p-10 ${isNavbarVisible ? "ml-0" : "-ml-54"}`}>
         <div className="flex justify-center gap-16 mt-10 flex-wrap">
           <div className="flex flex-col items-center w-[400px]">
             <h1 className="font-bold text-[28px] text-transparent mb-7 bg-clip-text bg-gradient-to-r from-[#4caf50] via-[#76bf73] to-[#a0cf96]">
               Change Password
             </h1>
             <div className="w-full space-y-4 bg-[#fffaec] p-8 border border-[#2d2d2d4e] rounded-sm">
-              <form
-                onSubmit={handlePasswordSubmit}
-                className="flex flex-col gap-7"
-              >
-                <div className="relative">
-                  <Label
-                    htmlFor="current-password"
-                    className="pb-2 text-[#3E2723]"
-                  >
-                    Current Password
-                  </Label>
-                  <Input
-                    type={showCurrent ? "text" : "password"}
-                    id="current-password"
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    className="w-full pr-10"
-                  />
-                  <div
-                    onClick={() => setShowCurrent((prev) => !prev)}
-                    className="absolute top-8 right-3 cursor-pointer"
-                  >
-                    {showCurrent ? <EyeOff size={18} /> : <Eye size={18} />}
+              <form onSubmit={handlePasswordSubmit} className="flex flex-col gap-7">
+                {['current', 'new', 'confirm'].map((type) => (
+                  <div key={type} className="relative">
+                    <Label htmlFor={`${type}-password`} className="pb-2 text-[#3E2723]">
+                      {type === 'current' ? 'Current' : type === 'new' ? 'New' : 'Confirm'} Password
+                    </Label>
+                    <Input
+                      type={type === 'current' ? showCurrent ? "text" : "password" :
+                            type === 'new' ? showNew ? "text" : "password" :
+                            showConfirm ? "text" : "password"}
+                      id={`${type}-password`}
+                      value={type === 'current' ? currentPassword :
+                            type === 'new' ? newPassword : confirmPassword}
+                      onChange={(e) => type === 'current' ? setCurrentPassword(e.target.value) :
+                                type === 'new' ? setNewPassword(e.target.value) :
+                                setConfirmPassword(e.target.value)}
+                      className="w-full pr-10"
+                    />
+                    <div
+                      onClick={type === 'current' ? toggleShowCurrent :
+                              type === 'new' ? toggleShowNew : toggleShowConfirm}
+                      className="absolute top-8 right-3 cursor-pointer"
+                    >
+                      {type === 'current' ? (showCurrent ? <EyeOff size={18} /> : <Eye size={18} />) :
+                       type === 'new' ? (showNew ? <EyeOff size={18} /> : <Eye size={18} />) :
+                       (showConfirm ? <EyeOff size={18} /> : <Eye size={18} />)}
+                    </div>
                   </div>
-                </div>
-
-                <div className="relative">
-                  <Label htmlFor="new-password" className="pb-2 text-[#3E2723]">
-                    New Password
-                  </Label>
-                  <Input
-                    type={showNew ? "text" : "password"}
-                    id="new-password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full pr-10"
-                  />
-                  <div
-                    onClick={() => setShowNew((prev) => !prev)}
-                    className="absolute top-8 right-3 cursor-pointer"
-                  >
-                    {showNew ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </div>
-                </div>
-
-                <div className="relative">
-                  <Label
-                    htmlFor="confirm-password"
-                    className="pb-2 text-[#3E2723]"
-                  >
-                    Confirm Password
-                  </Label>
-                  <Input
-                    type={showConfirm ? "text" : "password"}
-                    id="confirm-password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full pr-10"
-                  />
-                  <div
-                    onClick={() => setShowConfirm((prev) => !prev)}
-                    className="absolute top-8 right-3 cursor-pointer"
-                  >
-                    {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </div>
-                </div>
+                ))}
 
                 <Button
                   type="submit"
                   className="mt-2 bg-[#4CAF50] hover:bg-[#45a049] text-white"
+                  disabled={passwordMutation.isPending}
                 >
-                  Submit
+                  {passwordMutation.isPending ? "Updating..." : "Submit"}
                 </Button>
               </form>
             </div>
@@ -238,8 +196,9 @@ export default function Configure() {
                 <Button
                   type="submit"
                   className="mt-2 bg-[#4CAF50] hover:bg-[#45a049] text-white"
+                  disabled={nameMutation.isPending}
                 >
-                  Submit
+                  {nameMutation.isPending ? "Updating..." : "Submit"}
                 </Button>
               </form>
             </div>
