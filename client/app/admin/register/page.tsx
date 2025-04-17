@@ -8,10 +8,12 @@ import axios from "axios";
 import { useSnackbar } from "@/app/context/SnackbarContext";
 import { Eye, EyeOff } from "lucide-react";
 import { useRegisterStore } from "@/app/stores/adminStores/useRegisterStore";
+import { useLoading } from "@/app/context/LoaderContext";
 
 export default function Signup() {
   const router = useRouter();
   const { openSnackbar } = useSnackbar();
+  const { setLoading: setGlobalLoading } = useLoading(); // Global loader
 
   const {
     firstName,
@@ -28,6 +30,7 @@ export default function Signup() {
     setSubmitted,
     toggleShowPassword,
     toggleShowConfirmPassword,
+    resetForm,
   } = useRegisterStore();
 
   const isDisabled = loading || submitted;
@@ -58,7 +61,9 @@ export default function Signup() {
       return;
     }
 
+    // Activate both local and global loaders
     setLoading(true);
+    setGlobalLoading(true);
 
     try {
       const res = await axios.post("http://localhost:5000/admin/register/signup", {
@@ -72,14 +77,23 @@ export default function Signup() {
       if (res.status === 201) {
         openSnackbar("Registration successful!", "success");
         setSubmitted(true);
-        setTimeout(() => router.push("/admin/login"), 3000);
+
+        // Delay before redirect while loader is shown
+        setTimeout(() => {
+          router.push("/admin/login");
+          resetForm();
+        }, 2000);
+      } else {
+        openSnackbar(res.data.message || "Something went wrong", "error");
       }
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message: string } } };
       const errorMessage = error?.response?.data?.message || "Something went wrong";
       openSnackbar(errorMessage, "error");
     } finally {
-      setLoading(false);
+      setLoading(false); // Local loading for UI state
+      // Don’t immediately hide global loader — let it ride during redirect
+      setTimeout(() => setGlobalLoading(false), 2500);
     }
   };
 
@@ -132,7 +146,6 @@ export default function Signup() {
               }
               className="focus:outline-none focus:border-[#4CAF50] focus:shadow-sm focus:shadow-[#4CAF50]/30 transition-all duration-300 pr-10"
             />
-
             {field.isPassword && (
               <div
                 onClick={field.toggle}
