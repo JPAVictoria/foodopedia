@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { SnackbarProvider } from "@/app/context/SnackbarContext";
 import { NavbarProvider } from "@/app/context/NavbarContext";
+import { LoadingProvider } from "@/app/context/LoaderContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 
@@ -30,11 +31,13 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.variable} antialiased min-h-screen`}>
         <QueryClientProvider client={queryClient}>
+        <LoadingProvider>
           <SnackbarProvider>
             <NavbarProvider>
               {children}
             </NavbarProvider>
           </SnackbarProvider>
+          </LoadingProvider>
         </QueryClientProvider>
       </body>
     </html>

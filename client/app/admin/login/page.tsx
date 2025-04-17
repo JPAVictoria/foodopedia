@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSnackbar } from "@/app/context/SnackbarContext";
 import { useLoginStore } from "@/app/stores/adminStores/useLoginStore";
-
+import { useLoading } from "@/app/context/LoaderContext"; // Import useLoading
 import Cookies from "js-cookie";
 import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
@@ -15,6 +15,7 @@ import { Eye, EyeOff } from "lucide-react";
 export default function Login() {
   const router = useRouter();
   const { openSnackbar } = useSnackbar();
+  const { setLoading } = useLoading(); // Get setLoading from LoadingContext
 
   const {
     email,
@@ -23,7 +24,6 @@ export default function Login() {
     submitted,
     setEmail,
     setPassword,
-    setLoading,
     setSubmitted,
     resetLoginForm, 
     showPassword, 
@@ -63,7 +63,7 @@ export default function Login() {
         openSnackbar("Login successful!", "success");
 
         setSubmitted(true);
-
+        setLoading(false);
         setTimeout(() => {
           router.push("/admin");
         }, 2000); 

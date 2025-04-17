@@ -3,18 +3,24 @@ import NavbarTitle from "./navbarTitle";
 import Link from "next/link";
 import { useNavbar } from "@/app/context/NavbarContext";
 import Cookies from "js-cookie";
+import { useLoading } from "@/app/context/LoaderContext"; // Import useLoading
 
 export default function Navbar() {
   const { isNavbarVisible, toggleNavbar } = useNavbar();
+  const { setLoading } = useLoading(); 
 
   const handleLogout = () => {
+    setLoading(true); 
+
     Cookies.remove("token");
     console.log("JWT token removed from cookies");
 
     localStorage.removeItem("admin");
     console.log("Admin data cleared from localStorage");
 
-    window.location.href = "/admin/login"; 
+    setTimeout(() => {
+      window.location.href = "/admin/login";
+    }, 1000); 
   };
 
   return (
@@ -33,7 +39,6 @@ export default function Navbar() {
           isNavbarVisible ? "translate-x-0" : "-translate-x-full"
         } fixed md:static top-0 left-0 z-40 min-h-screen md:h-auto w-64 bg-[#F5EEDC] flex flex-col p-4 border-r border-[#3E2723] transition-transform duration-300`}
       >
-        
         <button
           onClick={toggleNavbar}
           className="absolute top-4 right-4 p-2 text-[#3E2723] bg-transparent border-none cursor-pointer hover:bg-[#F1E5D8] transition"

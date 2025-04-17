@@ -14,14 +14,15 @@ import { Eye, EyeOff } from "lucide-react";
 import { useConfigureStore } from "@/app/stores/adminStores/useConfigureStore";
 import { useToggleStore } from "@/app/stores/adminStores/useToggleStore";
 import { useMutation } from "@tanstack/react-query";
+import { useLoading } from "@/app/context/LoaderContext"; 
 
 export default function Configure() {
   const router = useRouter();
+  const { setLoading } = useLoading(); 
   const { openSnackbar } = useSnackbar();
   const { isNavbarVisible } = useNavbar();
 
   const { firstName, lastName, setFirstName, setLastName } = useConfigureStore();
-
   const {
     currentPassword,
     newPassword,
@@ -90,13 +91,16 @@ export default function Configure() {
   });
 
   useEffect(() => {
+    setLoading(true); 
     const token = Cookies.get("token");
     if (!token) {
       openSnackbar("Token is missing", "error");
       const timer = setTimeout(() => router.push("/admin/login"), 2000);
       return () => clearTimeout(timer);
     }
-  }, [router, openSnackbar]);
+
+    setLoading(false); 
+  }, [router, openSnackbar, setLoading]);
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,6 +115,7 @@ export default function Configure() {
     e.preventDefault();
     nameMutation.mutate();
   };
+
 
   return (
     <div className="flex min-h-screen">
