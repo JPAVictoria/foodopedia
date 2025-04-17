@@ -7,10 +7,7 @@ import { Chip, Box, Button, Stack, Typography } from "@mui/material";
 import { useNavbar } from "@/app/context/NavbarContext";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import {
-  DataGrid,
-  GridColDef,
-} from "@mui/x-data-grid";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useSnackbar } from "@/app/context/SnackbarContext";
 
 interface ContentItem {
@@ -47,7 +44,11 @@ export default function Contents() {
 
   const handleDelete = async (id: string) => {
     try {
-      await axios.put(`http://localhost:5000/admin/content/softDelete/${id}`, {}, { withCredentials: true });
+      await axios.put(
+        `http://localhost:5000/admin/content/softDelete/${id}`,
+        {},
+        { withCredentials: true }
+      );
       setRows((prevRows) => prevRows.filter((row) => row.id !== id));
       openSnackbar("Content deleted successfully", "success");
     } catch (error) {
@@ -122,7 +123,6 @@ export default function Contents() {
               };
           }
         };
-        
 
         return <Chip size="medium" {...getChipProps(status)} />;
       },
@@ -145,7 +145,13 @@ export default function Contents() {
       align: "center",
       disableColumnMenu: true,
       renderCell: (params) => (
-        <Stack direction="row" spacing={2} justifyContent="center" alignItems="center" sx={{ height: "100%" }}>
+        <Stack 
+          direction="row" 
+          spacing={2} 
+          justifyContent="center" 
+          alignItems="center" 
+          sx={{ height: "100%" }}
+        >
           <Link href={`/admin/updateContent?id=${params.row.id}`}>
             <Button
               size="medium"
@@ -163,7 +169,15 @@ export default function Contents() {
               }}
             >
               <Pencil className="w-4 h-4" />
-              <Typography variant="caption" sx={{ color: "#3E2723", fontSize: "0.7rem", marginTop: "4px", textTransform: "none" }}>
+              <Typography 
+                variant="caption" 
+                sx={{ 
+                  color: "#3E2723", 
+                  fontSize: "0.7rem", 
+                  marginTop: "4px", 
+                  textTransform: "none" 
+                }}
+              >
                 Edit
               </Typography>
             </Button>
@@ -186,7 +200,15 @@ export default function Contents() {
             onClick={() => handleDelete(params.row.id)}
           >
             <Trash2 className="w-4 h-4" />
-            <Typography variant="caption" sx={{ color: "#3E2723", fontSize: "0.7rem", marginTop: "4px", textTransform: "none" }}>
+            <Typography 
+              variant="caption" 
+              sx={{ 
+                color: "#3E2723", 
+                fontSize: "0.7rem", 
+                marginTop: "4px", 
+                textTransform: "none" 
+              }}
+            >
               Delete
             </Typography>
           </Button>
@@ -205,12 +227,12 @@ export default function Contents() {
         style={{
           display: "flex",
           flexDirection: "column",
-          minWidth: 0,  
+          minWidth: 0,
           flex: 1,
         }}
       >
         <div className="flex justify-end">
-          <Link href="/admin/createContent" target="_blank" rel="noopener noreferrer">
+          <Link href="/admin/createContent">
             <div className="flex flex-col items-center rounded-md p-2 cursor-pointer transition">
               <SquarePlus className="w-5 h-5 text-[#3E2723]" />
               <span className="text-xs text-[#3E2723] mt-1">Create</span>
@@ -222,7 +244,12 @@ export default function Contents() {
           Content Overview
         </h1>
   
-        <Box sx={{ height: 500, width: "100%", marginTop: 5 , overflowX: "hidden" }}>
+        <Box sx={{ 
+          height: 500, 
+          width: "100%", 
+          marginTop: 5,
+          overflowX: "hidden" 
+        }}>
           <DataGrid
             getRowId={(row) => row.id}
             rows={rows}
@@ -260,5 +287,4 @@ export default function Contents() {
       </div>
     </div>
   );
-  
 }

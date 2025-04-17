@@ -8,7 +8,7 @@ const forgotRouter = require("./api/auth/forgot/auth.route");
 const resetRouter = require("./api/auth/reset/auth.route");
 const contentRouter = require("./api/content/content.route");
 const changePasswordRouter = require("./api/changePassword/change.route"); 
-const changeNameRouter = require("./api/changeName/change.route"); // ADD this line for name change
+const changeNameRouter = require("./api/changeName/change.route"); 
 
 const app = express();
 

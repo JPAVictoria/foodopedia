@@ -147,18 +147,8 @@ exports.Prisma.ContentScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   deleted: 'deleted',
-  adminId: 'adminId',
-  mediaId: 'mediaId',
-  views: 'views'
-};
-
-exports.Prisma.MediaScalarFieldEnum = {
-  id: 'id',
-  image1Url: 'image1Url',
-  image2Url: 'image2Url',
-  videoUrl: 'videoUrl',
-  uploadedAt: 'uploadedAt',
-  contentId: 'contentId'
+  views: 'views',
+  adminId: 'adminId'
 };
 
 exports.Prisma.RecipeScalarFieldEnum = {
@@ -190,11 +180,6 @@ exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
 };
-
-exports.Prisma.NullsOrder = {
-  first: 'first',
-  last: 'last'
-};
 exports.Category = exports.$Enums.Category = {
   DESSERT: 'DESSERT',
   ENTREE: 'ENTREE',
@@ -204,15 +189,13 @@ exports.Category = exports.$Enums.Category = {
 
 exports.ContentStatus = exports.$Enums.ContentStatus = {
   DRAFT: 'DRAFT',
-  PUBLISHED: 'PUBLISHED',
-  DELETED: 'DELETED'
+  PUBLISHED: 'PUBLISHED'
 };
 
 exports.Prisma.ModelName = {
   Admin: 'Admin',
   Viewer: 'Viewer',
   Content: 'Content',
-  Media: 'Media',
   Recipe: 'Recipe',
   RecipeInstruction: 'RecipeInstruction',
   Favorite: 'Favorite'

@@ -4,7 +4,7 @@ import { useNavbar } from "@/app/context/NavbarContext";
 import Navbar from "@/app/components/ui/navbar/navbar";
 import { FolderOpenDot, BookPlus, Trash2, Plus } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { useSnackbar } from "@/app/context/SnackbarContext";
@@ -20,21 +20,11 @@ export default function CreateContent() {
 
   const [recipes, setRecipes] = useState<string[]>([""]);
   const [instructions, setInstructions] = useState<string[]>([""]);
-  const [selectedClassification, setSelectedClassification] =
+  const [selectedClassification, setSelectedClassification] = 
     useState<string>("");
   const [foodName, setFoodName] = useState<string>("");
   const [shortDescription, setShortDescription] = useState<string>("");
   const [status, setStatus] = useState<string>("Draft");
-  const [mediaFiles, setMediaFiles] = useState<(File | null)[]>([
-    null,
-    null,
-    null,
-  ]);
-  const fileInputRefs = [
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-  ];
 
   const classifications = ["DESSERT", "APPETIZER", "ENTREE", "BEVERAGES"];
 
@@ -55,22 +45,6 @@ export default function CreateContent() {
 
   const handleClassificationChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setSelectedClassification(e.target.value);
-
-  const handleFileChange = (index: number, file: File) => {
-    const updated = [...mediaFiles];
-    updated[index] = file;
-    setMediaFiles(updated);
-  };
-
-  const handleDeleteFile = (index: number) => {
-    const updated = [...mediaFiles];
-    updated[index] = null;
-    setMediaFiles(updated);
-  };
-
-  const handleUploadClick = (index: number) => {
-    fileInputRefs[index].current?.click();
-  };
 
   const validateForm = () => {
     const errorList: string[] = [];
@@ -96,23 +70,16 @@ export default function CreateContent() {
     if (!validateForm()) return;
 
     try {
-      const formData = new FormData();
-      formData.append("title", foodName.trim()); // Add trim() to remove whitespace
-      formData.append("shortDesc", shortDescription);
-      formData.append("category", selectedClassification);
-      formData.append(
-        "status",
-        selectedStatus === "Publish" ? "PUBLISHED" : "DRAFT"
-      );
-      formData.append("ingredients", JSON.stringify(recipes));
-      formData.append("instructions", JSON.stringify(instructions));
+      const payload = {
+        title: foodName.trim(),
+        shortDesc: shortDescription,
+        category: selectedClassification,
+        status: selectedStatus === "Publish" ? "PUBLISHED" : "DRAFT",
+        ingredients: recipes,
+        instructions: instructions
+      };
 
-      mediaFiles.forEach((file) => {
-        if (file) formData.append("media", file);
-      });
-
-      await axios.post("http://localhost:5000/admin/content/create", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      await axios.post("http://localhost:5000/admin/content/create", payload, {
         withCredentials: true,
       });
 
@@ -141,15 +108,6 @@ export default function CreateContent() {
       }
     }
   };
-
-  useEffect(() => {
-    const token = Cookies.get("token");
-    if (!token) {
-      openSnackbar("Token is missing", "error");
-      const timer = setTimeout(() => router.push("/admin/login"), 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [router, openSnackbar]);
 
   useEffect(() => {
     const token = Cookies.get("token");
@@ -329,43 +287,6 @@ export default function CreateContent() {
               >
                 <Plus size={16} />
                 <span>Add</span>
-              </div>
-            </div>
-
-            <div className="bg-[#fffaec] p-8 rounded-sm border border-[#2d2d2d4e]">
-              <Label className="mb-3 block">Upload Media</Label>
-              <div className="grid grid-cols-3 gap-4 mt-6">
-                {mediaFiles.map((file, index) => (
-                  <div key={index} className="space-y-">
-                    <div
-                      className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-sm p-8 cursor-pointer hover:bg-gray-100 transition"
-                      onClick={() => handleUploadClick(index)}
-                    >
-                      <FolderOpenDot className="w-6 h-6 text-gray-500" />
-                      <input
-                        ref={fileInputRefs[index]}
-                        type="file"
-                        onChange={(e) =>
-                          e.target.files &&
-                          handleFileChange(index, e.target.files[0])
-                        }
-                        hidden
-                      />
-                    </div>
-                    {file && (
-                      <div className="mt-5 flex flex-col gap-y-3 justify-center items-center">
-                        <span>{file.name}</span>
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteFile(index)}
-                          className="text-[#3E2723] hover:text-[#3e2723a0] ml-2 cursor-pointer"
-                        >
-                          <Trash2 size={20} />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ))}
               </div>
             </div>
           </div>

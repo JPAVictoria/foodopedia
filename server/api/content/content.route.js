@@ -1,9 +1,6 @@
 const express = require('express');
-const multer = require('multer');
-const path = require('path');
 const { PrismaClient } = require('@prisma/client');
 const jwt = require('jsonwebtoken');
-const fs = require('fs');
 const { format } = require('date-fns');
 
 const prisma = new PrismaClient();
@@ -11,19 +8,7 @@ const router = express.Router();
 
 const SECRET = process.env.JWT_SECRET || "foodopedia";
 
-const uploadDir = path.join(__dirname, '..', 'uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname)),
-});
-const upload = multer({ storage });
-
-// CREATE
-router.post("/create", upload.array('media', 3), async (req, res) => {
+router.post("/create", async (req, res) => {
   const token = req.cookies?.token;
   if (!token) return res.status(401).json({ message: "No token provided" });
 
@@ -48,7 +33,6 @@ router.post("/create", upload.array('media', 3), async (req, res) => {
     });
   }
 
-  
   let ingredients = [];
   let instructions = [];
   
@@ -80,16 +64,6 @@ router.post("/create", upload.array('media', 3), async (req, res) => {
   if (!adminId) return res.status(401).json({ message: "Unauthorized" });
 
   try {
-    const mediaUrls = req.files?.map(file => `/uploads/${file.filename}`) || [];
-
-    const media = await prisma.media.create({
-      data: {
-        image1Url: mediaUrls[0] || null,
-        image2Url: mediaUrls[1] || null,
-        videoUrl: mediaUrls[2] || null,
-      },
-    });
-
     const allowedStatuses = ['DRAFT', 'PUBLISHED'];
     let validatedStatus = 'DRAFT';
     if (rawStatus && typeof rawStatus === 'string') {
@@ -105,7 +79,6 @@ router.post("/create", upload.array('media', 3), async (req, res) => {
         slug,
         shortDesc,
         category,
-        mediaId: media.id,
         adminId,
         status: validatedStatus,
         deleted: false,
@@ -147,7 +120,7 @@ router.post("/create", upload.array('media', 3), async (req, res) => {
   }
 });
 
-router.put("/:id", upload.array('media', 3), async (req, res) => {
+router.put("/:id", async (req, res) => {
   const { id } = req.params;
   const token = req.cookies?.token;
   if (!token) return res.status(401).json({ message: "No token provided" });
@@ -216,18 +189,6 @@ router.put("/:id", upload.array('media', 3), async (req, res) => {
     });
     if (duplicate) {
       return res.status(409).json({ message: "Another content with this title or slug exists." });
-    }
-
-    const mediaUrls = req.files?.map(file => `/uploads/${file.filename}`) || [];
-    if (content.mediaId) {
-      await prisma.media.update({
-        where: { id: content.mediaId },
-        data: {
-          image1Url: mediaUrls[0] || undefined,
-          image2Url: mediaUrls[1] || undefined,
-          videoUrl: mediaUrls[2] || undefined,
-        },
-      });
     }
 
     const allowedStatuses = ['DRAFT', 'PUBLISHED'];
@@ -315,7 +276,6 @@ router.get("/:id", async (req, res) => {
     const content = await prisma.content.findUnique({
       where: { id },
       include: {
-        media: true,
         admin: { select: { firstName: true, lastName: true, email: true } },
         recipes: true,
         instructions: { orderBy: { stepNumber: 'asc' } },
@@ -335,7 +295,6 @@ router.get("/:id", async (req, res) => {
     });
   }
 });
-
 
 router.get("/", async (req, res) => {
   const token = req.cookies?.token;
@@ -357,10 +316,9 @@ router.get("/", async (req, res) => {
     const contents = await prisma.content.findMany({
       where: {
         deleted: false,
-        adminId, // only fetch content owned by this admin
+        adminId, 
       },
       include: {
-        media: true,
         admin: { select: { firstName: true, lastName: true, email: true } },
       },
       orderBy: { createdAt: 'desc' },
@@ -380,7 +338,5 @@ router.get("/", async (req, res) => {
     });
   }
 });
-
-
 
 module.exports = router;

@@ -16,8 +16,7 @@ model Admin {
   lastName  String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-
-  contents  Content[] // A relation to the Content model
+  contents  Content[] 
 }
 
 model Viewer {
@@ -28,8 +27,7 @@ model Viewer {
   lastName   String
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
-
-  favorites  Favorite[] // Relation to Favorite model
+  favorites  Favorite[] 
 }
 
 model Content {
@@ -38,47 +36,32 @@ model Content {
   slug        String         @unique
   shortDesc   String         // Short description
   category    Category
-  status      ContentStatus  @default(DRAFT) // Enum for content status (draft, published, deleted)
+  status      ContentStatus  @default(DRAFT) 
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
   deleted     Boolean        @default(false)
+  views       Int            @default(0)  
 
   adminId     String
   admin       Admin          @relation(fields: [adminId], references: [id])
 
-  media       Media?
-  mediaId     String?
-
-  favorites   Favorite[]     // Track favorites for content
-  views       Int            @default(0)  // For basic analytics (e.g., number of views)
-
-  recipes     Recipe[]       // Store recipe ingredients
-  instructions RecipeInstruction[] // Store recipe instructions
+  favorites   Favorite[]     
+  recipes     Recipe[]       
+  instructions RecipeInstruction[] 
 }
 
-model Media {
-  id          String   @id @default(uuid())
-  image1Url   String?
-  image2Url   String?
-  videoUrl    String?
-  uploadedAt  DateTime @default(now())
-
-  content     Content? @relation(fields: [contentId], references: [id])
-  contentId   String?  @unique
-}
 
 model Recipe {
   id          String   @id @default(uuid())
-  ingredient  String   // Simple string input for ingredients
-
+  ingredient  String   
   contentId   String
   content     Content  @relation(fields: [contentId], references: [id])
 }
 
 model RecipeInstruction {
   id          String   @id @default(uuid())
-  instruction String   // Instruction step as a string
-  stepNumber  Int      // The order of the instruction step (e.g., 1, 2, 3...)
+  instruction String   
+  stepNumber  Int      
   contentId   String
   content     Content  @relation(fields: [contentId], references: [id])
 }
@@ -92,7 +75,7 @@ model Favorite {
   viewer     Viewer   @relation(fields: [viewerId], references: [id])
   content    Content  @relation(fields: [contentId], references: [id])
 
-  @@unique([viewerId, contentId]) // Prevent double favorites
+  @@unique([viewerId, contentId]) 
 }
 
 enum Category {
@@ -105,5 +88,4 @@ enum Category {
 enum ContentStatus {
   DRAFT
   PUBLISHED
-  DELETED
 }

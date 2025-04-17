@@ -3,7 +3,7 @@ import { useNavbar } from "@/app/context/NavbarContext";
 import Navbar from "@/app/components/ui/navbar/navbar";
 import { FolderOpenDot, BookPlus, Trash2, Plus } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Cookies from "js-cookie";
 import { useSnackbar } from "@/app/context/SnackbarContext";
@@ -26,8 +26,6 @@ export default function UpdateContent() {
   const [foodName, setFoodName] = useState<string>("");
   const [shortDescription, setShortDescription] = useState<string>("");
   const [status, setStatus] = useState<string>("Draft");
-  const [mediaFiles, setMediaFiles] = useState<(File | null)[]>([null, null, null]);
-  const fileInputRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)];
 
   const classifications = ["DESSERT", "APPETIZER", "ENTREE", "BEVERAGES"];
 
@@ -51,21 +49,7 @@ export default function UpdateContent() {
     stepNumber: number;
   }
 
-  const handleFileChange = (index: number, file: File) => {
-    const updated = [...mediaFiles];
-    updated[index] = file;
-    setMediaFiles(updated);
-  };
 
-  const handleDeleteFile = (index: number) => {
-    const updated = [...mediaFiles];
-    updated[index] = null;
-    setMediaFiles(updated);
-  };
-
-  const handleUploadClick = (index: number) => {
-    fileInputRefs[index].current?.click();
-  };
 
   const validateForm = () => {
     const errorList: string[] = [];
@@ -114,7 +98,6 @@ export default function UpdateContent() {
         }))
       ));
   
-      mediaFiles.forEach((file) => file && formData.append("media", file));
   
       await axios.put(`http://localhost:5000/admin/content/${contentId}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -339,41 +322,6 @@ export default function UpdateContent() {
               >
                 <Plus size={16} />
                 <span>Add</span>
-              </div>
-            </div>
-
-            <div className="bg-[#fffaec] p-8 rounded-sm border border-[#2d2d2d4e]">
-              <Label className="mb-3 block">Media:</Label>
-              <div className="grid grid-cols-3 gap-4">
-                {mediaFiles.map((file, index) => (
-                  <div key={index} className="text-center">
-                    <div
-                      className="cursor-pointer bg-[#efefef] border p-8 border-[#2d2d2d4e] rounded-sm"
-                      onClick={() => handleUploadClick(index)}
-                    >
-                      <FolderOpenDot size={24} />
-                    </div>
-                    {file && (
-                      <div className="mt-2">
-                        <span className="text-sm">{file.name}</span>
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteFile(index)}
-                          className="text-[#3E2723] ml-2"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    )}
-                    <input
-                      ref={fileInputRefs[index]}
-                      type="file"
-                      accept="image/*,video/*"
-                      onChange={(e) => e.target.files && handleFileChange(index, e.target.files[0])}
-                      hidden
-                    />
-                  </div>
-                ))}
               </div>
             </div>
           </div>
