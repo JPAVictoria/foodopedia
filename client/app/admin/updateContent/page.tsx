@@ -3,7 +3,7 @@ import { useNavbar } from "@/app/context/NavbarContext";
 import Navbar from "@/app/components/ui/navbar/navbar";
 import { FolderOpenDot, BookPlus, Trash2, Plus } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
-import { useEffect, useState } from "react";
+import { useEffect, useState} from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Cookies from "js-cookie";
 import { useSnackbar } from "@/app/context/SnackbarContext";
@@ -26,7 +26,6 @@ export default function UpdateContent() {
   const [foodName, setFoodName] = useState<string>("");
   const [shortDescription, setShortDescription] = useState<string>("");
   const [status, setStatus] = useState<string>("Draft");
-
   const classifications = ["DESSERT", "APPETIZER", "ENTREE", "BEVERAGES"];
 
   const handleAddField = () => setRecipes([...recipes, ""]);
@@ -49,8 +48,7 @@ export default function UpdateContent() {
     stepNumber: number;
   }
 
-
-
+ 
   const validateForm = () => {
     const errorList: string[] = [];
 
@@ -80,27 +78,19 @@ export default function UpdateContent() {
     if (!validateForm()) return;
   
     try {
-      const formData = new FormData();
-      formData.append("title", foodName.trim());
-      formData.append("shortDesc", shortDescription);
-      formData.append("category", selectedClassification);
-      formData.append("status", selectedStatus === 'Publish' ? 'PUBLISHED' : 'DRAFT');
+      const payload = {
+        title: foodName.trim(),
+        shortDesc: shortDescription,
+        category: selectedClassification,
+        status: selectedStatus === 'Publish' ? 'PUBLISHED' : 'DRAFT',
+        ingredients: JSON.stringify(recipes.filter(r => r.trim())), // Filter empty and stringify
+        instructions: JSON.stringify(instructions.filter(i => i.trim())) // Filter empty and stringify
+      };
   
-      // Convert to backend-expected format
-      formData.append("ingredients", JSON.stringify(
-        recipes.map(ingredient => ({ ingredient }))
-      ));
-      
-      formData.append("instructions", JSON.stringify(
-        instructions.map((instruction, index) => ({
-          instruction,
-          stepNumber: index + 1
-        }))
-      ));
-  
-  
-      await axios.put(`http://localhost:5000/admin/content/${contentId}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      await axios.put(`http://localhost:5000/admin/content/${contentId}`, payload, {
+        headers: { 
+          "Content-Type": "application/json",
+        },
         withCredentials: true,
       });
   
@@ -324,6 +314,7 @@ export default function UpdateContent() {
                 <span>Add</span>
               </div>
             </div>
+
           </div>
         </div>
       </div>

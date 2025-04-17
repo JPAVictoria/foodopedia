@@ -75,8 +75,8 @@ export default function CreateContent() {
         shortDesc: shortDescription,
         category: selectedClassification,
         status: selectedStatus === "Publish" ? "PUBLISHED" : "DRAFT",
-        ingredients: recipes,
-        instructions: instructions
+        ingredients: JSON.stringify(recipes.filter(r => r.trim())), // Filter empty and stringify
+        instructions: JSON.stringify(instructions.filter(i => i.trim())) // Filter empty and stringify
       };
 
       await axios.post("http://localhost:5000/admin/content/create", payload, {
