@@ -7,6 +7,8 @@ const loginRouter = require("./api/auth/login/auth.route");
 const forgotRouter = require("./api/auth/forgot/auth.route");
 const resetRouter = require("./api/auth/reset/auth.route");
 const contentRouter = require("./api/content/content.route");
+const changePasswordRouter = require("./api/changePassword/change.route"); 
+const changeNameRouter = require("./api/changeName/change.route"); // ADD this line for name change
 
 const app = express();
 
@@ -15,24 +17,24 @@ const corsOptions = {
   credentials: true,
 };
 
-// ✅ MIDDLEWARE
 app.use(cors(corsOptions));
 app.use(express.json());
-app.use(cookieParser()); // ✅ PARSE COOKIES FROM CLIENT
+app.use(cookieParser());
 
-// ✅ ROUTES
+
 app.use("/admin/register", authRouter);
 app.use("/admin/login", loginRouter);
 app.use("/admin/forgot", forgotRouter);
 app.use("/admin/reset", resetRouter);
 app.use("/admin/content", contentRouter);
+app.use("/admin/change", changePasswordRouter); 
+app.use("/admin/change", changeNameRouter); 
 
-// ✅ HEALTH CHECK
+
 app.get("/", (req, res) => {
   res.send("Server is up and running!");
 });
 
-// ✅ START SERVER
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

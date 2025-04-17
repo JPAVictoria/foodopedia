@@ -4,12 +4,26 @@ export default function NavbarTitle() {
   const [admin, setAdmin] = useState<{ firstName: string; lastName: string } | null>(null);
 
   useEffect(() => {
-    // Load admin data from localStorage when the component mounts
     const storedAdmin = localStorage.getItem("admin");
     if (storedAdmin) {
       setAdmin(JSON.parse(storedAdmin));
     }
-  }, []);
+  }, []); // Initial load from localStorage
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const storedAdmin = localStorage.getItem("admin");
+      if (storedAdmin) {
+        setAdmin(JSON.parse(storedAdmin));
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []); // Listen for changes to localStorage
 
   return (
     <div className="bg-[#F3E7C7] p-4 rounded-md text-[#3E2723]">
