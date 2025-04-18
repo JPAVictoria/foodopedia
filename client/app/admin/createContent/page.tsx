@@ -12,6 +12,7 @@ import { Chip } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useInformationStore } from "@/app/stores/adminStores/useInformationStore";
+import { useLoading } from "@/app/context/LoaderContext"; 
 
 type Classification = "DESSERT" | "APPETIZER" | "ENTREE" | "BEVERAGES";
 
@@ -19,6 +20,8 @@ export default function CreateContent() {
   const router = useRouter();
   const { openSnackbar } = useSnackbar();
   const { isNavbarVisible } = useNavbar();
+  const { setLoading } = useLoading(); 
+
   const queryClient = useQueryClient();
 
   const {
@@ -71,6 +74,7 @@ export default function CreateContent() {
 
   const createMutation = useMutation({
     mutationFn: async (selectedStatus: string) => {
+      setLoading(true);
       const payload = {
         title: foodName.trim(),
         shortDesc: shortDescription,
@@ -90,10 +94,14 @@ export default function CreateContent() {
         "success"
       );
       queryClient.invalidateQueries({ queryKey: ['contents'] });
-      setTimeout(() => router.push("/admin/contents"), 2000);
+      setTimeout(() => {
+        setLoading(false); 
+        router.push("/admin/contents");
+      }); 
     },
     onError: (error) => {
       console.error("Submission error:", error);
+      setLoading(false);
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 409) {
           openSnackbar(
@@ -115,6 +123,7 @@ export default function CreateContent() {
   const handleSubmit = (selectedStatus: string) => {
     if (!validateForm()) return;
     setStatus(selectedStatus);
+    setLoading(true);
     createMutation.mutate(selectedStatus);
   };
 

@@ -154,7 +154,7 @@ export default function Contents() {
           alignItems="center" 
           sx={{ height: "100%" }}
         >
-          <Link href={`/admin/updateContent?id=${params.row.id}`}>
+          <Link href={`/admin/updateContent?id=${params.row.id}`} target="_blank">
             <Button
               size="medium"
               variant="text"
