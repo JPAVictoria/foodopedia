@@ -61,6 +61,7 @@ export default function Configure() {
       } else {
         openSnackbar("An unexpected error occurred.", "error");
       }
+      resetPasswordForm();
     }
   });
 
@@ -114,6 +115,7 @@ export default function Configure() {
       return;
     }
     passwordMutation.mutate();
+    
   };
 
   const handleNameSubmit = (e: React.FormEvent) => {

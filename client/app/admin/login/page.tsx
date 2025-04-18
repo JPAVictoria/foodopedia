@@ -15,7 +15,7 @@ import { Eye, EyeOff } from "lucide-react";
 export default function Login() {
   const router = useRouter();
   const { openSnackbar } = useSnackbar();
-  const { setLoading } = useLoading(); // Get setLoading from LoadingContext
+  const { setLoading } = useLoading(); 
 
   const {
     email,
@@ -44,7 +44,7 @@ export default function Login() {
       openSnackbar("Email and password are required.", "error");
       return;
     }
-
+    
     setLoading(true);
 
     try {
