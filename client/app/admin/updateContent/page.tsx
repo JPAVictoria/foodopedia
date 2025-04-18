@@ -11,6 +11,8 @@ import { Chip } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useInformationStore } from "@/app/stores/adminStores/useInformationStore";
+import { useLoading } from "@/app/context/LoaderContext"; 
+
 
 type Classification = "DESSERT" | "APPETIZER" | "ENTREE" | "BEVERAGES";
 
@@ -35,6 +37,7 @@ interface ContentResponse {
 export default function UpdateContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { setLoading } = useLoading(); 
   const contentId = searchParams.get("id");
   const { openSnackbar } = useSnackbar();
   const { isNavbarVisible } = useNavbar();
@@ -100,6 +103,7 @@ export default function UpdateContent() {
 
   const updateMutation = useMutation({
     mutationFn: async (selectedStatus: string) => {
+      setLoading(true);
       const payload = {
         title: foodName.trim(),
         shortDesc: shortDescription,
@@ -116,10 +120,14 @@ export default function UpdateContent() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contents"] });
       openSnackbar("Content updated successfully", "success");
-      setTimeout(() => router.push("/admin/contents"), 2000);
+      setTimeout(() => {
+        setLoading(false); 
+        router.push("/admin/contents");
+      }); 
     },
     onError: (error: unknown) => {
       console.error(error);
+      setLoading(false);
       if (axios.isAxiosError(error)) {
         openSnackbar(error.response?.data?.message || "Failed to update content", "error");
       } else {
