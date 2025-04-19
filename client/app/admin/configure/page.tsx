@@ -1,5 +1,4 @@
 "use client";
-
 import Navbar from "@/app/components/ui/navbar/navbar";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";

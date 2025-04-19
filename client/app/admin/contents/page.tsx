@@ -9,6 +9,10 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useSnackbar } from "@/app/context/SnackbarContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import { useLoading } from "@/app/context/LoaderContext"; 
+import { useEffect } from "react";
+
+
 import { useContentStore } from "@/app/stores/adminStores/useContentStore";
 
 interface ContentItem {
@@ -20,29 +24,45 @@ interface ContentItem {
 }
 
 export default function Contents() {
+  const { setLoading } = useLoading(); 
+
   const { isNavbarVisible } = useNavbar();
   const { openSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
   const { contents, setContents } = useContentStore();
 
+
+  useEffect(() => {
+    setLoading(false);
+    return () => setLoading(false); 
+  }, [setLoading]);
+
+
   const { data, isLoading } = useQuery<ContentItem[]>({
     queryKey: ['contents'],
     queryFn: async () => {
-      const response = await axios.get("http://localhost:5000/admin/content", {
-        withCredentials: true,
-      });
-      setContents(response.data); 
-      return response.data;
+      setLoading(true);
+      try {
+        const response = await axios.get("http://localhost:5000/admin/content", {
+          withCredentials: true,
+        });
+        setContents(response.data); 
+        return response.data;
+      } finally {
+        setLoading(false); 
+      }
     },
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => 
-      axios.put(
+    mutationFn: (id: string) => {
+      setLoading(true); 
+      return axios.put(
         `http://localhost:5000/admin/content/softDelete/${id}`,
         {},
         { withCredentials: true }
-      ),
+      );
+    },
     onSuccess: (_, id) => {
       queryClient.setQueryData<ContentItem[]>(['contents'], (old) => 
         old?.filter(item => item.id !== id) || []
@@ -52,6 +72,9 @@ export default function Contents() {
     },
     onError: () => {
       openSnackbar("Failed to delete content", "error");
+    },
+    onSettled: () => {
+      setLoading(false); 
     }
   });
 
@@ -154,7 +177,7 @@ export default function Contents() {
           alignItems="center" 
           sx={{ height: "100%" }}
         >
-          <Link href={`/admin/updateContent?id=${params.row.id}`} target="_blank">
+          <Link href={`/admin/updateContent?id=${params.row.id}`}>
             <Button
               size="medium"
               variant="text"

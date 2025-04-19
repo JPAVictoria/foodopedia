@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSnackbar } from "@/app/context/SnackbarContext";
 import { useLoginStore } from "@/app/stores/adminStores/useLoginStore";
-import { useLoading } from "@/app/context/LoaderContext"; // Import useLoading
+import { useLoading } from "@/app/context/LoaderContext";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
@@ -29,7 +29,6 @@ export default function Login() {
     showPassword, 
     toggleShowPassword
   } = useLoginStore();
-
 
   useEffect(() => {
     return () => {
@@ -57,25 +56,26 @@ export default function Login() {
 
       if (token && admin) {
         Cookies.set("token", token, { expires: 1 });
-
         localStorage.setItem("admin", JSON.stringify(admin));
-
         openSnackbar("Login successful!", "success");
 
         setSubmitted(true);
-        setLoading(false);
+        
+        // Show loader during redirect
+        setLoading(true);
         setTimeout(() => {
           router.push("/admin");
-        }, 2000); 
+          // Keep loader visible during page transition
+        }, 1000); // Reduced delay for better UX
       }
     } catch (err) {
       setLoading(false);
-
       const msg = axios.isAxiosError(err)
         ? err.response?.data?.message || "Invalid email or password."
         : "An unexpected error occurred.";
-
       openSnackbar(msg, "error");
+    } finally {
+      // Don't setLoading(false) here as we want to keep it during redirect
     }
   };
 
@@ -153,7 +153,7 @@ export default function Login() {
 
           <div className="pt-8">
             <p className="font-light text-sm text-[#3E2723]">
-              Don’t have an account yet?
+              Don't have an account yet?
             </p>
             <Link href="/admin/register">
               <Button

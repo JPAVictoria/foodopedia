@@ -5,16 +5,19 @@ import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { useSnackbar } from "@/app/context/SnackbarContext";
 import { useNavbar } from "@/app/context/NavbarContext";
+import { useLoading } from "@/app/context/LoaderContext"; // Import the loader context
 import Navbar from "@/app/components/ui/navbar/navbar";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { Button } from "@mui/material";
 
 export default function AdminDashboard() {
+  const { setLoading } = useLoading(); // Get setLoading from context
   const { isNavbarVisible } = useNavbar();
   const router = useRouter();
   const { openSnackbar } = useSnackbar();
 
   useEffect(() => {
+    setLoading(false);
     const token = Cookies.get("token");
 
     if (!token) {
@@ -24,9 +27,12 @@ export default function AdminDashboard() {
         router.push("/admin/login");
       }, 2000);
 
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(timer);
+        setLoading(false); 
+      };
     }
-  }, [router, openSnackbar]);
+  }, [router, openSnackbar, setLoading]);
 
   const pieChartData = [
     { id: 0, value: 30, color: "#06b6d4" },

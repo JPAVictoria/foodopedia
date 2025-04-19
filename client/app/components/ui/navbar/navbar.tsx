@@ -1,26 +1,27 @@
 import { Home, FileText, Settings, LogOut, AlignRight, Menu } from "lucide-react";
 import NavbarTitle from "./navbarTitle";
-import Link from "next/link";
 import { useNavbar } from "@/app/context/NavbarContext";
 import Cookies from "js-cookie";
-import { useLoading } from "@/app/context/LoaderContext"; // Import useLoading
+import { useLoading } from "@/app/context/LoaderContext";
+import { useRouter } from "next/navigation"; 
 
 export default function Navbar() {
   const { isNavbarVisible, toggleNavbar } = useNavbar();
-  const { setLoading } = useLoading(); 
+  const { setLoading } = useLoading();
+  const router = useRouter(); 
 
   const handleLogout = () => {
-    setLoading(true); 
-
+    setLoading(true);
     Cookies.remove("token");
-    console.log("JWT token removed from cookies");
-
     localStorage.removeItem("admin");
-    console.log("Admin data cleared from localStorage");
-
     setTimeout(() => {
       window.location.href = "/admin/login";
-    }, 1000); 
+    }, 1000);
+  };
+
+  const handleNavigation = (path: string) => {
+    setLoading(true); 
+    router.push(path);
   };
 
   return (
@@ -51,19 +52,28 @@ export default function Navbar() {
         </div>
 
         <div className="space-y-8 mt-20 flex-grow">
-          <Link href={"/admin"} className="block">
+          <button 
+            onClick={() => handleNavigation("/admin")} 
+            className="block w-full text-left"
+          >
             <NavItem label="Home" Icon={Home} />
-          </Link>
-          <Link href={"/admin/contents"} className="block">
+          </button>
+          <button 
+            onClick={() => handleNavigation("/admin/contents")} 
+            className="block w-full text-left"
+          >
             <NavItem label="Contents" Icon={FileText} />
-          </Link>
-          <Link href={"/admin/configure"} className="block">
+          </button>
+          <button 
+            onClick={() => handleNavigation("/admin/configure")} 
+            className="block w-full text-left"
+          >
             <NavItem label="Configuration" Icon={Settings} />
-          </Link>
+          </button>
         </div>
 
         <div>
-          <button onClick={handleLogout}>
+          <button onClick={handleLogout} className="w-full text-left">
             <NavItem label="Logout" Icon={LogOut} />
           </button>
         </div>
