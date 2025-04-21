@@ -25,7 +25,7 @@ export const LoadingProvider = ({ children }: { children: ReactNode }) => {
       {children}
       {loading && (
         <div className="fixed top-0 left-0 w-full h-full bg-opacity-50 bg-[#FAFAFA] flex justify-center items-center">
-          <CircularProgress size={60} color="success" />
+          <CircularProgress size={60} sx={{ color: '#3E2723' }}/>
         </div>
       )}
     </LoadingContext.Provider>
