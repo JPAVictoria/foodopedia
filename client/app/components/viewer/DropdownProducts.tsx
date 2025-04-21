@@ -4,7 +4,6 @@ import React, { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ChevronDown } from "lucide-react"
-import { Button } from "@/app/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,16 +41,17 @@ export default function DropdownProducts() {
     <nav className="p-4">
       <DropdownMenu open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger asChild>
-          <Button
+          {/* Normal Button Element */}
+          <button
             onClick={() => setOpen(!open)}
-            className="flex items-center gap-2 text-[#3E2723] font-medium cursor-pointer outline-none focus:outline-none focus:ring-0 disabled={true}"
+            className="flex items-center gap-2 text-[#3E2723] font-medium cursor-pointer outline-none focus:outline-none focus:ring-0 bg-transparent"
           >
             Products
             <ChevronDown className="w-4 h-4 transition-opacity duration-200" />
-          </Button>
+          </button>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent side="bottom" align="end" className="w-76 text-right overflow-visible">
+        <DropdownMenuContent side="bottom" align="end" className="w-56 text-right overflow-visible">
           <AnimatePresence>
             {open && (
               <motion.div
@@ -63,7 +63,7 @@ export default function DropdownProducts() {
               >
                 {menuItems.map((item, index) => (
                   <motion.div key={index} variants={itemVariants}>
-                    <DropdownMenuItem className="justify-end text-[#3E2723] font-medium hover:bg-gray-200 hover:scale-105 transition-all">
+                    <DropdownMenuItem className="justify-end text-[#3E2723] font-medium transition-all hover:bg-gray-200 rounded-md">
                       {item.type === "link" ? (
                         <Link href={item.href!} className="w-full text-right">
                           {item.label}
