@@ -11,7 +11,7 @@ import { Label } from "@/app/components/ui/label";
 import { Button } from "@/app/components/ui/button";
 import { Eye, EyeOff } from "lucide-react";
 import { useConfigureStore } from "@/app/stores/adminStores/useConfigureStore";
-import { useToggleStore } from "@/app/stores/adminStores/useToggleStore";
+import { useToggleStore } from "@/app/stores/useToggleStore";
 import { useMutation } from "@tanstack/react-query";
 import { useLoading } from "@/app/context/LoaderContext"; 
 

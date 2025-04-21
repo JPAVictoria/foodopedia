@@ -66,7 +66,7 @@ export default function ChangePassword() {
     setGlobalLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:5000/admin/reset/reset", {
+      const res = await axios.post("http://localhost:5000/viewer/reset/reset", {
         newPassword,
         token,
       });
@@ -74,7 +74,7 @@ export default function ChangePassword() {
       if (res.status === 200 || res.status === 201) {
         openSnackbar(res.data.message || "Password changed successfully", "success");
         setSubmitted(true);
-        setTimeout(() => router.push("/admin/login"), 2000);
+        setTimeout(() => router.push("/viewer/login"), 2000);
       } else {
         openSnackbar(res.data.message || "Something went wrong", "error");
       }
@@ -105,7 +105,7 @@ export default function ChangePassword() {
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="grid w-full max-w-sm items-center text-center">
-        <h1 className="font-bold text-[32px] text-transparent bg-clip-text bg-gradient-to-r from-[#4caf50] via-[#76bf73] to-[#a0cf96]">
+      <h1 className="font-bold text-[32px] text-transparent bg-clip-text bg-gradient-to-r from-[#FF9800] via-[#FAC36E] to-[#F7D9A5]">
           Change your password
         </h1>
         <form onSubmit={handleSubmit} className="pt-5">
@@ -120,11 +120,11 @@ export default function ChangePassword() {
               value={newPassword}
               disabled={loading || submitted}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="pr-10 focus:outline-none focus:border-[#4CAF50] focus:shadow-sm focus:shadow-[#4CAF50]/30"
+              className="pr-10 focus:outline-none focus:border-[#FF9800] focus:shadow-sm focus:shadow-[#FF9800]/30"
             />
             <div
               onClick={toggleShowNew}
-              className="absolute inset-y-10 right-3 flex items-center cursor-pointer text-gray-500 hover:text-[#4CAF50]"
+              className="absolute inset-y-10 right-3 flex items-center cursor-pointer text-gray-500 hover:text-[#FF9800]"
             >
               {showNew ? <EyeOff size={18} /> : <Eye size={18} />}
             </div>
@@ -141,11 +141,11 @@ export default function ChangePassword() {
               value={confirmPassword}
               disabled={loading || submitted}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="pr-10 focus:outline-none focus:border-[#4CAF50] focus:shadow-sm focus:shadow-[#4CAF50]/30"
+              className="pr-10 focus:outline-none focus:border-[#FF9800] focus:shadow-sm focus:shadow-[#FF9800]/30"
             />
             <div
               onClick={toggleShowConfirm}
-              className="absolute inset-y-15 right-3 flex items-center cursor-pointer text-gray-500 hover:text-[#4CAF50]"
+              className="absolute inset-y-15 right-3 flex items-center cursor-pointer text-gray-500 hover:text-[#FF9800]"
             >
               {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
             </div>
@@ -157,8 +157,8 @@ export default function ChangePassword() {
               disabled={loading || submitted}
               className={`w-full text-white py-5 px-4 rounded-md transition duration-200 ${
                 loading || submitted
-                  ? "bg-[#A5D6A7] cursor-not-allowed"
-                  : "bg-[#4CAF50] hover:bg-[#45a049] cursor-pointer"
+                  ? "bg-[#FF9800] cursor-not-allowed"
+                  : "bg-[#FF9800] hover:bg-[#FAC36E] cursor-pointer"
               }`}
             >
               {loading ? "Changing..." : submitted ? "Submitted" : "Submit"}
@@ -167,7 +167,7 @@ export default function ChangePassword() {
         </form>
 
         <div className="pt-5">
-          <Link href="/admin/login">
+          <Link href="/viewer/login">
             <Button variant="link" className="cursor-pointer pt-3 text-[#3E2723]">
               Go back to login
             </Button>
