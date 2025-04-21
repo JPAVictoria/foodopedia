@@ -5,7 +5,7 @@ import { Button } from "@/app/components/ui/button";
 import Link from "next/link";
 import axios from "axios";
 import { useSnackbar } from "@/app/context/SnackbarContext";
-import { useForgotPasswordStore } from "@/app/stores/adminStores/useForgotStore";
+import { useForgotPasswordStore } from "@/app/stores/useForgotStore";
 
 export default function ForgotPassword() {
   const { openSnackbar } = useSnackbar();

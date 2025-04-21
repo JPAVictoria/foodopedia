@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useSnackbar } from "@/app/context/SnackbarContext";
 import { Eye, EyeOff } from "lucide-react";
-import { useRegisterStore } from "@/app/stores/adminStores/useRegisterStore";
+import { useRegisterStore } from "@/app/stores/useRegisterStore";
 import { useLoading } from "@/app/context/LoaderContext";
 
 export default function Signup() {
