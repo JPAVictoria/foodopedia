@@ -61,7 +61,6 @@ export default function Signup() {
       return;
     }
 
-    // Activate both local and global loaders
     setLoading(true);
     setGlobalLoading(true);
 

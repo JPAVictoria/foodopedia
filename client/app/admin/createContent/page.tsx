@@ -41,20 +41,20 @@ export default function CreateContent() {
 
   const classifications: Classification[] = ["DESSERT", "APPETIZER", "ENTREE", "BEVERAGES"];
 
-  const handleAddField = () => setRecipes([...recipes, ""]);
-  const handleInputChange = (index: number, value: string) =>
-    setRecipes(recipes.map((item, i) => (i === index ? value : item)));
-  const handleDeleteField = (index: number) =>
-    setRecipes(recipes.filter((_, i) => i !== index));
+    const handleAddField = () => setRecipes([...recipes, ""]);
+    const handleInputChange = (index: number, value: string) =>
+      setRecipes(recipes.map((item, i) => (i === index ? value : item)));
+    const handleDeleteField = (index: number) =>
+      setRecipes(recipes.filter((_, i) => i !== index));
 
-  const handleAddInstructionField = () => setInstructions([...instructions, ""]);
-  const handleInputInstructionChange = (index: number, value: string) =>
-    setInstructions(instructions.map((item, i) => (i === index ? value : item)));
-  const handleDeleteInstructionField = (index: number) =>
-    setInstructions(instructions.filter((_, i) => i !== index));
+    const handleAddInstructionField = () => setInstructions([...instructions, ""]);
+    const handleInputInstructionChange = (index: number, value: string) =>
+      setInstructions(instructions.map((item, i) => (i === index ? value : item)));
+    const handleDeleteInstructionField = (index: number) =>
+      setInstructions(instructions.filter((_, i) => i !== index));
 
-  const handleClassificationChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setSelectedClassification(e.target.value as Classification);
+    const handleClassificationChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+      setSelectedClassification(e.target.value as Classification);
 
   const validateForm = () => {
     const errorList: string[] = [];

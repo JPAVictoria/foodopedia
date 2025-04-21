@@ -20,7 +20,6 @@ router.post("/signup", async (req, res) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // Create new admin in the database
     const admin = await prisma.admin.create({
       data: {
         firstName,
