@@ -47,22 +47,21 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:5000/admin/login/login", {
+      const response = await axios.post("http://localhost:5000/viewer/login/login", {
         email,
         password,
       });
 
-      const { token, admin } = response.data;
+      const { token, viewer } = response.data;
 
-      if (token && admin) {
+      if (token && viewer) {
         Cookies.set("token", token, { expires: 1 });
-        localStorage.setItem("admin", JSON.stringify(admin));
+        localStorage.setItem("viewer", JSON.stringify(viewer));
         openSnackbar("Login successful!", "success");
-
         setSubmitted(true);
         setLoading(true);
         setTimeout(() => {
-          router.push("/admin");
+          router.push("/viewer/home");
         }, 1000); 
       }
     } catch (err) {
@@ -72,7 +71,6 @@ export default function Login() {
         : "An unexpected error occurred.";
       openSnackbar(msg, "error");
     } finally {
-      
     }
   };
 
@@ -81,8 +79,8 @@ export default function Login() {
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="grid w-full max-w-sm items-center text-center">
-        <h1 className="font-bold text-[32px] text-transparent bg-clip-text bg-gradient-to-r from-[#4caf50] via-[#76bf73] to-[#a0cf96]">
-          Welcome back
+      <h1 className="font-bold text-[32px] text-transparent bg-clip-text bg-gradient-to-r from-[#FF9800] via-[#FAC36E] to-[#F7D9A5]">
+      Welcome back
         </h1>
 
         <form onSubmit={handleLogin} className="pt-5">
@@ -97,7 +95,7 @@ export default function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={isDisabled}
-              className="focus:outline-none focus:border-[#4CAF50] focus:shadow-sm focus:shadow-[#4CAF50]/30 transition-all duration-300"
+              className="focus:outline-none focus:border-[#FF9800] focus:shadow-sm focus:shadow-[#FF9800]/30 transition-all duration-300"
             />
           </div>
 
@@ -112,17 +110,17 @@ export default function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={isDisabled}
-              className="w-full focus:outline-none focus:border-[#4CAF50] focus:shadow-sm focus:shadow-[#4CAF50]/30 transition-all duration-300 pr-10"
+              className="w-full focus:outline-none focus:border-[#FF9800] focus:shadow-sm focus:shadow-[#FF9800]/30 transition-all duration-300 pr-10"
             />
             <div
               onClick={toggleShowPassword}
-              className="absolute inset-y-15 right-3 flex items-center cursor-pointer text-gray-500 hover:text-[#4CAF50] transition"
+              className="absolute inset-y-15 right-3 flex items-center cursor-pointer text-gray-500 hover:text-[#FF9800] transition"
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </div>
 
             <div className="flex justify-end pt-1">
-              <Link href="/admin/forgot-password">
+              <Link href="/viewer/forgot-password">
                 <Button
                   variant="link"
                   className="text-[#3E2723] text-xs p-0 h-auto cursor-pointer font-medium"
@@ -140,8 +138,8 @@ export default function Login() {
               disabled={isDisabled}
               className={`w-full text-white py-5 px-4 rounded-md transition duration-200 ${
                 isDisabled
-                  ? "bg-[#A5D6A7] cursor-not-allowed"
-                  : "bg-[#4CAF50] hover:bg-[#45a049] cursor-pointer"
+                  ? "bg-[#FF9800] cursor-not-allowed"
+                  : "bg-[#FF9800] hover:bg-[#FAC36E] cursor-pointer"
               }`}
             >
               {loading ? "Logging in..." : submitted ? "Logged in" : "Login"}
@@ -152,7 +150,7 @@ export default function Login() {
             <p className="font-light text-sm text-[#3E2723]">
               Don't have an account yet?
             </p>
-            <Link href="/admin/register">
+            <Link href="/viewer/register">
               <Button
                 variant="link"
                 className="cursor-pointer pt-3 text-[#3E2723]"

@@ -10,6 +10,7 @@ const contentRouter = require("./api/content/content.route");
 const changePasswordRouter = require("./api/changePassword/change.route"); 
 const changeNameRouter = require("./api/changeName/change.route"); 
 const viewerRegisterRouter = require("./api/authViewer/register/auth.route");
+const viewerLoginRouter = require("./api/authViewer/login/auth.route");
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use("/admin/content", contentRouter);
 app.use("/admin/change", changePasswordRouter); 
 app.use("/admin/change", changeNameRouter); 
 app.use("/viewer/register", viewerRegisterRouter);
+app.use("/viewer/login", viewerLoginRouter);
 
 
 
