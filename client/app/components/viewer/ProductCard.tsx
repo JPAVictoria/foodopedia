@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export default function ProductCard() {
   return (
-    <div className="w-[300px] h-[335px] rounded-sm shadow-md border border-[#2d2d2d5b] bg-[#fffaee] overflow-hidden transition-transform hover:scale-[1.01]">
+    <div className="w-[300px] h-[330px] rounded-sm shadow-md border border-[#2d2d2d5b] bg-[#fffaee] overflow-hidden">
       <div className="px-2 pt-2">
         <div className="relative w-full h-[120px] shadow-sm rounded-sm overflow-hidden">
           <Image
