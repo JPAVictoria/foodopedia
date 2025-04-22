@@ -70,7 +70,7 @@ export default function DropdownProducts() {
               >
                 {menuItems.map((item, index) => (
                   <motion.div key={index} variants={itemVariants}>
-                    <DropdownMenuItem className="justify-end text-[#3E2723] font-medium transition-all hover:bg-[#f0f0f0e8] mb-2">
+                    <DropdownMenuItem className="w-full justify-end text-[#3E2723] text-[16px] font-medium transition-all hover:underline hover:underline-[#FF9800] mb-2">
                       {item.type === "link" ? (
                         <Link href={item.href!} className="w-full text-right">
                           {item.label}

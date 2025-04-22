@@ -23,7 +23,7 @@ export default function Navbar() {
 
         <Link href="/viewer/favorites">
           <button
-            className="flex items-center gap-2 text-[#3E2723] hover:text-[#2c21128e] font-medium cursor-pointer outline-none focus:outline-none focus:ring-0"
+            className="flex items-center gap-2 text-[#3E2723] hover:underline font-medium cursor-pointer outline-none focus:outline-none focus:ring-0"
           >
             Favorites
           </button>
@@ -31,7 +31,7 @@ export default function Navbar() {
 
         <Link href="/viewer/profile">
           <button
-            className="flex items-center gap-2 text-[#3E2723] font-medium hover:text-[#2c21128e] cursor-pointer outline-none focus:outline-none focus:ring-0"
+            className="flex items-center gap-2 text-[#3E2723] font-medium hover:underline cursor-pointer outline-none focus:outline-none focus:ring-0"
           >
             Profile
           </button>
