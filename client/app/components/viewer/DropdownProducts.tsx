@@ -21,7 +21,7 @@ export default function DropdownProducts() {
     { label: "Entree", type: "link", href: "/billing" },
     { label: "Appetizer", type: "button", onClick: () => router.push("/settings") },
     { label: "Beverages", type: "link", href: "/logout" },
-    { label: "All Types", type: "link", href: "/logout" },
+    { label: "All Types", type: "link", href: "/viewer/home" },
   ]
 
   const containerVariants = {
@@ -44,7 +44,7 @@ export default function DropdownProducts() {
         <DropdownMenuTrigger asChild>
           <button
             onClick={() => setOpen(!open)}
-            className="flex items-center gap-2 text-[#FF9800] font-medium cursor-pointer outline-none focus:outline-none focus:ring-0 bg-transparent p-4"
+            className="flex items-center gap-2 text-[#3E2723] font-medium cursor-pointer outline-none focus:outline-none focus:ring-0 bg-transparent p-4"
           >
             Products
             <ChevronDown

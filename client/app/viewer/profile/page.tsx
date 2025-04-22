@@ -1,11 +1,10 @@
 "use client";
-import Navbar from "@/app/components/ui/navbar/navbar";
+import Navbar from "@/app/components/viewer/Navbar";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { useSnackbar } from "@/app/context/SnackbarContext";
-import { useNavbar } from "@/app/context/NavbarContext";
 import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
 import { Button } from "@/app/components/ui/button";
@@ -13,15 +12,15 @@ import { Eye, EyeOff } from "lucide-react";
 import { useConfigureStore } from "@/app/stores/useConfigureStore";
 import { useToggleStore } from "@/app/stores/useToggleStore";
 import { useMutation } from "@tanstack/react-query";
-import { useLoading } from "@/app/context/LoaderContext"; 
+import { useLoading } from "@/app/context/LoaderContext";
 
 export default function Configure() {
   const router = useRouter();
-  const { setLoading } = useLoading(); 
+  const { setLoading } = useLoading();
   const { openSnackbar } = useSnackbar();
-  const { isNavbarVisible } = useNavbar();
 
-  const { firstName, lastName, setFirstName, setLastName } = useConfigureStore();
+  const { firstName, lastName, setFirstName, setLastName } =
+    useConfigureStore();
   const {
     currentPassword,
     newPassword,
@@ -35,7 +34,7 @@ export default function Configure() {
     toggleShowCurrent,
     toggleShowNew,
     toggleShowConfirm,
-    resetPasswordForm
+    resetPasswordForm,
   } = useToggleStore();
 
   const passwordMutation = useMutation({
@@ -48,7 +47,10 @@ export default function Configure() {
       );
     },
     onSuccess: (res) => {
-      openSnackbar(res.data.message || "Password updated successfully.", "success");
+      openSnackbar(
+        res.data.message || "Password updated successfully.",
+        "success"
+      );
       resetPasswordForm();
     },
     onError: (error) => {
@@ -61,7 +63,7 @@ export default function Configure() {
         openSnackbar("An unexpected error occurred.", "error");
       }
       resetPasswordForm();
-    }
+    },
   });
 
   const nameMutation = useMutation({
@@ -87,11 +89,11 @@ export default function Configure() {
       } else {
         openSnackbar("An unexpected error occurred.", "error");
       }
-    }
+    },
   });
 
   useEffect(() => {
-    setLoading(true); 
+    setLoading(true);
     const token = Cookies.get("token");
     if (!token) {
       openSnackbar("Token is missing", "error");
@@ -99,7 +101,7 @@ export default function Configure() {
       return () => clearTimeout(timer);
     }
 
-    setLoading(false); 
+    setLoading(false);
   }, [router, openSnackbar, setLoading]);
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
@@ -114,7 +116,6 @@ export default function Configure() {
       return;
     }
     passwordMutation.mutate();
-    
   };
 
   const handleNameSubmit = (e: React.FormEvent) => {
@@ -122,50 +123,98 @@ export default function Configure() {
     nameMutation.mutate();
   };
 
-
   return (
-    <div className="flex min-h-screen">
+    <div className="">
       <Navbar />
-      <div className={`transition-all mt-20 duration-300 flex-1 p-10 ${isNavbarVisible ? "ml-0" : "-ml-54"}`}>
+      <div className="transition-all duration-300 flex-1 p-10">
         <div className="flex justify-center gap-16 mt-10 flex-wrap">
           <div className="flex flex-col items-center w-[400px]">
-            <h1 className="font-bold text-[28px] text-transparent mb-7 bg-clip-text bg-gradient-to-r from-[#4caf50] via-[#76bf73] to-[#a0cf96]">
+            <h1 className="font-bold text-[32px] text-transparent mb-7 bg-clip-text bg-gradient-to-r from-[#FF9800] via-[#FAC36E] to-[#F7D9A5]">
               Change Password
             </h1>
             <div className="w-full space-y-4 bg-[#fffaec] p-8 border border-[#2d2d2d4e] rounded-sm">
-              <form onSubmit={handlePasswordSubmit} className="flex flex-col gap-7">
-                {['current', 'new', 'confirm'].map((type) => (
+              <form
+                onSubmit={handlePasswordSubmit}
+                className="flex flex-col gap-7"
+              >
+                {["current", "new", "confirm"].map((type) => (
                   <div key={type} className="relative">
-                    <Label htmlFor={`${type}-password`} className="pb-2 text-[#3E2723]">
-                      {type === 'current' ? 'Current' : type === 'new' ? 'New' : 'Confirm'} Password
+                    <Label
+                      htmlFor={`${type}-password`}
+                      className="pb-2 text-[#3E2723]"
+                    >
+                      {type === "current"
+                        ? "Current"
+                        : type === "new"
+                        ? "New"
+                        : "Confirm"}{" "}
+                      Password
                     </Label>
                     <Input
-                      type={type === 'current' ? showCurrent ? "text" : "password" :
-                            type === 'new' ? showNew ? "text" : "password" :
-                            showConfirm ? "text" : "password"}
+                      type={
+                        type === "current"
+                          ? showCurrent
+                            ? "text"
+                            : "password"
+                          : type === "new"
+                          ? showNew
+                            ? "text"
+                            : "password"
+                          : showConfirm
+                          ? "text"
+                          : "password"
+                      }
                       id={`${type}-password`}
-                      value={type === 'current' ? currentPassword :
-                            type === 'new' ? newPassword : confirmPassword}
-                      onChange={(e) => type === 'current' ? setCurrentPassword(e.target.value) :
-                                type === 'new' ? setNewPassword(e.target.value) :
-                                setConfirmPassword(e.target.value)}
-                      className="w-full pr-10"
+                      value={
+                        type === "current"
+                          ? currentPassword
+                          : type === "new"
+                          ? newPassword
+                          : confirmPassword
+                      }
+                      onChange={(e) =>
+                        type === "current"
+                          ? setCurrentPassword(e.target.value)
+                          : type === "new"
+                          ? setNewPassword(e.target.value)
+                          : setConfirmPassword(e.target.value)
+                      }
+                      className="focus:outline-none focus:border-[#FF9800] focus:shadow-sm focus:shadow-[#FF9800]/30 transition-all duration-300"
                     />
                     <div
-                      onClick={type === 'current' ? toggleShowCurrent :
-                              type === 'new' ? toggleShowNew : toggleShowConfirm}
+                      onClick={
+                        type === "current"
+                          ? toggleShowCurrent
+                          : type === "new"
+                          ? toggleShowNew
+                          : toggleShowConfirm
+                      }
                       className="absolute top-8 right-3 cursor-pointer"
                     >
-                      {type === 'current' ? (showCurrent ? <EyeOff size={18} /> : <Eye size={18} />) :
-                       type === 'new' ? (showNew ? <EyeOff size={18} /> : <Eye size={18} />) :
-                       (showConfirm ? <EyeOff size={18} /> : <Eye size={18} />)}
+                      {type === "current" ? (
+                        showCurrent ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )
+                      ) : type === "new" ? (
+                        showNew ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )
+                      ) : showConfirm ? (
+                        <EyeOff size={18} />
+                      ) : (
+                        <Eye size={18} />
+                      )}
                     </div>
                   </div>
                 ))}
 
                 <Button
                   type="submit"
-                  className="mt-2 bg-[#4CAF50] hover:bg-[#45a049] text-white"
+                  className="mt-2 bg-[#FF9800] hover:bg-[#FAC36E] text-white"
                   disabled={passwordMutation.isPending}
                 >
                   {passwordMutation.isPending ? "Updating..." : "Submit"}
@@ -175,7 +224,7 @@ export default function Configure() {
           </div>
 
           <div className="flex flex-col items-center w-[400px]">
-            <h1 className="font-bold text-[28px] text-transparent mb-7 bg-clip-text bg-gradient-to-r from-[#4caf50] via-[#76bf73] to-[#a0cf96]">
+            <h1 className="font-bold text-[32px] text-transparent mb-7 bg-clip-text bg-gradient-to-r from-[#FF9800] via-[#FAC36E] to-[#F7D9A5]">
               Change Name
             </h1>
             <div className="w-full space-y-4 bg-[#fffaec] p-8 border border-[#2d2d2d4e] rounded-sm">
@@ -189,6 +238,7 @@ export default function Configure() {
                     id="first-name"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
+                    className="focus:outline-none focus:border-[#FF9800] focus:shadow-sm focus:shadow-[#FF9800]/30 transition-all duration-300"
                   />
                 </div>
 
@@ -201,12 +251,13 @@ export default function Configure() {
                     id="last-name"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
+                    className="focus:outline-none focus:border-[#FF9800] focus:shadow-sm focus:shadow-[#FF9800]/30 transition-all duration-300"
                   />
                 </div>
 
                 <Button
                   type="submit"
-                  className="mt-2 bg-[#4CAF50] hover:bg-[#45a049] text-white"
+                  className="mt-2 bg-[#FF9800] hover:bg-[#FAC36E] text-white"
                   disabled={nameMutation.isPending}
                 >
                   {nameMutation.isPending ? "Updating..." : "Submit"}
