@@ -57,7 +57,7 @@ export default function DropdownProducts() {
         <DropdownMenuContent
           side="bottom"
           align="end"
-          className="w-56 text-right overflow-visible"
+          className="w-56 text-right overflow-visible border-1 border-[#2d2d2d41]"
         >
           <AnimatePresence>
             {open && (
@@ -70,7 +70,7 @@ export default function DropdownProducts() {
               >
                 {menuItems.map((item, index) => (
                   <motion.div key={index} variants={itemVariants}>
-                    <DropdownMenuItem className="justify-end text-[#3E2723] font-medium transition-all hover:bg-gray-200 rounded-md">
+                    <DropdownMenuItem className="justify-end text-[#3E2723] font-medium transition-all hover:bg-[#f0f0f0e8] mb-2">
                       {item.type === "link" ? (
                         <Link href={item.href!} className="w-full text-right">
                           {item.label}
