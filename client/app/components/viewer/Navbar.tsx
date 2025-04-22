@@ -1,5 +1,6 @@
 import Image from "next/image"
 import DropdownProducts from "@/app/components/viewer/DropdownProducts"
+import Link from "next/link"
 
 export default function Navbar() {
   return (
@@ -13,24 +14,28 @@ export default function Navbar() {
           />
         </div>
         <h1 className="font-bold text-[#3E2723] text-[20px]">
-          Welcome John Doe
+          Welcome, John Doe
         </h1>
       </div>
 
-      <div className="flex items-center gap-10 mr-10">
+      <div className="flex items-center gap-20 mr-20">
         <DropdownProducts />
 
-        <button
-          className="flex items-center gap-2 text-[#3E2723] font-medium cursor-pointer outline-none focus:outline-none focus:ring-0"
-        >
-          Favorites
-        </button>
+        <Link href="/viewer/favorites">
+          <button
+            className="flex items-center gap-2 text-[#3E2723] hover:text-[#2c21128e] font-medium cursor-pointer outline-none focus:outline-none focus:ring-0"
+          >
+            Favorites
+          </button>
+        </Link>
 
-        <button
-          className="flex items-center gap-2 text-[#3E2723] font-medium cursor-pointer outline-none focus:outline-none focus:ring-0"
-        >
-          Configuration
-        </button>
+        <Link href="/viewer/profile">
+          <button
+            className="flex items-center gap-2 text-[#3E2723] font-medium hover:text-[#2c21128e] cursor-pointer outline-none focus:outline-none focus:ring-0"
+          >
+            Profile
+          </button>
+        </Link>
       </div>
     </div>
   )
