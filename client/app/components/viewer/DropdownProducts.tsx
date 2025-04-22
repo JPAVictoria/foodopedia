@@ -21,6 +21,7 @@ export default function DropdownProducts() {
     { label: "Entree", type: "link", href: "/billing" },
     { label: "Appetizer", type: "button", onClick: () => router.push("/settings") },
     { label: "Beverages", type: "link", href: "/logout" },
+    { label: "All Types", type: "link", href: "/logout" },
   ]
 
   const containerVariants = {
@@ -38,12 +39,12 @@ export default function DropdownProducts() {
   }
 
   return (
-    <nav className="p-4">
+    <div className="relative inline-block"> 
       <DropdownMenu open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger asChild>
           <button
             onClick={() => setOpen(!open)}
-            className="flex items-center gap-2 text-[#3E2723] font-medium cursor-pointer outline-none focus:outline-none focus:ring-0 bg-transparent"
+            className="flex items-center gap-2 text-[#FF9800] font-medium cursor-pointer outline-none focus:outline-none focus:ring-0 bg-transparent p-4"
           >
             Products
             <ChevronDown
@@ -57,7 +58,7 @@ export default function DropdownProducts() {
         <DropdownMenuContent
           side="bottom"
           align="end"
-          className="w-56 text-right overflow-visible border-1 border-[#2d2d2d41]"
+          className="w-56 text-right overflow-visible border border-[#2d2d2d32] bg-white shadow-sm z-[1000]" 
         >
           <AnimatePresence>
             {open && (
@@ -70,7 +71,7 @@ export default function DropdownProducts() {
               >
                 {menuItems.map((item, index) => (
                   <motion.div key={index} variants={itemVariants}>
-                    <DropdownMenuItem className="w-full justify-end text-[#3E2723] text-[16px] font-medium transition-all hover:underline hover:underline-[#FF9800] mb-2">
+                    <DropdownMenuItem className="w-full justify-end text-[#3E2723] text-[16px] transition-all hover:bg-gray-50 px-4 py-2">
                       {item.type === "link" ? (
                         <Link href={item.href!} className="w-full text-right">
                           {item.label}
@@ -92,6 +93,6 @@ export default function DropdownProducts() {
           </AnimatePresence>
         </DropdownMenuContent>
       </DropdownMenu>
-    </nav>
+    </div>
   )
 }
