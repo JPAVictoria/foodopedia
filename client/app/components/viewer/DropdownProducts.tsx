@@ -41,17 +41,24 @@ export default function DropdownProducts() {
     <nav className="p-4">
       <DropdownMenu open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger asChild>
-          {/* Normal Button Element */}
           <button
             onClick={() => setOpen(!open)}
             className="flex items-center gap-2 text-[#3E2723] font-medium cursor-pointer outline-none focus:outline-none focus:ring-0 bg-transparent"
           >
             Products
-            <ChevronDown className="w-4 h-4 transition-opacity duration-200" />
+            <ChevronDown
+              className={`w-4 h-4 transition-transform duration-200 ${
+                open ? "rotate-180" : ""
+              }`}
+            />
           </button>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent side="bottom" align="end" className="w-56 text-right overflow-visible">
+        <DropdownMenuContent
+          side="bottom"
+          align="end"
+          className="w-56 text-right overflow-visible"
+        >
           <AnimatePresence>
             {open && (
               <motion.div
