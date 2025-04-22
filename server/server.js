@@ -13,6 +13,9 @@ const viewerRegisterRouter = require("./api/authViewer/register/auth.route");
 const viewerLoginRouter = require("./api/authViewer/login/auth.route");
 const viewerForgotRouter = require("./api/authViewer/forgot/auth.route");
 const viewerResetRouter = require("./api/authViewer/reset/auth.route");
+const viewerChangePasswordRouter = require("./api/viewer/changePassword/change.route");
+const viewerChangeNameRouter = require("./api/viewer/changeName/change.route");
+
 
 
 const app = express();
@@ -38,6 +41,8 @@ app.use("/viewer/register", viewerRegisterRouter);
 app.use("/viewer/login", viewerLoginRouter);
 app.use("/viewer/forgot", viewerForgotRouter);
 app.use("/viewer/reset", viewerResetRouter);
+app.use("/viewer/change", viewerChangePasswordRouter);
+app.use("/viewer/change", viewerChangeNameRouter);
 
 
 

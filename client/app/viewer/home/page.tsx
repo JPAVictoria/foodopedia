@@ -1,7 +1,17 @@
+"use client";
 import Navbar from "@/app/components/viewer/Navbar"
 import ProductCard from "@/app/components/viewer/ProductCard"
+import { useLoading } from "@/app/context/LoaderContext"; // Import the loader context
+import { useEffect } from "react";
 
 export default function ViewerHome() {
+
+  const { setLoading } = useLoading(); 
+
+  useEffect(() => {
+    setLoading(false);
+  }, [setLoading]);
+
   return (
     <div className="">
         <Navbar />

@@ -1,7 +1,5 @@
 "use client";
 import Navbar from "@/app/components/viewer/Navbar";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { useSnackbar } from "@/app/context/SnackbarContext";
@@ -12,13 +10,10 @@ import { Eye, EyeOff } from "lucide-react";
 import { useConfigureStore } from "@/app/stores/useConfigureStore";
 import { useToggleStore } from "@/app/stores/useToggleStore";
 import { useMutation } from "@tanstack/react-query";
-import { useLoading } from "@/app/context/LoaderContext";
 
 export default function Configure() {
-  const router = useRouter();
-  const { setLoading } = useLoading();
-  const { openSnackbar } = useSnackbar();
 
+  const { openSnackbar } = useSnackbar();
   const { firstName, lastName, setFirstName, setLastName } =
     useConfigureStore();
   const {
@@ -41,7 +36,7 @@ export default function Configure() {
     mutationFn: async () => {
       const token = Cookies.get("token");
       return axios.put(
-        "http://localhost:5000/admin/change/change-password",
+        "http://localhost:5000/viewer/change/change-password",
         { currentPassword, newPassword },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -70,13 +65,13 @@ export default function Configure() {
     mutationFn: async () => {
       const token = Cookies.get("token");
       return axios.put(
-        "http://localhost:5000/admin/change/change-name",
+        "http://localhost:5000/viewer/change/change-name",
         { firstName, lastName },
         { headers: { Authorization: `Bearer ${token}` } }
       );
     },
     onSuccess: (res) => {
-      localStorage.setItem("admin", JSON.stringify({ firstName, lastName }));
+      localStorage.setItem("viewer", JSON.stringify({ firstName, lastName }));
       openSnackbar(res.data.message || "Name updated successfully.", "success");
       setTimeout(() => window.location.reload(), 1000);
     },
@@ -92,17 +87,6 @@ export default function Configure() {
     },
   });
 
-  useEffect(() => {
-    setLoading(true);
-    const token = Cookies.get("token");
-    if (!token) {
-      openSnackbar("Token is missing", "error");
-      const timer = setTimeout(() => router.push("/admin/login"), 2000);
-      return () => clearTimeout(timer);
-    }
-
-    setLoading(false);
-  }, [router, openSnackbar, setLoading]);
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
