@@ -12,7 +12,8 @@ import { Chip } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useInformationStore } from "@/app/stores/adminStores/useInformationStore";
-import { useLoading } from "@/app/context/LoaderContext"; 
+import { useLoading } from "@/app/context/LoaderContext";
+import { useState } from "react";
 
 type Classification = "DESSERT" | "APPETIZER" | "ENTREE" | "BEVERAGES";
 
@@ -20,7 +21,7 @@ export default function CreateContent() {
   const router = useRouter();
   const { openSnackbar } = useSnackbar();
   const { isNavbarVisible } = useNavbar();
-  const { setLoading } = useLoading(); 
+  const { setLoading } = useLoading();
 
   const queryClient = useQueryClient();
 
@@ -39,31 +40,45 @@ export default function CreateContent() {
     setStatus,
   } = useInformationStore();
 
-  const classifications: Classification[] = ["DESSERT", "APPETIZER", "ENTREE", "BEVERAGES"];
+  const classifications: Classification[] = [
+    "DESSERT",
+    "APPETIZER",
+    "ENTREE",
+    "BEVERAGES",
+  ];
 
-    const handleAddField = () => setRecipes([...recipes, ""]);
-    const handleInputChange = (index: number, value: string) =>
-      setRecipes(recipes.map((item, i) => (i === index ? value : item)));
-    const handleDeleteField = (index: number) =>
-      setRecipes(recipes.filter((_, i) => i !== index));
+  const handleAddField = () => setRecipes([...recipes, ""]);
+  const handleInputChange = (index: number, value: string) =>
+    setRecipes(recipes.map((item, i) => (i === index ? value : item)));
+  const handleDeleteField = (index: number) =>
+    setRecipes(recipes.filter((_, i) => i !== index));
 
-    const handleAddInstructionField = () => setInstructions([...instructions, ""]);
-    const handleInputInstructionChange = (index: number, value: string) =>
-      setInstructions(instructions.map((item, i) => (i === index ? value : item)));
-    const handleDeleteInstructionField = (index: number) =>
-      setInstructions(instructions.filter((_, i) => i !== index));
+  const handleAddInstructionField = () =>
+    setInstructions([...instructions, ""]);
+  const handleInputInstructionChange = (index: number, value: string) =>
+    setInstructions(
+      instructions.map((item, i) => (i === index ? value : item))
+    );
+  const handleDeleteInstructionField = (index: number) =>
+    setInstructions(instructions.filter((_, i) => i !== index));
 
-    const handleClassificationChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-      setSelectedClassification(e.target.value as Classification);
+  const handleClassificationChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setSelectedClassification(e.target.value as Classification);
+
+  const [imageUrl, setImageUrl] = useState("");
 
   const validateForm = () => {
     const errorList: string[] = [];
 
     if (!foodName.trim()) errorList.push("Food name is required.");
     if (!selectedClassification) errorList.push("Classification is required.");
-    if (!shortDescription.trim()) errorList.push("Short description is required.");
-    if (recipes.some((r) => !r.trim())) errorList.push("All recipe fields must be filled.");
-    if (instructions.some((i) => !i.trim())) errorList.push("All instruction fields must be filled.");
+    if (!shortDescription.trim())
+      errorList.push("Short description is required.");
+    if (recipes.some((r) => !r.trim()))
+      errorList.push("All recipe fields must be filled.");
+    if (instructions.some((i) => !i.trim()))
+      errorList.push("All instruction fields must be filled.");
+    if (!imageUrl.trim()) errorList.push("Image URL is required.");
 
     if (errorList.length > 0) {
       openSnackbar(errorList.join(" "), "error");
@@ -80,8 +95,9 @@ export default function CreateContent() {
         shortDesc: shortDescription,
         category: selectedClassification,
         status: selectedStatus === "Publish" ? "PUBLISHED" : "DRAFT",
-        ingredients: JSON.stringify(recipes.filter(r => r.trim())),
-        instructions: JSON.stringify(instructions.filter(i => i.trim()))
+        ingredients: JSON.stringify(recipes.filter((r) => r.trim())),
+        instructions: JSON.stringify(instructions.filter((i) => i.trim())),
+        imageUrl: imageUrl.trim() || null,
       };
 
       return axios.post("http://localhost:5000/admin/content/create", payload, {
@@ -93,11 +109,11 @@ export default function CreateContent() {
         `Content ${selectedStatus.toLowerCase()}ed successfully!`,
         "success"
       );
-      queryClient.invalidateQueries({ queryKey: ['contents'] });
+      queryClient.invalidateQueries({ queryKey: ["contents"] });
       setTimeout(() => {
-        setLoading(false); 
+        setLoading(false);
         router.push("/admin/contents");
-      }); 
+      });
     },
     onError: (error) => {
       console.error("Submission error:", error);
@@ -117,7 +133,7 @@ export default function CreateContent() {
       } else {
         openSnackbar("An unexpected error occurred", "error");
       }
-    }
+    },
   });
 
   const handleSubmit = (selectedStatus: string) => {
@@ -148,7 +164,8 @@ export default function CreateContent() {
                     label={status}
                     sx={{
                       marginLeft: "8px",
-                      backgroundColor: status === "Draft" ? "#FFF8E1" : "#E8F5E9",
+                      backgroundColor:
+                        status === "Draft" ? "#FFF8E1" : "#E8F5E9",
                       color: status === "Draft" ? "#FBC02D" : "#4CAF50",
                       borderRadius: "12px",
                       padding: "4px 12px",
@@ -295,6 +312,18 @@ export default function CreateContent() {
               >
                 <Plus size={16} />
                 <span>Add</span>
+              </div>
+            </div>
+            <div className="bg-[#fffaec] p-8 rounded-sm border border-[#2d2d2d4e]">
+              <Label className="mb-3 block">Image URL:</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="text"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  placeholder="https://example.com/video.mp4"
+                  className="w-full bg-white border border-[#2d2d2d4e] p-2 h-8 resize-none rounded-none"
+                />
               </div>
             </div>
           </div>

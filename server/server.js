@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const app = express();
 
 const authRouter = require("./api/auth/register/auth.route");
 const loginRouter = require("./api/auth/login/auth.route");
@@ -18,7 +19,6 @@ const viewerChangeNameRouter = require("./api/viewer/changeName/change.route");
 
 
 
-const app = express();
 
 const corsOptions = {
   origin: 'http://localhost:3000',

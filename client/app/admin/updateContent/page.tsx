@@ -12,6 +12,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useInformationStore } from "@/app/stores/adminStores/useInformationStore";
 import { useLoading } from "@/app/context/LoaderContext";
+import { useState } from "react";
 
 type Classification = "DESSERT" | "APPETIZER" | "ENTREE" | "BEVERAGES";
 
@@ -31,6 +32,7 @@ interface ContentResponse {
   status: "PUBLISHED" | "DRAFT";
   recipes: Recipe[];
   instructions: Instruction[];
+  imageUrl?: string;
 }
 
 export default function UpdateContent() {
@@ -82,6 +84,8 @@ export default function UpdateContent() {
   const handleClassificationChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setSelectedClassification(e.target.value as Classification);
 
+  const [imageUrl, setImageUrl] = useState("");
+
   const {} = useQuery({
     queryKey: ["content", contentId],
     queryFn: async (): Promise<ContentResponse> => {
@@ -105,6 +109,7 @@ export default function UpdateContent() {
         ?.sort((a, b) => a.stepNumber - b.stepNumber)
         ?.map((i) => i.instruction) || [""];
       setInstructions(instructionStrings.length ? instructionStrings : [""]);
+      setImageUrl(data.imageUrl || "");
 
       return data;
     },
@@ -121,6 +126,7 @@ export default function UpdateContent() {
         status: selectedStatus === "Publish" ? "PUBLISHED" : "DRAFT",
         ingredients: JSON.stringify(recipes.filter((r) => r.trim())),
         instructions: JSON.stringify(instructions.filter((i) => i.trim())),
+        imageUrl: imageUrl.trim(), // Add imageUrl to the payload
       };
 
       return axios.put(
@@ -164,6 +170,7 @@ export default function UpdateContent() {
       errorList.push("All recipes must be filled.");
     if (instructions.some((i) => !i.trim()))
       errorList.push("All instructions must be filled.");
+    if (!imageUrl.trim()) errorList.push("Image URL is required.");
 
     if (errorList.length > 0) {
       openSnackbar(errorList.join(" "), "error");
@@ -348,6 +355,18 @@ export default function UpdateContent() {
               >
                 <Plus size={16} />
                 <span>Add</span>
+              </div>
+              <div className="bg-[#fffaec] p-8 rounded-sm border border-[#2d2d2d4e]">
+                <Label className="mb-3 block">Image URL:</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="text"
+                    value={imageUrl}
+                    onChange={(e) => setImageUrl(e.target.value)}
+                    placeholder="https://example.com/video.mp4"
+                    className="w-full bg-white border border-[#2d2d2d4e] p-2 h-8 resize-none rounded-none"
+                  />
+                </div>
               </div>
             </div>
           </div>

@@ -85,7 +85,7 @@ export default function SpecificPage() {
               Instructions to make:
             </h2>
             <ol className="list-decimal pl-6 space-y-2">
-              {Array.from({ length: 10 }).map((_, index) => (
+              {Array.from({ length: 6 }).map((_, index) => (
                 <li
                   key={index}
                   className="text-[#3E2723] tracking-[0.01em] leading-[1.5]"

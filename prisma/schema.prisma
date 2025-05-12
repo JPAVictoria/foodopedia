@@ -31,24 +31,26 @@ model Viewer {
 }
 
 model Content {
-  id          String         @id @default(uuid())
-  title       String
-  slug        String         @unique
-  shortDesc   String         
-  category    Category
-  status      ContentStatus  @default(DRAFT) 
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  deleted     Boolean        @default(false)
-  views       Int            @default(0)  
+  id            String         @id @default(uuid())
+  title         String
+  slug          String         @unique
+  shortDesc     String         
+  category      Category
+  status        ContentStatus  @default(DRAFT) 
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  deleted       Boolean        @default(false)
+  views         Int            @default(0)
+  imageURL      String?       
 
-  adminId     String
-  admin       Admin          @relation(fields: [adminId], references: [id])
+  adminId       String
+  admin         Admin          @relation(fields: [adminId], references: [id])
 
-  favorites   Favorite[]     
-  recipes     Recipe[]       
-  instructions RecipeInstruction[] 
+  favorites     Favorite[]     
+  recipes       Recipe[]       
+  instructions  RecipeInstruction[] 
 }
+
 
 
 model Recipe {
