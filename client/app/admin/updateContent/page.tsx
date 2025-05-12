@@ -32,7 +32,7 @@ interface ContentResponse {
   status: "PUBLISHED" | "DRAFT";
   recipes: Recipe[];
   instructions: Instruction[];
-  imageUrl?: string;
+  imageURL?: string;
 }
 
 export default function UpdateContent() {
@@ -84,7 +84,7 @@ export default function UpdateContent() {
   const handleClassificationChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setSelectedClassification(e.target.value as Classification);
 
-  const [imageUrl, setImageUrl] = useState("");
+const [imageUrl, setImageUrl] = useState('');
 
   const {} = useQuery({
     queryKey: ["content", contentId],
@@ -109,7 +109,7 @@ export default function UpdateContent() {
         ?.sort((a, b) => a.stepNumber - b.stepNumber)
         ?.map((i) => i.instruction) || [""];
       setInstructions(instructionStrings.length ? instructionStrings : [""]);
-      setImageUrl(data.imageUrl || "");
+      setImageUrl(data.imageURL || "");
 
       return data;
     },
@@ -126,7 +126,7 @@ export default function UpdateContent() {
         status: selectedStatus === "Publish" ? "PUBLISHED" : "DRAFT",
         ingredients: JSON.stringify(recipes.filter((r) => r.trim())),
         instructions: JSON.stringify(instructions.filter((i) => i.trim())),
-        imageUrl: imageUrl.trim(), // Add imageUrl to the payload
+        imageURL: imageUrl || null, // Add imageUrl to the payload
       };
 
       return axios.put(
@@ -170,8 +170,9 @@ export default function UpdateContent() {
       errorList.push("All recipes must be filled.");
     if (instructions.some((i) => !i.trim()))
       errorList.push("All instructions must be filled.");
-    if (!imageUrl.trim()) errorList.push("Image URL is required.");
-
+  if (imageUrl && !imageUrl.trim()) {
+    errorList.push("Image URL must be valid if provided.");
+  }
     if (errorList.length > 0) {
       openSnackbar(errorList.join(" "), "error");
       return false;
@@ -356,17 +357,17 @@ export default function UpdateContent() {
                 <Plus size={16} />
                 <span>Add</span>
               </div>
-              <div className="bg-[#fffaec] p-8 rounded-sm border border-[#2d2d2d4e]">
-                <Label className="mb-3 block">Image URL:</Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="text"
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    placeholder="https://example.com/video.mp4"
-                    className="w-full bg-white border border-[#2d2d2d4e] p-2 h-8 resize-none rounded-none"
-                  />
-                </div>
+            </div>
+            <div className="bg-[#fffaec] p-8 rounded-sm border border-[#2d2d2d4e]">
+              <Label className="mb-3 block">Image URL:</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="text"
+                  value={imageUrl || ""}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  placeholder="https://example.com/video.mp4"
+                  className="w-full bg-white border border-[#2d2d2d4e] p-2 h-8 resize-none rounded-none"
+                />
               </div>
             </div>
           </div>

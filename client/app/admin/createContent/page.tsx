@@ -97,7 +97,7 @@ export default function CreateContent() {
         status: selectedStatus === "Publish" ? "PUBLISHED" : "DRAFT",
         ingredients: JSON.stringify(recipes.filter((r) => r.trim())),
         instructions: JSON.stringify(instructions.filter((i) => i.trim())),
-        imageUrl: imageUrl.trim() || null,
+        imageURL: imageUrl.trim() || null,
       };
 
       return axios.post("http://localhost:5000/admin/content/create", payload, {

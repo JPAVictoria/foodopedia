@@ -18,7 +18,7 @@ router.post("/create", async (req, res) => {
   } catch (err) {
     return res.status(401).json({ message: "Invalid or expired token" });
   }
-  const { title, shortDesc, category } = req.body;
+  const { title, shortDesc, category, imageURL } = req.body;
 
   const existing = await prisma.content.findFirst({
     where: {
@@ -80,6 +80,7 @@ router.post("/create", async (req, res) => {
         shortDesc,
         category,
         adminId,
+        imageURL: imageURL || null, // ✅ add this
         status: validatedStatus,
         deleted: false,
       },
@@ -132,7 +133,7 @@ router.put("/:id", async (req, res) => {
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 
-  const { title, shortDesc, category } = req.body;
+  const { title, shortDesc, category, imageURL } = req.body;
 
   const existing = await prisma.content.findFirst({
     where: {
@@ -208,6 +209,8 @@ router.put("/:id", async (req, res) => {
         shortDesc,
         category,
         status: validatedStatus,
+        imageURL: imageURL || null, // ✅ add this
+
       },
     });
 

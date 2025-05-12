@@ -192,7 +192,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\Andre Victoria\\Desktop\\Foodopedia v2\\prisma\\node_modules\\@prisma\\client",
+      "value": "C:\\Users\\Andre Victoria\\Desktop\\Foodopedia v2\\prisma\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -211,9 +211,9 @@ const config = {
   },
   "relativeEnvPaths": {
     "rootEnvPath": null,
-    "schemaEnvPath": "../../../../.env"
+    "schemaEnvPath": "../../../.env"
   },
-  "relativePath": "../../..",
+  "relativePath": "../..",
   "clientVersion": "6.7.0",
   "engineVersion": "3cff47a7f5d65c3ea74883f1d736e41d68ce91ed",
   "datasourceNames": [
@@ -229,8 +229,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"node_modules/@prisma/client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel Admin {\n  id        String    @id @default(uuid())\n  email     String    @unique\n  password  String\n  firstName String\n  lastName  String\n  createdAt DateTime  @default(now())\n  updatedAt DateTime  @updatedAt\n  contents  Content[]\n}\n\nmodel Viewer {\n  id        String     @id @default(uuid())\n  email     String     @unique\n  password  String\n  firstName String\n  lastName  String\n  createdAt DateTime   @default(now())\n  updatedAt DateTime   @updatedAt\n  favorites Favorite[]\n}\n\nmodel Content {\n  id        String        @id @default(uuid())\n  title     String\n  slug      String        @unique\n  shortDesc String\n  category  Category\n  status    ContentStatus @default(DRAFT)\n  createdAt DateTime      @default(now())\n  updatedAt DateTime      @updatedAt\n  deleted   Boolean       @default(false)\n  views     Int           @default(0)\n  imageURL  String?\n\n  adminId String\n  admin   Admin  @relation(fields: [adminId], references: [id])\n\n  favorites    Favorite[]\n  recipes      Recipe[]\n  instructions RecipeInstruction[]\n}\n\nmodel Recipe {\n  id         String  @id @default(uuid())\n  ingredient String\n  contentId  String\n  content    Content @relation(fields: [contentId], references: [id])\n}\n\nmodel RecipeInstruction {\n  id          String  @id @default(uuid())\n  instruction String\n  stepNumber  Int\n  contentId   String\n  content     Content @relation(fields: [contentId], references: [id])\n}\n\nmodel Favorite {\n  id        String   @id @default(uuid())\n  viewerId  String\n  contentId String\n  createdAt DateTime @default(now())\n\n  viewer  Viewer  @relation(fields: [viewerId], references: [id])\n  content Content @relation(fields: [contentId], references: [id])\n\n  @@unique([viewerId, contentId])\n}\n\nenum Category {\n  DESSERT\n  ENTREE\n  APPETIZER\n  DRINKS\n}\n\nenum ContentStatus {\n  DRAFT\n  PUBLISHED\n}\n",
-  "inlineSchemaHash": "0d1a3e73179c11dfd1971b6926c0bff84fceadd646aeeea55ec245f6b1598e6e",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"./generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel Admin {\n  id        String    @id @default(uuid())\n  email     String    @unique\n  password  String\n  firstName String\n  lastName  String\n  createdAt DateTime  @default(now())\n  updatedAt DateTime  @updatedAt\n  contents  Content[]\n}\n\nmodel Viewer {\n  id        String     @id @default(uuid())\n  email     String     @unique\n  password  String\n  firstName String\n  lastName  String\n  createdAt DateTime   @default(now())\n  updatedAt DateTime   @updatedAt\n  favorites Favorite[]\n}\n\nmodel Content {\n  id        String        @id @default(uuid())\n  title     String\n  slug      String        @unique\n  shortDesc String\n  category  Category\n  status    ContentStatus @default(DRAFT)\n  createdAt DateTime      @default(now())\n  updatedAt DateTime      @updatedAt\n  deleted   Boolean       @default(false)\n  views     Int           @default(0)\n  imageURL  String?\n\n  adminId String\n  admin   Admin  @relation(fields: [adminId], references: [id])\n\n  favorites    Favorite[]\n  recipes      Recipe[]\n  instructions RecipeInstruction[]\n}\n\nmodel Recipe {\n  id         String  @id @default(uuid())\n  ingredient String\n  contentId  String\n  content    Content @relation(fields: [contentId], references: [id])\n}\n\nmodel RecipeInstruction {\n  id          String  @id @default(uuid())\n  instruction String\n  stepNumber  Int\n  contentId   String\n  content     Content @relation(fields: [contentId], references: [id])\n}\n\nmodel Favorite {\n  id        String   @id @default(uuid())\n  viewerId  String\n  contentId String\n  createdAt DateTime @default(now())\n\n  viewer  Viewer  @relation(fields: [viewerId], references: [id])\n  content Content @relation(fields: [contentId], references: [id])\n\n  @@unique([viewerId, contentId])\n}\n\nenum Category {\n  DESSERT\n  ENTREE\n  APPETIZER\n  DRINKS\n}\n\nenum ContentStatus {\n  DRAFT\n  PUBLISHED\n}\n",
+  "inlineSchemaHash": "1ea31c5f992b90f6ecfad9b8e22a987981a7cbe4bfca32a99ffca585db18d67c",
   "copyEngine": true
 }
 config.dirname = '/'
