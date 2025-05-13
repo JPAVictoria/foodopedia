@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Heart, CornerDownRight } from "lucide-react";
 
 interface ProductCardProps {
@@ -5,6 +6,7 @@ interface ProductCardProps {
   shortDesc: string;
   imageURL?: string;
   adminName: string;
+  id: string;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -12,17 +14,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
   shortDesc,
   imageURL,
   adminName,
+  id,
 }) => {
-  // Check if the image URL is valid (starts with 'http' or 'https')
-  const imageSrc = imageURL && imageURL.startsWith("http")
-    ? imageURL
-    : "/placeholder.jpg"; // Fallback to placeholder image
+  const imageSrc =
+    imageURL && imageURL.startsWith("http") ? imageURL : "/placeholder.jpg";
 
   return (
     <div className="w-full sm:w-[300px] h-[330px] rounded-sm shadow-md border border-[#2d2d2d5b] bg-[#fffaee] overflow-hidden">
       <div className="px-2 pt-2">
         <div className="relative w-full h-[120px] shadow-sm rounded-sm overflow-hidden">
-          {/* Using the <img> tag for external image links */}
           <img
             src={imageSrc}
             alt={title}
@@ -45,7 +45,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
         <div className="flex justify-end items-center gap-3 mb-2">
           <Heart className="w-4 h-4 text-[#3E2723] cursor-pointer hover:scale-110 transition" />
-          <CornerDownRight className="w-4 h-4 text-[#3E2723] cursor-pointer hover:scale-110 transition" />
+          <Link href={`/viewer/specificPage?id=${id}`}>
+            <CornerDownRight className="w-4 h-4 text-[#3E2723] cursor-pointer hover:scale-110 transition" />
+          </Link>
         </div>
       </div>
     </div>

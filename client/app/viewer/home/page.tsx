@@ -2,7 +2,7 @@
 
 import Navbar from "@/app/components/viewer/Navbar";
 import ProductCard from "@/app/components/viewer/ProductCard";
-import { useLoading } from "@/app/context/LoaderContext";
+import { useLoading } from "@/app/context/LoaderContext";  // Ensure your context is correctly imported
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -33,10 +33,13 @@ export default function ViewerHome() {
   const { data, isLoading, isError } = useContents();
 
   useEffect(() => {
-    setLoading(false);
-  }, [setLoading]);
+    if (isLoading) {
+      setLoading(true);  
+    } else {
+      setLoading(false);  
+    }
+  }, [isLoading, setLoading]);
 
-  if (isLoading) return <div className="p-4 text-gray-700">Loading...</div>;
   if (isError) return <div className="p-4 text-red-600">Error loading contents.</div>;
 
   return (
@@ -47,6 +50,7 @@ export default function ViewerHome() {
           {data?.map((item) => (
             <ProductCard
               key={item.id}
+              id={item.id}
               title={item.title}
               shortDesc={item.shortDesc}
               imageURL={item.imageURL}

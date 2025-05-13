@@ -1,6 +1,5 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
-const { route } = require('../content/content.route');
 
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -35,5 +34,42 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch contents' });
   }
 });
+
+
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const content = await prisma.content.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        title: true,
+        shortDesc: true,
+        imageURL: true,
+        admin: {
+          select: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+        recipes: true,
+        instructions: true,
+      },
+    });
+
+    if (!content) {
+      return res.status(404).json({ error: 'Content not found' });
+    }
+
+    res.json(content);
+  } catch (error) {
+    console.error('Error fetching content:', error);
+    res.status(500).json({ error: 'Failed to fetch content' });
+  }
+});
+
+
+
 
 module.exports = router;

@@ -1,19 +1,62 @@
 "use client";
-import Image from "next/image";
-import { useState } from "react";
+
+import axios from "axios";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { useLoading } from "@/app/context/LoaderContext";
+import { useSearchParams } from "next/navigation";
+
+interface Recipe {
+  ingredient: string;
+}
+
+interface Instruction {
+  instruction: string;
+}
+
+interface Content {
+  id: string;
+  title: string;
+  shortDesc: string;
+  imageURL: string;
+  recipes: Recipe[];
+  instructions: Instruction[];
+}
 
 export default function SpecificPage() {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const images = [
-    "/adobong-sitaw-1.jpg",
-    "/adobong-sitaw-2.jpg",
-    "/adobong-sitaw-3.jpg",
-  ];
+  const { setLoading } = useLoading();
+  const searchParams = useSearchParams();
+  const contentId = searchParams.get("id");
+
+  const {
+    data: content,
+    isLoading,
+    isError,
+  } = useQuery<Content>({
+    queryKey: ["content", contentId],
+    queryFn: async () => {
+      if (!contentId) throw new Error("Content ID is missing");
+      const res = await axios.get<Content>(
+        `http://localhost:5000/viewer/getCard/${contentId}`
+      );
+      return res.data;
+    },
+    enabled: !!contentId,
+  });
+
+  useEffect(() => {
+    setLoading(isLoading);
+  }, [isLoading, setLoading]);
+
+  if (isLoading || !contentId) return <div className="p-4">Loading...</div>;
+  if (isError || !content)
+    return <div className="p-4 text-red-600">Error loading content.</div>;
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
+      {/* Back to Home Link */}
       <div className="mt-5 flex justify-start">
         <Link
           href="/viewer/home"
@@ -24,49 +67,27 @@ export default function SpecificPage() {
         </Link>
       </div>
 
+      {/* Content Section */}
       <div className="mt-20 flex flex-col md:flex-row gap-8">
         <div className="w-full md:w-1/2">
-          <div
-            className="relative aspect-square rounded-lg overflow-hidden mb-4 
-                         border border-[#2d2d2d] border-opacity-25 shadow-sm"
-          >
-            <Image
-              src={images[currentImageIndex]}
-              alt="Adobong Sitaw"
-              fill
-              className="object-cover"
-              priority
+          <div className="relative aspect-square rounded-lg overflow-hidden mb-4 border border-[#2d2d2d] border-opacity-25 shadow-sm">
+            <img
+              src={content.imageURL || "/placeholder.jpg"}
+              alt={content.title}
+              className="object-cover w-full h-full"
+              loading="lazy"
             />
-          </div>
-
-          <div className="flex justify-center gap-3">
-            {images.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentImageIndex(index)}
-                className={`w-3 h-3 rounded-full transition-colors border border-[#2d2d2d] ${
-                  currentImageIndex === index
-                    ? "bg-[#F7D9A5]"
-                    : "bg-[#ffffff] cursor-pointer"
-                }`}
-                aria-label={`View image ${index + 1}`}
-              />
-            ))}
           </div>
         </div>
 
         <div className="ml-5 w-full md:w-1/2">
           <h1 className="text-4xl font-bold text-[#3E2723] mb-4">
-            Adobong Sitaw
+            {content.title}
           </h1>
 
           <div className="mb-6">
             <p className="text-[#3E2723] tracking-[0.01em] leading-[1.5] mb-4">
-              Hungarian Overload is a feast of bold and hearty flavors, packed
-              with traditional Hungarian favorites like rich goulash, savory
-              sausages, cheesy lángos, and spicy paprika stews. This dish is a
-              true celebration of Hungary's culinary heritage, delivering a
-              satisfying and indulgent experience in every bite!
+              {content.shortDesc}
             </p>
           </div>
 
@@ -74,23 +95,24 @@ export default function SpecificPage() {
             <h2 className="text-2xl font-semibold text-[#3E2723] mb-2">
               Ingredients:
             </h2>
-            <p className="text-[#3E2723] tracking-[0.01em] leading-[1.5]">
-              Olive oil, downy, zonrox, sayote, amapalaya, kung ano-ano pa Olive
-              oil, downy, zonrox, sayote, amapalaya, kung ano-ano pa
-            </p>
+            <ul className="list-disc list-inside text-[#3E2723] tracking-[0.01em] leading-[1.5]">
+              {content.recipes.map((recipe, index) => (
+                <li key={index}>{recipe.ingredient}</li>
+              ))}
+            </ul>
           </div>
 
           <div>
             <h2 className="text-2xl font-semibold text-[#3E2723] mb-2">
-              Instructions to make:
+              Instructions:
             </h2>
             <ol className="list-decimal pl-6 space-y-2">
-              {Array.from({ length: 6 }).map((_, index) => (
+              {content.instructions.map((step, index) => (
                 <li
                   key={index}
                   className="text-[#3E2723] tracking-[0.01em] leading-[1.5]"
                 >
-                  Olive oil, downy, zonrox, sayote, amapalaya, kung ano-ano pa
+                  {step.instruction}
                 </li>
               ))}
             </ol>
