@@ -1,5 +1,10 @@
-import Link from "next/link";
+"use client";
+
+import React, { useState } from "react";
 import { Heart, CornerDownRight } from "lucide-react";
+import axios from "axios";
+import Link from "next/link";
+import { useSnackbar } from "@/app/context/SnackbarContext";
 
 interface ProductCardProps {
   title: string;
@@ -16,8 +21,44 @@ const ProductCard: React.FC<ProductCardProps> = ({
   adminName,
   id,
 }) => {
-  const imageSrc =
-    imageURL && imageURL.startsWith("http") ? imageURL : "/placeholder.jpg";
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { openSnackbar } = useSnackbar();
+
+  const handleFavoriteClick = async () => {
+    if (isFavorited || loading) return;
+
+    const viewer = JSON.parse(localStorage.getItem("viewer") || "{}");
+    const viewerId = viewer?.id;
+
+    if (!viewerId) {
+      openSnackbar("You must be logged in to favorite.", "error");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await axios.post("http://localhost:5000/viewer/getCard/favorite", {
+        contentId: id,
+        viewerId,
+      });
+
+      if (response && response.status === 200) {
+        setIsFavorited(true);
+        openSnackbar("Added to favorites!", "success");
+      } else {
+        openSnackbar("Failed to add to favorites.", "error");
+      }
+    } catch (error) {
+      console.error("Error favoriting:", error);
+      setIsFavorited(false);
+      openSnackbar("Failed to add to favorites.", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const imageSrc = imageURL && imageURL.startsWith("http") ? imageURL : "/placeholder.jpg";
 
   return (
     <div className="w-full sm:w-[300px] h-[330px] rounded-sm shadow-md border border-[#2d2d2d5b] bg-[#fffaee] overflow-hidden">
@@ -44,7 +85,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </p>
         </div>
         <div className="flex justify-end items-center gap-3 mb-2">
-          <Heart className="w-4 h-4 text-[#3E2723] cursor-pointer hover:scale-110 transition" />
+          <Heart
+            className={`w-4 h-4 cursor-pointer transition ${
+              isFavorited ? "text-red-500" : "text-[#3E2723]"
+            }`}
+            onClick={handleFavoriteClick}
+          />
           <Link href={`/viewer/specificPage?id=${id}`}>
             <CornerDownRight className="w-4 h-4 text-[#3E2723] cursor-pointer hover:scale-110 transition" />
           </Link>

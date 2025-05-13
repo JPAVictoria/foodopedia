@@ -9,7 +9,7 @@ const router = Router();
 const generateToken = (viewer) => {
   return jwt.sign(
     { id: viewer.id, email: viewer.email },
-    process.env.JWT_SECRET,  
+    process.env.JWT_SECRET,
     { expiresIn: "1h" }
   );
 };
@@ -35,14 +35,15 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    
+    // Generate token with the viewer's id and email
     const token = generateToken(viewer);
 
-    
+    // Return the viewer id along with other details
     res.status(200).json({
       message: "Login successful",
       token,
       viewer: {
+        id: viewer.id,  // Ensure you include the viewer's id
         email: viewer.email,
         firstName: viewer.firstName,
         lastName: viewer.lastName,
