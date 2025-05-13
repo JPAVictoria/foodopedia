@@ -144,6 +144,33 @@ router.post("/favorite", async (req, res) => {
   }
 });
 
+router.delete("/favorite", async (req, res) => {
+  const { contentId, viewerId } = req.body;
+
+  if (!contentId || !viewerId) {
+    return res.status(400).json({ error: "Missing contentId or viewerId" });
+  }
+
+  try {
+    const favorite = await prisma.favorite.deleteMany({
+      where: {
+        contentId,
+        viewerId,
+      },
+    });
+
+    if (favorite.count === 0) {
+      return res.status(404).json({ error: "Favorite not found" });
+    }
+
+    res.json({ message: "Removed from favorites" });
+  } catch (error) {
+    console.error("Error removing from favorites:", error);
+    res.status(500).json({ error: "Failed to remove from favorites" });
+  }
+});
+
+
 
 
 module.exports = router;

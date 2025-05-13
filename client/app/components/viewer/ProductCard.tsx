@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Heart, CornerDownRight } from "lucide-react";
 import axios from "axios";
 import Link from "next/link";
@@ -25,8 +25,42 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const [loading, setLoading] = useState(false);
   const { openSnackbar } = useSnackbar();
 
+  const imageSrc =
+    imageURL && imageURL.startsWith("http") ? imageURL : "/placeholder.jpg";
+
+  // Check if the product is already favorited when the component mounts
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      const viewer = JSON.parse(localStorage.getItem("viewer") || "{}");
+      const viewerId = viewer?.id;
+
+      if (!viewerId) return;
+
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/viewer/getCard/favorites",
+          {
+            params: { viewerId },
+          }
+        );
+
+        if (response?.data?.length) {
+          const isThisFavorited = response.data.some(
+            (fav: { id: string }) => fav.id === id
+          );
+          setIsFavorited(isThisFavorited);
+        }
+      } catch (error) {
+        console.error("Failed to fetch favorite status:", error);
+      }
+    };
+
+    fetchFavorites();
+  }, [id]);
+
+  // Handle favorite/unfavorite
   const handleFavoriteClick = async () => {
-    if (isFavorited || loading) return;
+    if (loading) return;
 
     const viewer = JSON.parse(localStorage.getItem("viewer") || "{}");
     const viewerId = viewer?.id;
@@ -37,28 +71,44 @@ const ProductCard: React.FC<ProductCardProps> = ({
     }
 
     setLoading(true);
-    try {
-      const response = await axios.post("http://localhost:5000/viewer/getCard/favorite", {
-        contentId: id,
-        viewerId,
-      });
 
-      if (response && response.status === 200) {
-        setIsFavorited(true);
-        openSnackbar("Added to favorites!", "success");
+    try {
+      if (isFavorited) {
+        const response = await axios.delete(
+          "http://localhost:5000/viewer/getCard/favorite",
+          {
+            data: { contentId: id, viewerId },
+          }
+        );
+        if (response.status === 200) {
+          setIsFavorited(false);
+          openSnackbar("Removed from favorites.", "success");
+        } else {
+          openSnackbar("Failed to remove from favorites.", "error");
+        }
       } else {
-        openSnackbar("Failed to add to favorites.", "error");
+        const response = await axios.post(
+          "http://localhost:5000/viewer/getCard/favorite",
+          {
+            contentId: id,
+            viewerId,
+          }
+        );
+
+        if (response.status === 200) {
+          setIsFavorited(true);
+          openSnackbar("Added to favorites!", "success");
+        } else {
+          openSnackbar("Failed to add to favorites.", "error");
+        }
       }
     } catch (error) {
       console.error("Error favoriting:", error);
-      setIsFavorited(false);
-      openSnackbar("Failed to add to favorites.", "error");
+      openSnackbar("Failed to update favorites.", "error");
     } finally {
       setLoading(false);
     }
   };
-
-  const imageSrc = imageURL && imageURL.startsWith("http") ? imageURL : "/placeholder.jpg";
 
   return (
     <div className="w-full sm:w-[300px] h-[330px] rounded-sm shadow-md border border-[#2d2d2d5b] bg-[#fffaee] overflow-hidden">
