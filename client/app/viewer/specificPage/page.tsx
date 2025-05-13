@@ -34,7 +34,7 @@ export default function SpecificPage() {
     data: content,
     isLoading,
     isError,
-  } = useQuery<Content>({
+  } = useQuery<Content | undefined>({
     queryKey: ["content", contentId],
     queryFn: async () => {
       if (!contentId) throw new Error("Content ID is missing");
@@ -50,13 +50,10 @@ export default function SpecificPage() {
     setLoading(isLoading);
   }, [isLoading, setLoading]);
 
-  if (isLoading || !contentId) return <div className="p-4">Loading...</div>;
-  if (isError || !content)
-    return <div className="p-4 text-red-600">Error loading content.</div>;
+  if (!contentId || !content || isError) return null;
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      {/* Back to Home Link */}
       <div className="mt-5 flex justify-start">
         <Link
           href="/viewer/home"
@@ -86,31 +83,29 @@ export default function SpecificPage() {
           </h1>
 
           <div className="mb-6">
-            <p className="text-[#3E2723] tracking-[0.01em] leading-[1.5] mb-4">
+            <p className="text-[#3E2723] text-[14px] tracking-[0.01em] leading-[1.5] mb-4">
               {content.shortDesc}
             </p>
           </div>
 
           <div className="mb-6">
-            <h2 className="text-2xl font-semibold text-[#3E2723] mb-2">
+            <h2 className="text-xl font-semibold text-[#3E2723] mb-3">
               Ingredients:
             </h2>
-            <ul className="list-disc list-inside text-[#3E2723] tracking-[0.01em] leading-[1.5]">
-              {content.recipes.map((recipe, index) => (
-                <li key={index}>{recipe.ingredient}</li>
-              ))}
-            </ul>
+            <p className="text-[#3E2723] text-[14px] tracking-[0.01em] leading-[1.5]">
+              {content.recipes.map((r) => r.ingredient).join(", ")}
+            </p>
           </div>
 
           <div>
-            <h2 className="text-2xl font-semibold text-[#3E2723] mb-2">
+            <h2 className="text-xl font-semibold text-[#3E2723] mb-3">
               Instructions:
             </h2>
             <ol className="list-decimal pl-6 space-y-2">
               {content.instructions.map((step, index) => (
                 <li
                   key={index}
-                  className="text-[#3E2723] tracking-[0.01em] leading-[1.5]"
+                  className="text-[#3E2723] text-[14px] tracking-[0.01em] leading-[1.5]"
                 >
                   {step.instruction}
                 </li>
