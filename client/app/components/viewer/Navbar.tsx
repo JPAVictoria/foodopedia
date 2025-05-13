@@ -5,11 +5,13 @@ import Image from "next/image";
 import DropdownProducts from "@/app/components/viewer/DropdownProducts";
 import { useLoading } from "@/app/context/LoaderContext";
 import { useRouter } from "next/navigation"; 
+import { useSnackbar } from "@/app/context/SnackbarContext";
 
 export default function Navbar({ onCategorySelect }: { onCategorySelect: (category: string) => void }) {
   const { loading, setLoading } = useLoading();
   const [viewer, setViewer] = useState<{ firstName: string; lastName: string } | null>(null);
   const router = useRouter(); 
+  const { openSnackbar } = useSnackbar(); 
 
   useEffect(() => {
     const storedViewer = localStorage.getItem("viewer");
@@ -18,13 +20,16 @@ export default function Navbar({ onCategorySelect }: { onCategorySelect: (catego
     }
   }, []);
 
-  const handleLogout = () => {
-    setLoading(true);
+const handleLogout = () => {
+  openSnackbar("Successfully Logged out!", "success"); 
+  setLoading(true); 
+
+
+  setTimeout(() => {
     localStorage.removeItem("viewer");
-    setTimeout(() => {
-      router.push("/viewer/login"); 
-    }, 1000);
-  };
+    router.push("/viewer/login");
+  }, 1000); 
+};
 
   const handleGoHome = () => {
   window.location.href = "/viewer/home"; 

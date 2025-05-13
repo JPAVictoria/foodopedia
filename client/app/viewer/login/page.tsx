@@ -33,8 +33,9 @@ export default function Login() {
   useEffect(() => {
     return () => {
       resetLoginForm();
+      setLoading(false);
     };
-  }, [resetLoginForm]);
+  }, [resetLoginForm, setLoading]);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -71,6 +72,8 @@ export default function Login() {
         : "An unexpected error occurred.";
       openSnackbar(msg, "error");
     } finally {
+
+      setLoading(false);
     }
   };
 
@@ -148,7 +151,7 @@ export default function Login() {
 
           <div className="pt-8">
             <p className="font-light text-sm text-[#3E2723]">
-              Don't have an account yet?
+              Don&apos;t have an account yet?
             </p>
             <Link href="/viewer/register">
               <Button
