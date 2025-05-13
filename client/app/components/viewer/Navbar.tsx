@@ -4,10 +4,12 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import DropdownProducts from "@/app/components/viewer/DropdownProducts";
 import { useLoading } from "@/app/context/LoaderContext";
+import { useRouter } from "next/navigation"; 
 
 export default function Navbar({ onCategorySelect }: { onCategorySelect: (category: string) => void }) {
   const { loading, setLoading } = useLoading();
   const [viewer, setViewer] = useState<{ firstName: string; lastName: string } | null>(null);
+  const router = useRouter(); 
 
   useEffect(() => {
     const storedViewer = localStorage.getItem("viewer");
@@ -20,16 +22,21 @@ export default function Navbar({ onCategorySelect }: { onCategorySelect: (catego
     setLoading(true);
     localStorage.removeItem("viewer");
     setTimeout(() => {
-      window.location.href = "/viewer/login";
+      router.push("/viewer/login"); 
     }, 1000);
   };
 
   const handleGoHome = () => {
-    window.location.href = "/viewer/home"; // Full page reload
+  window.location.href = "/viewer/home"; 
   };
 
-  const handleGoFavorites = () => {
-    window.location.href = "/viewer/favorites"; // Full page reload
+const handleGoFavorites = () => {
+  window.location.href = "/viewer/favorites"; 
+};
+
+
+  const handleGoProfile = () => {
+    router.push("/viewer/profile"); 
   };
 
   return (
@@ -47,7 +54,6 @@ export default function Navbar({ onCategorySelect }: { onCategorySelect: (catego
         {/* Pass category change handler to DropdownProducts */}
         <DropdownProducts onSelectCategory={onCategorySelect} />
 
-        {/* Home Button with hard refresh */}
         <button
           onClick={handleGoHome}
           className="flex items-center gap-2 text-[#3E2723] font-medium hover:underline cursor-pointer outline-none focus:outline-none focus:ring-0"
@@ -55,7 +61,6 @@ export default function Navbar({ onCategorySelect }: { onCategorySelect: (catego
           Home
         </button>
 
-        {/* Favorites Button with hard refresh */}
         <button
           onClick={handleGoFavorites}
           className="flex items-center gap-2 text-[#3E2723] hover:underline font-medium cursor-pointer outline-none focus:outline-none focus:ring-0"
@@ -63,15 +68,13 @@ export default function Navbar({ onCategorySelect }: { onCategorySelect: (catego
           Favorites
         </button>
 
-        {/* Profile Link */}
         <button
-          onClick={() => window.location.href = "/viewer/profile"}
+          onClick={handleGoProfile}
           className="flex items-center gap-2 text-[#3E2723] font-medium hover:underline cursor-pointer outline-none focus:outline-none focus:ring-0"
         >
           Profile
         </button>
 
-        {/* Logout Button */}
         <button
           onClick={handleLogout}
           className="flex items-center gap-2 text-[#3E2723] font-medium hover:underline cursor-pointer outline-none focus:outline-none focus:ring-0"

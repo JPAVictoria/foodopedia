@@ -12,6 +12,7 @@ interface ProductCardProps {
   imageURL?: string;
   adminName: string;
   id: string;
+  onFavoriteRemove: (id: string) => void; 
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -20,6 +21,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   imageURL,
   adminName,
   id,
+  onFavoriteRemove, 
 }) => {
   const [isFavorited, setIsFavorited] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -28,7 +30,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const imageSrc =
     imageURL && imageURL.startsWith("http") ? imageURL : "/placeholder.jpg";
 
-  // Check if the product is already favorited when the component mounts
+
   useEffect(() => {
     const fetchFavorites = async () => {
       const viewer = JSON.parse(localStorage.getItem("viewer") || "{}");
@@ -58,7 +60,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
     fetchFavorites();
   }, [id]);
 
-  // Handle favorite/unfavorite
   const handleFavoriteClick = async () => {
     if (loading) return;
 
@@ -83,6 +84,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         if (response.status === 200) {
           setIsFavorited(false);
           openSnackbar("Removed from favorites.", "success");
+          onFavoriteRemove(id); 
         } else {
           openSnackbar("Failed to remove from favorites.", "error");
         }

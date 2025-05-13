@@ -34,6 +34,7 @@ const useFavoriteContents = (viewerId: string | null) => {
 export default function Favorites() {
   const { setLoading } = useLoading();
   const [viewerId, setViewerId] = useState<string | null>(null);
+  const [favorites, setFavorites] = useState<Content[]>([]); 
 
   useEffect(() => {
     const storedViewer = localStorage.getItem("viewer");
@@ -47,22 +48,31 @@ export default function Favorites() {
 
   useEffect(() => {
     setLoading(isLoading);
-  }, [isLoading, setLoading]);
+    if (data) {
+      setFavorites(data); 
+    }
+  }, [data, isLoading, setLoading]);
 
-  const handleCategoryChange = () => {
-    // No-op for favorites, required by Navbar prop
+  const handleRemoveFavorite = (removedId: string) => {
+    
+    setFavorites((prevFavorites) =>
+      prevFavorites.filter((item) => item.id !== removedId)
+    );
   };
 
-  if (isError)
-    return <div className="p-4 text-red-600">Failed to load favorites.</div>;
+  const handleCategoryChange = () => {
+    
+  };
+
+  if (isError) return <div className="p-4 text-red-600">Failed to load favorites.</div>;
 
   return (
     <div>
       <Navbar onCategorySelect={handleCategoryChange} />
       <div className="mt-20 px-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-[1100px] mx-auto mb-20">
-          {data?.length ? (
-            data.map((item) => (
+          {favorites.length ? (
+            favorites.map((item) => (
               <ProductCard
                 key={item.id}
                 id={item.id}
@@ -70,6 +80,7 @@ export default function Favorites() {
                 shortDesc={item.shortDesc}
                 imageURL={item.imageURL}
                 adminName={`${item.admin.firstName} ${item.admin.lastName}`}
+                onFavoriteRemove={handleRemoveFavorite} 
               />
             ))
           ) : (

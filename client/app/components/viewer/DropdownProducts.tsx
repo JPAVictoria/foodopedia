@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation"; 
+import Link from "next/link"; 
 
 interface MenuItem {
   label: string;
@@ -20,15 +21,22 @@ interface DropdownProps {
 
 export default function DropdownProducts({ onSelectCategory }: DropdownProps) {
   const [open, setOpen] = useState(false);
+  const router = useRouter(); 
 
-const menuItems: MenuItem[] = [
-  { label: "Dessert", category: "Dessert", type: "button", onClick: () => onSelectCategory("Dessert") },
-  { label: "Entree", category: "Entree", type: "button", onClick: () => onSelectCategory("Entree") },
-  { label: "Appetizer", category: "Appetizer", type: "button", onClick: () => onSelectCategory("Appetizer") },
-  { label: "Drinks", category: "Drinks", type: "button", onClick: () => onSelectCategory("Drinks") },
-  { label: "All Types", category: "", type: "button", onClick: () => onSelectCategory("") },
-];
+  const menuItems: MenuItem[] = [
+    { label: "Dessert", category: "Dessert", type: "button", onClick: () => handleCategorySelect("Dessert") },
+    { label: "Entree", category: "Entree", type: "button", onClick: () => handleCategorySelect("Entree") },
+    { label: "Appetizer", category: "Appetizer", type: "button", onClick: () => handleCategorySelect("Appetizer") },
+    { label: "Drinks", category: "Drinks", type: "button", onClick: () => handleCategorySelect("Drinks") },
+    { label: "All Types", category: "", type: "button", onClick: () => handleCategorySelect("") },
+  ];
 
+  
+  const handleCategorySelect = (category: string) => {
+    setOpen(false); 
+    router.push(`/viewer/home?category=${category}`); 
+    onSelectCategory(category); 
+  };
 
   const containerVariants = {
     hidden: {},
@@ -77,9 +85,10 @@ const menuItems: MenuItem[] = [
                   <motion.div key={index} variants={itemVariants}>
                     <DropdownMenuItem
                       className="w-full justify-end text-[#3E2723] cursor-pointer text-[16px] transition-all hover:bg-gray-50 px-4 py-2"
-                      onClick={() => onSelectCategory(item.category)} // Trigger onSelectCategory when an item is clicked
+                      onClick={item.onClick} 
                     >
                       {item.type === "link" ? (
+                        
                         <Link href={item.href!} className="w-full text-right">
                           {item.label}
                         </Link>
