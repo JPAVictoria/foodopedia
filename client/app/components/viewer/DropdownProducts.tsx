@@ -1,28 +1,34 @@
-"use client"
+"use client";
 
-import React, { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { ChevronDown } from "lucide-react"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { motion, AnimatePresence } from "framer-motion"
+import React, { useState } from "react";
+import Link from "next/link";
+import { ChevronDown } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { motion, AnimatePresence } from "framer-motion";
 
-export default function DropdownProducts() {
-  const [open, setOpen] = useState(false)
-  const router = useRouter()
+interface MenuItem {
+  label: string;
+  category: string;
+  type: "link" | "button";
+  href?: string;
+  onClick?: () => void;
+}
 
-  const menuItems = [
-    { label: "Dessert", type: "link", href: "/profile" },
-    { label: "Entree", type: "link", href: "/billing" },
-    { label: "Appetizer", type: "button", onClick: () => router.push("/settings") },
-    { label: "Drinks", type: "link", href: "/logout" },
-    { label: "All Types", type: "link", href: "/viewer/home" },
-  ]
+interface DropdownProps {
+  onSelectCategory: (category: string) => void;
+}
+
+export default function DropdownProducts({ onSelectCategory }: DropdownProps) {
+  const [open, setOpen] = useState(false);
+
+const menuItems: MenuItem[] = [
+  { label: "Dessert", category: "Dessert", type: "button", onClick: () => onSelectCategory("Dessert") },
+  { label: "Entree", category: "Entree", type: "button", onClick: () => onSelectCategory("Entree") },
+  { label: "Appetizer", category: "Appetizer", type: "button", onClick: () => onSelectCategory("Appetizer") },
+  { label: "Drinks", category: "Drinks", type: "button", onClick: () => onSelectCategory("Drinks") },
+  { label: "All Types", category: "", type: "button", onClick: () => onSelectCategory("") },
+];
+
 
   const containerVariants = {
     hidden: {},
@@ -31,15 +37,15 @@ export default function DropdownProducts() {
         staggerChildren: 0.1,
       },
     },
-  }
+  };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 10 },
     visible: { opacity: 1, y: 0 },
-  }
+  };
 
   return (
-    <div className="relative inline-block"> 
+    <div className="relative inline-block">
       <DropdownMenu open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger asChild>
           <button
@@ -48,9 +54,7 @@ export default function DropdownProducts() {
           >
             Products
             <ChevronDown
-              className={`w-4 h-4 transition-transform duration-200 ${
-                open ? "rotate-180" : ""
-              }`}
+              className={`w-4 h-4 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
             />
           </button>
         </DropdownMenuTrigger>
@@ -58,7 +62,7 @@ export default function DropdownProducts() {
         <DropdownMenuContent
           side="bottom"
           align="end"
-          className="w-56 text-right overflow-visible border border-[#2d2d2d32] bg-white shadow-sm z-[1000]" 
+          className="w-56 text-right overflow-visible border border-[#2d2d2d32] bg-white shadow-sm z-[1000]"
         >
           <AnimatePresence>
             {open && (
@@ -69,9 +73,12 @@ export default function DropdownProducts() {
                 variants={containerVariants}
                 className="flex flex-col"
               >
-                {menuItems.map((item, index) => (
+                {menuItems.map((item: MenuItem, index: number) => (
                   <motion.div key={index} variants={itemVariants}>
-                    <DropdownMenuItem className="w-full justify-end text-[#3E2723] text-[16px] transition-all hover:bg-gray-50 px-4 py-2">
+                    <DropdownMenuItem
+                      className="w-full justify-end text-[#3E2723] cursor-pointer text-[16px] transition-all hover:bg-gray-50 px-4 py-2"
+                      onClick={() => onSelectCategory(item.category)} // Trigger onSelectCategory when an item is clicked
+                    >
                       {item.type === "link" ? (
                         <Link href={item.href!} className="w-full text-right">
                           {item.label}
@@ -94,5 +101,5 @@ export default function DropdownProducts() {
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
-  )
+  );
 }

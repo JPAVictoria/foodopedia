@@ -1,11 +1,14 @@
-import { useEffect, useState } from "react";
+// Navbar.tsx
+"use client";
+
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import DropdownProducts from "@/app/components/viewer/DropdownProducts";
 import Link from "next/link";
-import { useLoading } from "@/app/context/LoaderContext"; 
+import { useLoading } from "@/app/context/LoaderContext";
 
-export default function Navbar() {
-  const { loading, setLoading } = useLoading(); 
+export default function Navbar({ onCategorySelect }: { onCategorySelect: (category: string) => void }) {
+  const { loading, setLoading } = useLoading();
   const [viewer, setViewer] = useState<{ firstName: string; lastName: string } | null>(null);
 
   useEffect(() => {
@@ -13,25 +16,21 @@ export default function Navbar() {
     if (storedViewer) {
       setViewer(JSON.parse(storedViewer));
     }
-  }, []); 
+  }, []);
 
   const handleLogout = () => {
-    setLoading(true); 
-    localStorage.removeItem("viewer"); 
+    setLoading(true);
+    localStorage.removeItem("viewer");
     setTimeout(() => {
-      window.location.href = "/viewer/login"; 
-    }, 1000); 
+      window.location.href = "/viewer/login";
+    }, 1000);
   };
 
   return (
     <div className="flex items-center justify-between p-5 px-10">
       <div className="flex items-center gap-8 ml-10">
         <div className="relative w-20 h-20 overflow-hidden">
-          <Image
-            src="/Foodopedia2.png"
-            alt="Logo"
-            layout="fill"
-          />
+          <Image src="/Foodopedia2.png" alt="Logo" layout="fill" />
         </div>
         <h1 className="font-bold text-[#3E2723] text-[20px]">
           {loading ? "Loading..." : `Welcome, ${viewer ? `${viewer.firstName} ${viewer.lastName}` : "Guest"}`}
@@ -39,7 +38,8 @@ export default function Navbar() {
       </div>
 
       <div className="flex items-center gap-15 mr-20">
-        <DropdownProducts />
+        {/* Pass category change handler to DropdownProducts */}
+        <DropdownProducts onSelectCategory={onCategorySelect} />
 
         <Link href="/viewer/home">
           <button className="flex items-center gap-2 text-[#3E2723] font-medium hover:underline cursor-pointer outline-none focus:outline-none focus:ring-0">
@@ -60,7 +60,7 @@ export default function Navbar() {
         </Link>
 
         <button
-          onClick={handleLogout} 
+          onClick={handleLogout}
           className="flex items-center gap-2 text-[#3E2723] font-medium hover:underline cursor-pointer outline-none focus:outline-none focus:ring-0"
         >
           Logout
