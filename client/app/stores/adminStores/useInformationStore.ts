@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-type Classification = "DESSERT" | "APPETIZER" | "ENTREE" | "BEVERAGES";
+type Classification = "DESSERT" | "APPETIZER" | "ENTREE" | "DRINKS";
 
 interface ContentFormState {
   recipes: string[];

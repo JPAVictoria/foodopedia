@@ -20,7 +20,7 @@ export default function DropdownProducts() {
     { label: "Dessert", type: "link", href: "/profile" },
     { label: "Entree", type: "link", href: "/billing" },
     { label: "Appetizer", type: "button", onClick: () => router.push("/settings") },
-    { label: "Beverages", type: "link", href: "/logout" },
+    { label: "Drinks", type: "link", href: "/logout" },
     { label: "All Types", type: "link", href: "/viewer/home" },
   ]
 

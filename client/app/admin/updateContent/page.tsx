@@ -14,7 +14,7 @@ import { useInformationStore } from "@/app/stores/adminStores/useInformationStor
 import { useLoading } from "@/app/context/LoaderContext";
 import { useState } from "react";
 
-type Classification = "DESSERT" | "APPETIZER" | "ENTREE" | "BEVERAGES";
+type Classification = "DESSERT" | "APPETIZER" | "ENTREE" | "DRINKS";
 
 interface Recipe {
   ingredient: string;
@@ -63,7 +63,7 @@ export default function UpdateContent() {
     "DESSERT",
     "APPETIZER",
     "ENTREE",
-    "BEVERAGES",
+    "DRINKS",
   ];
 
   const handleAddField = () => setRecipes([...recipes, ""]);

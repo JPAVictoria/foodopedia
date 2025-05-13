@@ -15,7 +15,7 @@ import { useInformationStore } from "@/app/stores/adminStores/useInformationStor
 import { useLoading } from "@/app/context/LoaderContext";
 import { useState } from "react";
 
-type Classification = "DESSERT" | "APPETIZER" | "ENTREE" | "BEVERAGES";
+type Classification = "DESSERT" | "APPETIZER" | "ENTREE" | "DRINKS";
 
 export default function CreateContent() {
   const router = useRouter();
@@ -44,7 +44,7 @@ export default function CreateContent() {
     "DESSERT",
     "APPETIZER",
     "ENTREE",
-    "BEVERAGES",
+    "DRINKS",
   ];
 
   const handleAddField = () => setRecipes([...recipes, ""]);
