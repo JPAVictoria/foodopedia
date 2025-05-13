@@ -11,11 +11,13 @@ import { useLoading } from "@/app/context/LoaderContext";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
+import { AnimatedGridPattern } from "@/components/magicui/animated-grid-pattern";
+import { cn } from "@/lib/utils";
 
 export default function Login() {
   const router = useRouter();
   const { openSnackbar } = useSnackbar();
-  const { setLoading } = useLoading(); 
+  const { setLoading } = useLoading();
 
   const {
     email,
@@ -25,9 +27,9 @@ export default function Login() {
     setEmail,
     setPassword,
     setSubmitted,
-    resetLoginForm, 
-    showPassword, 
-    toggleShowPassword
+    resetLoginForm,
+    showPassword,
+    toggleShowPassword,
   } = useLoginStore();
 
   useEffect(() => {
@@ -44,14 +46,17 @@ export default function Login() {
       openSnackbar("Email and password are required.", "error");
       return;
     }
-    
+
     setLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:5000/viewer/login/login", {
-        email,
-        password,
-      });
+      const response = await axios.post(
+        "http://localhost:5000/viewer/login/login",
+        {
+          email,
+          password,
+        }
+      );
 
       const { token, viewer } = response.data;
 
@@ -63,7 +68,7 @@ export default function Login() {
         setLoading(true);
         setTimeout(() => {
           router.push("/viewer/home");
-        }, 1000); 
+        }, 1000);
       }
     } catch (err) {
       setLoading(false);
@@ -72,7 +77,6 @@ export default function Login() {
         : "An unexpected error occurred.";
       openSnackbar(msg, "error");
     } finally {
-
       setLoading(false);
     }
   };
@@ -80,10 +84,20 @@ export default function Login() {
   const isDisabled = loading || submitted;
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background">
+      <AnimatedGridPattern
+        numSquares={30}
+        maxOpacity={0.3}
+        duration={5}
+        repeatDelay={1}
+        className={cn(
+          "[mask-image:radial-gradient(500px_circle_at_center,white,transparent)]",
+          "absolute inset-x-0 inset-y-[-30%] h-[200%] skew-y-12"
+        )}
+      />
       <div className="grid w-full max-w-sm items-center text-center">
-      <h1 className="font-bold text-[32px] text-transparent bg-clip-text bg-gradient-to-r from-[#FF9800] via-[#FAC36E] to-[#F7D9A5]">
-      Welcome back
+        <h1 className="font-bold text-[32px] text-transparent bg-clip-text bg-gradient-to-r from-[#FF9800] via-[#FAC36E] to-[#F7D9A5]">
+          Welcome back
         </h1>
 
         <form onSubmit={handleLogin} className="pt-5">

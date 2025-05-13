@@ -6,6 +6,8 @@ import Link from "next/link";
 import axios from "axios";
 import { useSnackbar } from "@/app/context/SnackbarContext";
 import { useForgotPasswordStore } from "@/app/stores/useForgotStore";
+import { AnimatedGridPattern } from "@/components/magicui/animated-grid-pattern";
+import { cn } from "@/lib/utils";
 
 export default function ForgotPassword() {
   const { openSnackbar } = useSnackbar();
@@ -22,7 +24,10 @@ export default function ForgotPassword() {
     setLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:5000/viewer/forgot/forgot", { email });
+      const res = await axios.post(
+        "http://localhost:5000/viewer/forgot/forgot",
+        { email }
+      );
 
       if (res.status === 200 || res.status === 201) {
         openSnackbar(res.data.message, "success");
@@ -50,10 +55,20 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background">
+      <AnimatedGridPattern
+        numSquares={30}
+        maxOpacity={0.3}
+        duration={5}
+        repeatDelay={1}
+        className={cn(
+          "[mask-image:radial-gradient(500px_circle_at_center,white,transparent)]",
+          "absolute inset-x-0 inset-y-[-30%] h-[200%] skew-y-12"
+        )}
+      />
       <div className="grid w-full max-w-sm items-center text-center">
-      <h1 className="font-bold text-[32px] text-transparent bg-clip-text bg-gradient-to-r from-[#FF9800] via-[#FAC36E] to-[#F7D9A5]">
-      Forgot your password?
+        <h1 className="font-bold text-[32px] text-transparent bg-clip-text bg-gradient-to-r from-[#FF9800] via-[#FAC36E] to-[#F7D9A5]">
+          Forgot your password?
         </h1>
         <form onSubmit={handleSubmit} className="pt-5">
           <div>
@@ -80,9 +95,14 @@ export default function ForgotPassword() {
           </div>
         </form>
         <div className="pt-8">
-          <p className="font-light text-sm text-[#3E2723]">Remember your password?</p>
+          <p className="font-light text-sm text-[#3E2723]">
+            Remember your password?
+          </p>
           <Link href="/viewer/login">
-            <Button variant="link" className="cursor-pointer pt-3 text-[#3E2723]">
+            <Button
+              variant="link"
+              className="cursor-pointer pt-3 text-[#3E2723]"
+            >
               Back to login
             </Button>
           </Link>

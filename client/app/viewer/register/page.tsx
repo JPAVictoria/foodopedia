@@ -9,11 +9,13 @@ import { useSnackbar } from "@/app/context/SnackbarContext";
 import { Eye, EyeOff } from "lucide-react";
 import { useRegisterStore } from "@/app/stores/useRegisterStore";
 import { useLoading } from "@/app/context/LoaderContext";
+import { AnimatedGridPattern } from "@/components/magicui/animated-grid-pattern";
+import { cn } from "@/lib/utils";
 
 export default function Signup() {
   const router = useRouter();
   const { openSnackbar } = useSnackbar();
-  const { setLoading: setGlobalLoading } = useLoading(); 
+  const { setLoading: setGlobalLoading } = useLoading();
 
   const {
     firstName,
@@ -65,13 +67,16 @@ export default function Signup() {
     setGlobalLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:5000/viewer/register/signup", {
-        firstName,
-        lastName,
-        email,
-        password,
-        confirmPassword,
-      });
+      const res = await axios.post(
+        "http://localhost:5000/viewer/register/signup",
+        {
+          firstName,
+          lastName,
+          email,
+          password,
+          confirmPassword,
+        }
+      );
 
       if (res.status === 201) {
         openSnackbar("Registration successful!", "success");
@@ -86,23 +91,39 @@ export default function Signup() {
       }
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message: string } } };
-      const errorMessage = error?.response?.data?.message || "Something went wrong";
+      const errorMessage =
+        error?.response?.data?.message || "Something went wrong";
       openSnackbar(errorMessage, "error");
     } finally {
-      setLoading(false); 
+      setLoading(false);
       setTimeout(() => setGlobalLoading(false), 2500);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background">
+      <AnimatedGridPattern
+        numSquares={30}
+        maxOpacity={0.3}
+        duration={5}
+        repeatDelay={1}
+        className={cn(
+          "[mask-image:radial-gradient(500px_circle_at_center,white,transparent)]",
+          "absolute inset-x-0 inset-y-[-30%] h-[200%] skew-y-12"
+        )}
+      />
       <div className="grid w-full max-w-sm items-center text-center">
         <h1 className="font-bold text-[32px] text-transparent bg-clip-text bg-gradient-to-r from-[#FF9800] via-[#FAC36E] to-[#F7D9A5]">
           Register now
         </h1>
 
         {[
-          { id: "firstName", label: "First Name", value: firstName, type: "text" },
+          {
+            id: "firstName",
+            label: "First Name",
+            value: firstName,
+            type: "text",
+          },
           { id: "lastName", label: "Last Name", value: lastName, type: "text" },
           { id: "email", label: "Email", value: email, type: "email" },
           {
@@ -169,8 +190,10 @@ export default function Signup() {
         </div>
 
         <div className="pt-8">
-          <p className="font-light text-sm text-[#3E2723]">Remember your account?</p>
-          <Link href="/admin/login">
+          <p className="font-light text-sm text-[#3E2723]">
+            Remember your account?
+          </p>
+          <Link href="/viewer/login">
             <Button
               variant="link"
               disabled={isDisabled}
