@@ -7,12 +7,12 @@ import { useEffect, useState } from "react";
 import { useSnackbar } from "@/app/context/SnackbarContext";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
-import { useToggleStore } from "@/app/stores/useToggleStore"; 
-import { useStateStore } from "@/app/stores/useStateStore"; 
+import { useToggleStore } from "@/app/stores/useToggleStore";
+import { useStateStore } from "@/app/stores/useStateStore";
 import { useLoading } from "@/app/context/LoaderContext";
-
+import { AnimatedGridPattern } from "@/components/magicui/animated-grid-pattern";
+import { cn } from "@/lib/utils";
 import axios from "axios";
-
 
 export default function ChangePassword() {
   const {
@@ -27,11 +27,10 @@ export default function ChangePassword() {
   } = useToggleStore();
 
   const { loading, setLoading, submitted, setSubmitted } = useStateStore();
-  const { setLoading: setGlobalLoading } = useLoading(); 
+  const { setLoading: setGlobalLoading } = useLoading();
   const [token, setToken] = useState<string | null>(null);
   const { openSnackbar } = useSnackbar();
   const router = useRouter();
-
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -72,7 +71,10 @@ export default function ChangePassword() {
       });
 
       if (res.status === 200 || res.status === 201) {
-        openSnackbar(res.data.message || "Password changed successfully", "success");
+        openSnackbar(
+          res.data.message || "Password changed successfully",
+          "success"
+        );
         setSubmitted(true);
         setTimeout(() => router.push("/admin/login"), 2000);
       } else {
@@ -85,7 +87,8 @@ export default function ChangePassword() {
 
       if (error instanceof Error) {
         message =
-          error.message || "An unexpected error occurred. Please try again later.";
+          error.message ||
+          "An unexpected error occurred. Please try again later.";
       }
 
       if (axios.isAxiosError(error)) {
@@ -103,7 +106,17 @@ export default function ChangePassword() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background">
+      <AnimatedGridPattern
+        numSquares={30}
+        maxOpacity={0.3}
+        duration={5}
+        repeatDelay={1}
+        className={cn(
+          "[mask-image:radial-gradient(500px_circle_at_center,white,transparent)]",
+          "absolute inset-x-0 inset-y-[-30%] h-[200%] skew-y-12"
+        )}
+      />
       <div className="grid w-full max-w-sm items-center text-center">
         <h1 className="font-bold text-[32px] text-transparent bg-clip-text bg-gradient-to-r from-[#4caf50] via-[#76bf73] to-[#a0cf96]">
           Change your password
@@ -168,7 +181,10 @@ export default function ChangePassword() {
 
         <div className="pt-5">
           <Link href="/admin/login">
-            <Button variant="link" className="cursor-pointer pt-3 text-[#3E2723]">
+            <Button
+              variant="link"
+              className="cursor-pointer pt-3 text-[#3E2723]"
+            >
               Go back to login
             </Button>
           </Link>
