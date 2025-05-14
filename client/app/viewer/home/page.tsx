@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useRouter, useSearchParams } from "next/navigation"; 
+import { useRouter, useSearchParams } from "next/navigation";
 import Navbar from "@/app/components/viewer/Navbar";
 import ProductCard from "@/app/components/viewer/ProductCard";
 import { useLoading } from "@/app/context/LoaderContext";
@@ -18,7 +18,6 @@ interface Content {
     lastName: string;
   };
 }
-
 
 const useContents = (category: string) => {
   return useQuery<Content[]>({
@@ -36,23 +35,18 @@ export default function ViewerHome() {
   const { setLoading } = useLoading();
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const { data, isLoading, isError } = useContents(selectedCategory);
-  const router = useRouter(); 
-  const searchParams = useSearchParams(); 
-  const [favorites, setFavorites] = useState<Content[]>([]); 
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  
   useEffect(() => {
     setLoading(isLoading);
   }, [isLoading, setLoading]);
 
-  
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
-    
     router.push(`/viewer/home?category=${category}`);
   };
 
-  
   useEffect(() => {
     const categoryFromURL = searchParams.get("category");
     if (categoryFromURL) {
@@ -60,14 +54,18 @@ export default function ViewerHome() {
     }
   }, [searchParams]);
 
-  
-  const handleRemoveFavorite = (removedId: string) => {
-    setFavorites((prevFavorites) =>
-      prevFavorites.filter((item) => item.id !== removedId)
-    );
-  };
+  if (isLoading) return null; // Global loader will show
 
-  if (isError) return <div className="p-4 text-red-600">Error loading contents.</div>;
+  if (isError) {
+    return (
+      <div>
+        <Navbar onCategorySelect={handleCategoryChange} />
+        <div className="mt-20 text-center text-red-600">
+          Error loading contents.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -82,7 +80,7 @@ export default function ViewerHome() {
               shortDesc={item.shortDesc}
               imageURL={item.imageURL}
               adminName={`${item.admin.firstName} ${item.admin.lastName}`}
-              onFavoriteRemove={handleRemoveFavorite} 
+              onFavoriteRemove={() => null} // no-op function
             />
           ))}
         </div>

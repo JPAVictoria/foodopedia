@@ -22,9 +22,12 @@ const useFavoriteContents = (viewerId: string | null) => {
   return useQuery<Content[]>({
     queryKey: ["favorites", viewerId],
     queryFn: async () => {
-      const response = await axios.get("http://localhost:5000/viewer/getCard/favorites", {
-        params: { viewerId },
-      });
+      const response = await axios.get(
+        "http://localhost:5000/viewer/getCard/favorites",
+        {
+          params: { viewerId },
+        }
+      );
       return response.data;
     },
     enabled: !!viewerId, // Only run the query if viewerId is available
@@ -34,7 +37,7 @@ const useFavoriteContents = (viewerId: string | null) => {
 export default function Favorites() {
   const { setLoading } = useLoading();
   const [viewerId, setViewerId] = useState<string | null>(null);
-  const [favorites, setFavorites] = useState<Content[]>([]); 
+  const [favorites, setFavorites] = useState<Content[]>([]);
 
   useEffect(() => {
     const storedViewer = localStorage.getItem("viewer");
@@ -49,22 +52,31 @@ export default function Favorites() {
   useEffect(() => {
     setLoading(isLoading);
     if (data) {
-      setFavorites(data); 
+      setFavorites(data);
     }
   }, [data, isLoading, setLoading]);
 
   const handleRemoveFavorite = (removedId: string) => {
-    
     setFavorites((prevFavorites) =>
       prevFavorites.filter((item) => item.id !== removedId)
     );
   };
 
-  const handleCategoryChange = () => {
-    
-  };
+  const handleCategoryChange = () => {};
 
-  if (isError) return <div className="p-4 text-red-600">Failed to load favorites.</div>;
+  if (!viewerId) return null; // Wait until viewerId is available
+  if (isLoading) return null; // Loader will show globally via context
+
+  if (isError) {
+    return (
+      <div>
+        <Navbar onCategorySelect={handleCategoryChange} />
+        <div className="mt-20 text-center text-red-600">
+          Failed to load favorites.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -80,7 +92,7 @@ export default function Favorites() {
                 shortDesc={item.shortDesc}
                 imageURL={item.imageURL}
                 adminName={`${item.admin.firstName} ${item.admin.lastName}`}
-                onFavoriteRemove={handleRemoveFavorite} 
+                onFavoriteRemove={handleRemoveFavorite}
               />
             ))
           ) : (
