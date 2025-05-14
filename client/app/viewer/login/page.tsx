@@ -17,16 +17,13 @@ import { cn } from "@/lib/utils";
 export default function Login() {
   const router = useRouter();
   const { openSnackbar } = useSnackbar();
-  const { setLoading } = useLoading();
+  const { setLoading, loading } = useLoading();
 
   const {
     email,
     password,
-    loading,
-    submitted,
     setEmail,
     setPassword,
-    setSubmitted,
     resetLoginForm,
     showPassword,
     toggleShowPassword,
@@ -62,10 +59,9 @@ export default function Login() {
 
       if (token && viewer) {
         Cookies.set("token", token, { expires: 1 });
-        localStorage.setItem("user", JSON.stringify({ ...viewer, role: "viewer" })); // Store role
+        localStorage.setItem("user", JSON.stringify({ ...viewer, role: "viewer" }));
         openSnackbar("Login successful!", "success");
-        setSubmitted(true);
-        setLoading(true);
+
         setTimeout(() => {
           router.push("/viewer/home");
         }, 1000);
@@ -76,12 +72,21 @@ export default function Login() {
         ? err.response?.data?.message || "Invalid email or password."
         : "An unexpected error occurred.";
       openSnackbar(msg, "error");
-    } finally {
-      setLoading(false);
     }
   };
 
-  const isDisabled = loading || submitted;
+  // Disable all form elements if loading is true
+  const isDisabled = loading;
+
+  // Display a full-screen loader when `loading` is true
+  if (loading) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center bg-background">
+        {/* Replace with your actual loader component */}
+        <div className="text-[#FF9800] text-xl">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background">
@@ -159,7 +164,7 @@ export default function Login() {
                   : "bg-[#FF9800] hover:bg-[#FAC36E] cursor-pointer"
               }`}
             >
-              {loading ? "Logging in..." : submitted ? "Logged in" : "Login"}
+              {loading ? "Logging in..." : "Login"}
             </Button>
           </div>
 
