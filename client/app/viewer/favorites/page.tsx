@@ -6,7 +6,7 @@ import axios from "axios";
 import { useLoading } from "@/app/context/LoaderContext";
 import ProductCard from "@/app/components/viewer/ProductCard";
 import Navbar from "@/app/components/viewer/Navbar";
-
+import useRoleGuard from "@/app/hooks/useRoleGuard";
 interface Content {
   id: string;
   title: string;
@@ -35,6 +35,7 @@ const useFavoriteContents = (viewerId: string | null) => {
 };
 
 export default function Favorites() {
+  useRoleGuard(["viewer"]);
   const { setLoading } = useLoading();
   const [viewerId, setViewerId] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<Content[]>([]);

@@ -13,7 +13,7 @@ export default function Navbar() {
   const handleLogout = () => {
     setLoading(true);
     Cookies.remove("token");
-    localStorage.removeItem("admin");
+    localStorage.removeItem("user");
     setTimeout(() => {
       window.location.href = "/admin/login";
     }, 1000);

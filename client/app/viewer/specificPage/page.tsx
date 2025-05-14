@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useLoading } from "@/app/context/LoaderContext";
 import { useSearchParams } from "next/navigation";
-
+import useRoleGuard from "@/app/hooks/useRoleGuard";
 interface Recipe {
   ingredient: string;
 }
@@ -26,6 +26,8 @@ interface Content {
 }
 
 export default function SpecificPage() {
+    useRoleGuard(["viewer"]);
+
   const { setLoading } = useLoading();
   const searchParams = useSearchParams();
   const contentId = searchParams.get("id");

@@ -35,7 +35,7 @@ export default function Unauthorized() {
       </div>
 
       <div className="flex flex-col items-center text-center space-y-4 z-10">
-        <h1 className="font-bold text-4xl text-transparent bg-clip-text bg-gradient-to-r from-[#FF9800] via-[#FAC36E] to-[#F7D9A5]">
+        <h1 className="font-bold text-4xl leading-[1.5] text-transparent bg-clip-text bg-gradient-to-r from-[#2F27CE] via-[#8681E7] to-[#8681E7]">
           Unauthorized
         </h1>
         <p className="text-[#2d2d2d] tracking-wide text-md font-normal">

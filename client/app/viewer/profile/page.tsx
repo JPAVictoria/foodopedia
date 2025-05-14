@@ -10,10 +10,11 @@ import { Eye, EyeOff } from "lucide-react";
 import { useConfigureStore } from "@/app/stores/useConfigureStore";
 import { useToggleStore } from "@/app/stores/useToggleStore";
 import { useMutation } from "@tanstack/react-query";
-
+import useRoleGuard from "@/app/hooks/useRoleGuard";
 
 
 export default function Configure() {
+  useRoleGuard(["viewer"]);
   const { openSnackbar } = useSnackbar();
   const { firstName, lastName, setFirstName, setLastName } =
     useConfigureStore();

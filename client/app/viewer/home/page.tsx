@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Navbar from "@/app/components/viewer/Navbar";
 import ProductCard from "@/app/components/viewer/ProductCard";
 import { useLoading } from "@/app/context/LoaderContext";
-
+import useRoleGuard from "@/app/hooks/useRoleGuard";
 interface Content {
   id: string;
   title: string;
@@ -32,6 +32,8 @@ const useContents = (category: string) => {
 };
 
 export default function ViewerHome() {
+
+  useRoleGuard(["viewer"]);
   const { setLoading } = useLoading();
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const { data, isLoading, isError } = useContents(selectedCategory);
