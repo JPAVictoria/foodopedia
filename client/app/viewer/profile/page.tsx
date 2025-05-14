@@ -12,7 +12,6 @@ import { useToggleStore } from "@/app/stores/useToggleStore";
 import { useMutation } from "@tanstack/react-query";
 
 export default function Configure() {
-
   const { openSnackbar } = useSnackbar();
   const { firstName, lastName, setFirstName, setLastName } =
     useConfigureStore();
@@ -71,10 +70,20 @@ export default function Configure() {
       );
     },
     onSuccess: (res) => {
-      localStorage.setItem("viewer", JSON.stringify({ firstName, lastName }));
+      const existingUser = JSON.parse(localStorage.getItem("user") || "{}");
+
+      const updatedUser = {
+        ...existingUser,
+        firstName,
+        lastName,
+      };
+
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+
       openSnackbar(res.data.message || "Name updated successfully.", "success");
       setTimeout(() => window.location.reload(), 1000);
     },
+
     onError: (error) => {
       if (axios.isAxiosError(error)) {
         openSnackbar(
@@ -86,7 +95,6 @@ export default function Configure() {
       }
     },
   });
-
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
