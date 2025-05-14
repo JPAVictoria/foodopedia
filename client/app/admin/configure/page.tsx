@@ -13,18 +13,19 @@ import { Eye, EyeOff } from "lucide-react";
 import { useConfigureStore } from "@/app/stores/useConfigureStore";
 import { useToggleStore } from "@/app/stores/useToggleStore";
 import { useMutation } from "@tanstack/react-query";
-import { useLoading } from "@/app/context/LoaderContext"; 
+import { useLoading } from "@/app/context/LoaderContext";
 import useRoleGuard from "@/app/hooks/useRoleGuard";
 
 export default function Configure() {
   useRoleGuard(["admin"]);
 
   const router = useRouter();
-  const { setLoading } = useLoading(); 
+  const { setLoading } = useLoading();
   const { openSnackbar } = useSnackbar();
   const { isNavbarVisible } = useNavbar();
 
-  const { firstName, lastName, setFirstName, setLastName } = useConfigureStore();
+  const { firstName, lastName, setFirstName, setLastName } =
+    useConfigureStore();
   const {
     currentPassword,
     newPassword,
@@ -38,7 +39,7 @@ export default function Configure() {
     toggleShowCurrent,
     toggleShowNew,
     toggleShowConfirm,
-    resetPasswordForm
+    resetPasswordForm,
   } = useToggleStore();
 
   const passwordMutation = useMutation({
@@ -51,7 +52,10 @@ export default function Configure() {
       );
     },
     onSuccess: (res) => {
-      openSnackbar(res.data.message || "Password updated successfully.", "success");
+      openSnackbar(
+        res.data.message || "Password updated successfully.",
+        "success"
+      );
       resetPasswordForm();
     },
     onError: (error) => {
@@ -64,7 +68,7 @@ export default function Configure() {
         openSnackbar("An unexpected error occurred.", "error");
       }
       resetPasswordForm();
-    }
+    },
   });
 
   const nameMutation = useMutation({
@@ -77,7 +81,10 @@ export default function Configure() {
       );
     },
     onSuccess: (res) => {
-      localStorage.setItem("admin", JSON.stringify({ firstName, lastName }));
+      const existingUser = JSON.parse(localStorage.getItem("user") || "{}");
+      const updatedUser = { ...existingUser, firstName, lastName };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+
       openSnackbar(res.data.message || "Name updated successfully.", "success");
       setTimeout(() => window.location.reload(), 1000);
     },
@@ -90,11 +97,11 @@ export default function Configure() {
       } else {
         openSnackbar("An unexpected error occurred.", "error");
       }
-    }
+    },
   });
 
   useEffect(() => {
-    setLoading(true); 
+    setLoading(true);
     const token = Cookies.get("token");
     if (!token) {
       openSnackbar("Token is missing", "error");
@@ -102,7 +109,7 @@ export default function Configure() {
       return () => clearTimeout(timer);
     }
 
-    setLoading(false); 
+    setLoading(false);
   }, [router, openSnackbar, setLoading]);
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
@@ -117,7 +124,6 @@ export default function Configure() {
       return;
     }
     passwordMutation.mutate();
-    
   };
 
   const handleNameSubmit = (e: React.FormEvent) => {
@@ -125,43 +131,95 @@ export default function Configure() {
     nameMutation.mutate();
   };
 
-
   return (
     <div className="flex min-h-screen">
       <Navbar />
-      <div className={`transition-all mt-20 duration-300 flex-1 p-10 ${isNavbarVisible ? "ml-0" : "-ml-54"}`}>
+      <div
+        className={`transition-all mt-20 duration-300 flex-1 p-10 ${
+          isNavbarVisible ? "ml-0" : "-ml-54"
+        }`}
+      >
         <div className="flex justify-center gap-16 mt-10 flex-wrap">
           <div className="flex flex-col items-center w-[400px]">
             <h1 className="font-bold text-[28px] text-transparent mb-7 bg-clip-text bg-gradient-to-r from-[#4caf50] via-[#76bf73] to-[#a0cf96]">
               Change Password
             </h1>
             <div className="w-full space-y-4 bg-[#fffaec] p-8 border border-[#2d2d2d4e] rounded-sm">
-              <form onSubmit={handlePasswordSubmit} className="flex flex-col gap-7">
-                {['current', 'new', 'confirm'].map((type) => (
+              <form
+                onSubmit={handlePasswordSubmit}
+                className="flex flex-col gap-7"
+              >
+                {["current", "new", "confirm"].map((type) => (
                   <div key={type} className="relative">
-                    <Label htmlFor={`${type}-password`} className="pb-2 text-[#3E2723]">
-                      {type === 'current' ? 'Current' : type === 'new' ? 'New' : 'Confirm'} Password
+                    <Label
+                      htmlFor={`${type}-password`}
+                      className="pb-2 text-[#3E2723]"
+                    >
+                      {type === "current"
+                        ? "Current"
+                        : type === "new"
+                        ? "New"
+                        : "Confirm"}{" "}
+                      Password
                     </Label>
                     <Input
-                      type={type === 'current' ? showCurrent ? "text" : "password" :
-                            type === 'new' ? showNew ? "text" : "password" :
-                            showConfirm ? "text" : "password"}
+                      type={
+                        type === "current"
+                          ? showCurrent
+                            ? "text"
+                            : "password"
+                          : type === "new"
+                          ? showNew
+                            ? "text"
+                            : "password"
+                          : showConfirm
+                          ? "text"
+                          : "password"
+                      }
                       id={`${type}-password`}
-                      value={type === 'current' ? currentPassword :
-                            type === 'new' ? newPassword : confirmPassword}
-                      onChange={(e) => type === 'current' ? setCurrentPassword(e.target.value) :
-                                type === 'new' ? setNewPassword(e.target.value) :
-                                setConfirmPassword(e.target.value)}
+                      value={
+                        type === "current"
+                          ? currentPassword
+                          : type === "new"
+                          ? newPassword
+                          : confirmPassword
+                      }
+                      onChange={(e) =>
+                        type === "current"
+                          ? setCurrentPassword(e.target.value)
+                          : type === "new"
+                          ? setNewPassword(e.target.value)
+                          : setConfirmPassword(e.target.value)
+                      }
                       className="w-full pr-10"
                     />
                     <div
-                      onClick={type === 'current' ? toggleShowCurrent :
-                              type === 'new' ? toggleShowNew : toggleShowConfirm}
+                      onClick={
+                        type === "current"
+                          ? toggleShowCurrent
+                          : type === "new"
+                          ? toggleShowNew
+                          : toggleShowConfirm
+                      }
                       className="absolute top-8 right-3 cursor-pointer"
                     >
-                      {type === 'current' ? (showCurrent ? <EyeOff size={18} /> : <Eye size={18} />) :
-                       type === 'new' ? (showNew ? <EyeOff size={18} /> : <Eye size={18} />) :
-                       (showConfirm ? <EyeOff size={18} /> : <Eye size={18} />)}
+                      {type === "current" ? (
+                        showCurrent ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )
+                      ) : type === "new" ? (
+                        showNew ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )
+                      ) : showConfirm ? (
+                        <EyeOff size={18} />
+                      ) : (
+                        <Eye size={18} />
+                      )}
                     </div>
                   </div>
                 ))}

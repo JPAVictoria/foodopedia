@@ -4,7 +4,7 @@ export default function NavbarTitle() {
   const [admin, setAdmin] = useState<{ firstName: string; lastName: string } | null>(null);
 
   useEffect(() => {
-    const storedAdmin = localStorage.getItem("admin");
+    const storedAdmin = localStorage.getItem("user");
     if (storedAdmin) {
       setAdmin(JSON.parse(storedAdmin));
     }
@@ -12,7 +12,7 @@ export default function NavbarTitle() {
 
   useEffect(() => {
     const handleStorageChange = () => {
-      const storedAdmin = localStorage.getItem("admin");
+      const storedAdmin = localStorage.getItem("user");
       if (storedAdmin) {
         setAdmin(JSON.parse(storedAdmin));
       }
