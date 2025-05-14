@@ -9,7 +9,7 @@ export default function useRoleGuard(allowedRoles: string[]) {
   useEffect(() => {
     const userData = localStorage.getItem("user");
     if (!userData) {
-      router.push("/admin/login"); 
+      router.push("/"); 
       return;
     }
 

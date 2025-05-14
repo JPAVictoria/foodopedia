@@ -1,7 +1,6 @@
 "use client";
 import Navbar from "@/app/components/ui/navbar/navbar";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { useSnackbar } from "@/app/context/SnackbarContext";
@@ -19,7 +18,6 @@ import useRoleGuard from "@/app/hooks/useRoleGuard";
 export default function Configure() {
   useRoleGuard(["admin"]);
 
-  const router = useRouter();
   const { setLoading } = useLoading();
   const { openSnackbar } = useSnackbar();
   const { isNavbarVisible } = useNavbar();
@@ -102,15 +100,10 @@ export default function Configure() {
 
   useEffect(() => {
     setLoading(true);
-    const token = Cookies.get("token");
-    if (!token) {
-      openSnackbar("Token is missing", "error");
-      const timer = setTimeout(() => router.push("/admin/login"), 2000);
-      return () => clearTimeout(timer);
-    }
+    const timer = setTimeout(() => setLoading(false), 500); // Optional: simulate loading delay
 
-    setLoading(false);
-  }, [router, openSnackbar, setLoading]);
+    return () => clearTimeout(timer);
+  }, [setLoading]);
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();

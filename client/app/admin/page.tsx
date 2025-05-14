@@ -1,9 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
-import { useSnackbar } from "@/app/context/SnackbarContext";
 import { useNavbar } from "@/app/context/NavbarContext";
 import { useLoading } from "@/app/context/LoaderContext"; // Import the loader context
 import Navbar from "@/app/components/ui/navbar/navbar";
@@ -14,26 +11,14 @@ export default function AdminDashboard() {
   useRoleGuard(["admin"]);
   const { setLoading } = useLoading(); 
   const { isNavbarVisible } = useNavbar();
-  const router = useRouter();
-  const { openSnackbar } = useSnackbar();
 
-  useEffect(() => {
-    setLoading(false);
-    const token = Cookies.get("token");
 
-    if (!token) {
-      openSnackbar("Token is missing", "error");
+useEffect(() => {
+  setLoading(true);
+  const timer = setTimeout(() => setLoading(false), 500); // Optional: simulate loading delay
 
-      const timer = setTimeout(() => {
-        router.push("/admin/login");
-      }, 2000);
-
-      return () => {
-        clearTimeout(timer);
-        setLoading(false); 
-      };
-    }
-  }, [router, openSnackbar, setLoading]);
+  return () => clearTimeout(timer);
+}, [setLoading]);
 
   const pieChartData = [
     { id: 0, value: 30, color: "#06b6d4" },
