@@ -8,7 +8,6 @@ import { useNavbar } from "@/app/context/NavbarContext";
 import { useLoading } from "@/app/context/LoaderContext"; // Import the loader context
 import Navbar from "@/app/components/ui/navbar/navbar";
 import { PieChart } from "@mui/x-charts/PieChart";
-import { Button } from "@mui/material";
 import useRoleGuard from "../hooks/useRoleGuard";
 
 export default function AdminDashboard() {
@@ -42,18 +41,6 @@ export default function AdminDashboard() {
     { id: 2, value: 30, color: "#14b8a6" },
   ];
 
-  const filterButtons = ["Custom", "Monthly", "All time"];
-
-  const buttonStyles = {
-    backgroundColor: "#fff",
-    color: "#000",
-    borderColor: "rgba(45, 45, 45, 0.1)",
-    textTransform: "none",
-    "&:hover": {
-      backgroundColor: "#f5f5f5",
-      borderColor: "rgba(45, 45, 45, 0.2)",
-    },
-  };
 
   const valueFormatter = (value: { value: number }) => {
     return `${value.value}%`;
@@ -75,18 +62,7 @@ export default function AdminDashboard() {
               Top 10 Most Liked Products
             </h2>
 
-            <div className="pt-10 flex justify-center space-x-2 mb-4">
-              {filterButtons.map((label) => (
-                <Button
-                  key={label}
-                  variant="outlined"
-                  size="small"
-                  sx={buttonStyles}
-                >
-                  {label}
-                </Button>
-              ))}
-            </div>
+
 
             <div className="flex-1 flex justify-center items-center ml-25">
               <PieChart
@@ -107,19 +83,6 @@ export default function AdminDashboard() {
             <h2 className="text-lg font-semibold text-[#4CAF50] text-center">
               Top 10 Most Viewed Products
             </h2>
-
-            <div className="pt-10 flex justify-center space-x-2 mb-4">
-              {filterButtons.map((label) => (
-                <Button
-                  key={label}
-                  variant="outlined"
-                  size="small"
-                  sx={buttonStyles}
-                >
-                  {label}
-                </Button>
-              ))}
-            </div>
 
             <div className="flex-1 flex justify-center items-center ml-25">
               <PieChart

@@ -1,33 +1,35 @@
-import { NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
+import { NextResponse } from 'next/server'
 
-export function middleware(req) {
-  const url = req.nextUrl;  
-  const token = req.cookies.get('jwt');  
+export function middleware(request) {
+  const token = request.cookies.get('token')?.value
+  const pathname = request.nextUrl.pathname
 
-  const publicRoutes = ['/admin/register', '/admin/login', '/admin/forgot-password'];
+  const publicPaths = ['/admin/login', '/admin/register','/admin/forgot-password','/admin/change-password',
+    '/viewer/login', '/viewer/register','/viewer/forgot-password','/viewer/change-password'
+  ]
 
-  if (publicRoutes.includes(url.pathname)) {
-    return NextResponse.next(); 
+  if (publicPaths.includes(pathname)) {
+    return NextResponse.next()
   }
+
 
   if (!token) {
-    return NextResponse.redirect(new URL('/admin/login', req.url));
+    return NextResponse.redirect(new URL('/', request.url))
   }
 
-  try {
-    const secretKey = process.env.JWT_SECRET;  
-    if (!secretKey) {
-      throw new Error("JWT_SECRET is not set in the environment variables.");
-    }
 
-    jwt.verify(token, secretKey); 
-
-    return NextResponse.next(); 
-  } catch (err) {
-    console.error("Token verification failed:", err.message);
-    return NextResponse.redirect(new URL('/admin/login', req.url));
-  }
 }
 
-
+export const config = {
+  matcher: [
+    '/admin/createContent/:path*',
+    '/admin/updateContent/:path*',
+    '/admin/configure/:path*',
+    '/admin/:path*',
+    '/admin/contents/:path*',
+    '/viewer/profile/:path*',
+    '/viewer/favorites/:path*',
+    '/viewer/home/:path*',
+    '/viewer/specificPage/:path*',
+  ],
+}
