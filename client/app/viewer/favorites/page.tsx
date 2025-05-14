@@ -40,7 +40,7 @@ export default function Favorites() {
   const [favorites, setFavorites] = useState<Content[]>([]);
 
   useEffect(() => {
-    const storedViewer = localStorage.getItem("viewer");
+    const storedViewer = localStorage.getItem("user");
     if (storedViewer) {
       const parsed = JSON.parse(storedViewer);
       setViewerId(parsed.id);

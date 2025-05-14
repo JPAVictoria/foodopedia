@@ -62,7 +62,7 @@ export default function Login() {
 
       if (token && viewer) {
         Cookies.set("token", token, { expires: 1 });
-        localStorage.setItem("viewer", JSON.stringify(viewer));
+        localStorage.setItem("user", JSON.stringify({ ...viewer, role: "viewer" })); // Store role
         openSnackbar("Login successful!", "success");
         setSubmitted(true);
         setLoading(true);

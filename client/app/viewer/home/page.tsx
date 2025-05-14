@@ -54,7 +54,7 @@ export default function ViewerHome() {
     }
   }, [searchParams]);
 
-  if (isLoading) return null; // Global loader will show
+  if (isLoading) return null; 
 
   if (isError) {
     return (

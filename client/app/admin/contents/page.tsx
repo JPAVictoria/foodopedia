@@ -11,9 +11,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useLoading } from "@/app/context/LoaderContext"; 
 import { useEffect } from "react";
-
-
 import { useContentStore } from "@/app/stores/adminStores/useContentStore";
+import useRoleGuard from "@/app/hooks/useRoleGuard";
+
 
 interface ContentItem {
   id: string;
@@ -31,6 +31,7 @@ export default function Contents() {
   const queryClient = useQueryClient();
   const { contents, setContents } = useContentStore();
 
+useRoleGuard(["admin"]);
 
   useEffect(() => {
     setLoading(false);

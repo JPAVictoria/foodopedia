@@ -61,7 +61,7 @@ export default function Login() {
 
       if (token && admin) {
         Cookies.set("token", token, { expires: 1 });
-        localStorage.setItem("admin", JSON.stringify(admin));
+        localStorage.setItem("user", JSON.stringify({ ...admin, role: "admin" })); 
         openSnackbar("Login successful!", "success");
 
         setSubmitted(true);

@@ -14,6 +14,7 @@ import axios from "axios";
 import { useInformationStore } from "@/app/stores/adminStores/useInformationStore";
 import { useLoading } from "@/app/context/LoaderContext";
 import { useState } from "react";
+import useRoleGuard from "@/app/hooks/useRoleGuard";
 
 type Classification = "DESSERT" | "APPETIZER" | "ENTREE" | "DRINKS";
 
@@ -142,6 +143,8 @@ export default function CreateContent() {
     setLoading(true);
     createMutation.mutate(selectedStatus);
   };
+
+  useRoleGuard(["admin"]);
 
   return (
     <div className="flex min-h-screen text-[#3E2723]">

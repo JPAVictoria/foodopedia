@@ -14,7 +14,7 @@ export default function Navbar({ onCategorySelect }: { onCategorySelect: (catego
   const { openSnackbar } = useSnackbar(); 
 
   useEffect(() => {
-    const storedViewer = localStorage.getItem("viewer");
+    const storedViewer = localStorage.getItem("user");
     if (storedViewer) {
       setViewer(JSON.parse(storedViewer));
     }
@@ -26,7 +26,7 @@ const handleLogout = () => {
 
 
   setTimeout(() => {
-    localStorage.removeItem("viewer");
+    localStorage.removeItem("user");
     router.push("/viewer/login");
   }, 1000); 
 };

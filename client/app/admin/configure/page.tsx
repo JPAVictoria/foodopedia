@@ -14,8 +14,11 @@ import { useConfigureStore } from "@/app/stores/useConfigureStore";
 import { useToggleStore } from "@/app/stores/useToggleStore";
 import { useMutation } from "@tanstack/react-query";
 import { useLoading } from "@/app/context/LoaderContext"; 
+import useRoleGuard from "@/app/hooks/useRoleGuard";
 
 export default function Configure() {
+  useRoleGuard(["admin"]);
+
   const router = useRouter();
   const { setLoading } = useLoading(); 
   const { openSnackbar } = useSnackbar();

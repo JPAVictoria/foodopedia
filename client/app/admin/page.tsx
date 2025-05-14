@@ -9,9 +9,11 @@ import { useLoading } from "@/app/context/LoaderContext"; // Import the loader c
 import Navbar from "@/app/components/ui/navbar/navbar";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { Button } from "@mui/material";
+import useRoleGuard from "../hooks/useRoleGuard";
 
 export default function AdminDashboard() {
-  const { setLoading } = useLoading(); // Get setLoading from context
+  useRoleGuard(["admin"]);
+  const { setLoading } = useLoading(); 
   const { isNavbarVisible } = useNavbar();
   const router = useRouter();
   const { openSnackbar } = useSnackbar();

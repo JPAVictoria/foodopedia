@@ -33,7 +33,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   useEffect(() => {
     const fetchFavorites = async () => {
-      const viewer = JSON.parse(localStorage.getItem("viewer") || "{}");
+      const viewer = JSON.parse(localStorage.getItem("user") || "{}");
       const viewerId = viewer?.id;
 
       if (!viewerId) return;
@@ -63,7 +63,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const handleFavoriteClick = async () => {
     if (loading) return;
 
-    const viewer = JSON.parse(localStorage.getItem("viewer") || "{}");
+    const viewer = JSON.parse(localStorage.getItem("user") || "{}");
     const viewerId = viewer?.id;
 
     if (!viewerId) {
