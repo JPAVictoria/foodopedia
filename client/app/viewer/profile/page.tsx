@@ -11,6 +11,8 @@ import { useConfigureStore } from "@/app/stores/useConfigureStore";
 import { useToggleStore } from "@/app/stores/useToggleStore";
 import { useMutation } from "@tanstack/react-query";
 
+
+
 export default function Configure() {
   const { openSnackbar } = useSnackbar();
   const { firstName, lastName, setFirstName, setLastName } =
@@ -117,7 +119,7 @@ export default function Configure() {
 
   return (
     <div className="">
-      <Navbar />
+      <Navbar onCategorySelect={() => {}} />
       <div className="transition-all duration-300 flex-1 p-10">
         <div className="flex justify-center gap-16 mt-10 flex-wrap">
           <div className="flex flex-col items-center w-[400px]">
