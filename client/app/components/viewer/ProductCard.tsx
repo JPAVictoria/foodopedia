@@ -5,6 +5,7 @@ import { Heart, CornerDownRight } from "lucide-react";
 import axios from "axios";
 import Link from "next/link";
 import { useSnackbar } from "@/app/context/SnackbarContext";
+import { useRouter } from "next/navigation"; 
 
 interface ProductCardProps {
   title: string;
@@ -14,6 +15,9 @@ interface ProductCardProps {
   id: string;
   onFavoriteRemove: (id: string) => void; 
 }
+
+
+
 
 const ProductCard: React.FC<ProductCardProps> = ({
   title,
@@ -112,6 +116,18 @@ const ProductCard: React.FC<ProductCardProps> = ({
     }
   };
 
+  const router = useRouter();
+
+const handleViewClick = async () => {
+  try {
+    await axios.patch(`http://localhost:5000/viewer/getCard/${id}/view`);
+  } catch (err) {
+    console.error("Failed to increment views:", err);
+  } finally {
+    router.push(`/viewer/specificPage?id=${id}`);
+  }
+};
+
   return (
     <div className="w-full sm:w-[300px] h-[330px] rounded-sm shadow-md border border-[#2d2d2d5b] bg-[#fffaee] overflow-hidden">
       <div className="px-2 pt-2">
@@ -144,7 +160,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
             onClick={handleFavoriteClick}
           />
           <Link href={`/viewer/specificPage?id=${id}`}>
-            <CornerDownRight className="w-4 h-4 text-[#3E2723] cursor-pointer hover:scale-110 transition" />
+            <CornerDownRight className="w-4 h-4 text-[#3E2723] cursor-pointer hover:scale-110 transition"   onClick={handleViewClick}
+ />
           </Link>
         </div>
       </div>

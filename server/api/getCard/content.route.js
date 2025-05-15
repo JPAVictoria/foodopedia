@@ -170,6 +170,27 @@ router.delete("/favorite", async (req, res) => {
   }
 });
 
+router.patch("/:id/view", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const updatedContent = await prisma.content.update({
+      where: { id },
+      data: {
+        views: {
+          increment: 1,
+        },
+      },
+    });
+
+    res.json({ views: updatedContent.views });
+  } catch (error) {
+    console.error("Failed to increment views:", error);
+    res.status(500).json({ error: "Failed to increment views" });
+  }
+});
+
+
 
 
 
