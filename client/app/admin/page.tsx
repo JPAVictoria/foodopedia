@@ -2,88 +2,92 @@
 
 import { useEffect } from "react";
 import { useNavbar } from "@/app/context/NavbarContext";
-import { useLoading } from "@/app/context/LoaderContext"; // Import the loader context
+import { useLoading } from "@/app/context/LoaderContext";
 import Navbar from "@/app/components/ui/navbar/navbar";
-import { PieChart } from "@mui/x-charts/PieChart";
 import useRoleGuard from "../hooks/useRoleGuard";
+import {
+  AreaChart,
+  Area,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
+
+const chartData = [
+  { month: "January", desktop: 186, mobile: 80 },
+  { month: "February", desktop: 305, mobile: 200 },
+  { month: "March", desktop: 237, mobile: 120 },
+  { month: "April", desktop: 73, mobile: 190 },
+  { month: "May", desktop: 209, mobile: 130 },
+  { month: "June", desktop: 214, mobile: 140 },
+];
 
 export default function AdminDashboard() {
   useRoleGuard(["admin"]);
-  const { setLoading } = useLoading(); 
+  const { setLoading } = useLoading();
   const { isNavbarVisible } = useNavbar();
 
-
-useEffect(() => {
-  setLoading(true);
-  const timer = setTimeout(() => setLoading(false), 500); // Optional: simulate loading delay
-
-  return () => clearTimeout(timer);
-}, [setLoading]);
-
-  const pieChartData = [
-    { id: 0, value: 30, color: "#06b6d4" },
-    { id: 1, value: 40, color: "#a855f7" },
-    { id: 2, value: 30, color: "#14b8a6" },
-  ];
-
-
-  const valueFormatter = (value: { value: number }) => {
-    return `${value.value}%`;
-  };
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => setLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, [setLoading]);
 
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Navbar />
-      <main className={`transition-all mt-10 duration-300 flex-1 p-10 ${
+      <main
+        className={`transition-all mt-10 duration-300 flex-1 p-10 ${
           isNavbarVisible ? "ml-0" : "-ml-54"
-        }`}>
-        <h1 className="mt-5 text-2xl font-bold text-center text-[#4CAF50] mb-10">
+        }`}
+      >
+        <h1 className="text-2xl font-bold text-center text-[#4CAF50] mb-8">
           Content Analytics Dashboard
         </h1>
 
-        <div className="mt-25 grid grid-cols-1 md:grid-cols-2 gap-8 place-items-center">
-          <div className="bg-white rounded-lg shadow-md p-6 w-full max-w-md min-h-[400px] flex flex-col">
-            <h2 className="text-lg font-semibold text-[#4CAF50] text-center">
-              Top 10 Most Liked Products
-            </h2>
-
-
-
-            <div className="flex-1 flex justify-center items-center ml-25">
-              <PieChart
-                series={[
-                  {
-                    data: pieChartData,
-                    highlightScope: { fade: "global", highlight: "item" },
-                    faded: { innerRadius: 30, additionalRadius: -30, color: "gray" },
-                    valueFormatter,
-                  },
-                ]}
-                height={250}
-              />
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-md p-6 w-full max-w-md min-h-[400px] flex flex-col">
-            <h2 className="text-lg font-semibold text-[#4CAF50] text-center">
-              Top 10 Most Viewed Products
-            </h2>
-
-            <div className="flex-1 flex justify-center items-center ml-25">
-              <PieChart
-                series={[
-                  {
-                    data: pieChartData,
-                    highlightScope: { fade: "global", highlight: "item" },
-                    faded: { innerRadius: 30, additionalRadius: -30, color: "gray" },
-                    valueFormatter,
-                  },
-                ]}
-                height={250}
-              />
-            </div>
-          </div>
-        </div>
+        <Card className="bg-white rounded-lg shadow-md p-6 w-full border-0">
+          <CardHeader>
+            <CardTitle className="text-md text-[#2d2d2d] font-medium">Area Chart - Product Views</CardTitle>
+            <CardDescription className="text-[13px] font-regular text-[#2d2d2d]">
+              Number of views per product
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={450}>
+              <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" tickFormatter={(val) => val.slice(0, 3)} />
+                <YAxis />
+                <Tooltip />
+                <Area
+                  type="monotone"
+                  dataKey="mobile"
+                  stackId="1"
+                  stroke="hsl(var(--chart-2))"
+                  fill="hsl(var(--chart-2))"
+                  fillOpacity={0.4}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="desktop"
+                  stackId="1"
+                  stroke="hsl(var(--chart-1))"
+                  fill="hsl(var(--chart-1))"
+                  fillOpacity={0.4}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
       </main>
     </div>
   );
