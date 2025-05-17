@@ -176,7 +176,6 @@ export default function CreateContent() {
                   />
                 </div>
                 <p className="text-sm text-muted-foreground">Viewer Count:</p>
-                <p className="text-sm text-muted-foreground">Likes Count:</p>
               </div>
             </div>
             <div className="flex space-x-4">

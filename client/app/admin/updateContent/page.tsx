@@ -34,7 +34,9 @@ interface ContentResponse {
   recipes: Recipe[];
   instructions: Instruction[];
   imageURL?: string;
+  views: number;  
 }
+
 
 export default function UpdateContent() {
   useRoleGuard(["admin"]);
@@ -86,7 +88,8 @@ export default function UpdateContent() {
   const handleClassificationChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setSelectedClassification(e.target.value as Classification);
 
-const [imageUrl, setImageUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState("");
+  const [views, setViews] = useState<number>(0);
 
   const {} = useQuery({
     queryKey: ["content", contentId],
@@ -99,6 +102,7 @@ const [imageUrl, setImageUrl] = useState('');
       );
       const data: ContentResponse = res.data;
 
+      setViews(data.views || 0);
       setFoodName(data.title || "");
       setShortDescription(data.shortDesc || "");
       setSelectedClassification(data.category || "");
@@ -172,9 +176,9 @@ const [imageUrl, setImageUrl] = useState('');
       errorList.push("All recipes must be filled.");
     if (instructions.some((i) => !i.trim()))
       errorList.push("All instructions must be filled.");
-  if (imageUrl && !imageUrl.trim()) {
-    errorList.push("Image URL must be valid if provided.");
-  }
+    if (imageUrl && !imageUrl.trim()) {
+      errorList.push("Image URL must be valid if provided.");
+    }
     if (errorList.length > 0) {
       openSnackbar(errorList.join(" "), "error");
       return false;
@@ -217,8 +221,9 @@ const [imageUrl, setImageUrl] = useState('');
                     }}
                   />
                 </div>
-                <p className="text-sm text-muted-foreground">Viewer Count:</p>
-                <p className="text-sm text-muted-foreground">Likes Count:</p>
+                <p className="text-sm text-muted-foreground">
+                  Viewer Count: <span className="font-semibold">{views}</span>
+                </p>
               </div>
             </div>
             <div className="flex space-x-4">

@@ -94,13 +94,13 @@ export default function AdminDashboard() {
             {isError ? (
               <p className="text-red-500">Failed to load data.</p>
             ) : (
-              <ResponsiveContainer width="100%" height={450}>
+              <ResponsiveContainer width="100%" height={450} className="mt-10">
                 <AreaChart
                   data={productViews.map((p) => ({
                     name: p.title,
                     views: p.views,
                   }))}
-                  margin={{ top: 10, right: 30, left: 0, bottom: 50 }} // leave space for x labels
+                  margin={{ top: 10, right: 30, left: 0, bottom: 50 }} 
                 >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis
@@ -116,7 +116,7 @@ export default function AdminDashboard() {
                   />
 
                   <YAxis
-                    ticks={[0, 5, 10, 20, 50, 60]} 
+                    ticks={[0, 20, 40, 60, 80, 100]} 
                   />
                   <Tooltip />
                   <Area
