@@ -35,14 +35,13 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    
     const token = generateToken(admin);
 
-    
     res.status(200).json({
       message: "Login successful",
       token,
       admin: {
+        id: admin.id, 
         email: admin.email,
         firstName: admin.firstName,
         lastName: admin.lastName,

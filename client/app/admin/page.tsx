@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useNavbar } from "@/app/context/NavbarContext";
 import { useLoading } from "@/app/context/LoaderContext";
 import Navbar from "@/app/components/ui/navbar/navbar";
@@ -21,26 +21,53 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
-const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
-];
+interface ProductView {
+  id: string;
+  title: string;
+  views: number;
+}
 
 export default function AdminDashboard() {
   useRoleGuard(["admin"]);
   const { setLoading } = useLoading();
   const { isNavbarVisible } = useNavbar();
 
+  const adminId = useMemo(() => {
+    if (typeof window === "undefined") return null;
+
+    const userStr = localStorage.getItem("user");
+    if (!userStr) return null;
+
+    try {
+      const user = JSON.parse(userStr);
+      return user.id || null;
+    } catch (err) {
+      console.error("Failed to parse user from localStorage", err);
+      return null;
+    }
+  }, []);
+
+  const {
+    data: productViews = [],
+    isLoading,
+    isError,
+  } = useQuery<ProductView[]>({
+    queryKey: ["productViews", adminId],
+    queryFn: async () => {
+      const res = await axios.get(
+        `http://localhost:5000/viewer/analytics/${adminId}`
+      );
+      return res.data;
+    },
+    enabled: !!adminId,
+  });
+
   useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => setLoading(false), 500);
-    return () => clearTimeout(timer);
-  }, [setLoading]);
+    setLoading(isLoading);
+  }, [isLoading, setLoading]);
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -56,36 +83,52 @@ export default function AdminDashboard() {
 
         <Card className="bg-white rounded-lg shadow-md p-6 w-full border-0">
           <CardHeader>
-            <CardTitle className="text-md text-[#2d2d2d] font-medium">Area Chart - Product Views</CardTitle>
+            <CardTitle className="text-md text-[#2d2d2d] font-medium">
+              Area Chart - Product Views
+            </CardTitle>
             <CardDescription className="text-[13px] font-regular text-[#2d2d2d]">
-              Number of views per product
+              Number of views per published product
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={450}>
-              <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" tickFormatter={(val) => val.slice(0, 3)} />
-                <YAxis />
-                <Tooltip />
-                <Area
-                  type="monotone"
-                  dataKey="mobile"
-                  stackId="1"
-                  stroke="hsl(var(--chart-2))"
-                  fill="hsl(var(--chart-2))"
-                  fillOpacity={0.4}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="desktop"
-                  stackId="1"
-                  stroke="hsl(var(--chart-1))"
-                  fill="hsl(var(--chart-1))"
-                  fillOpacity={0.4}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+            {isError ? (
+              <p className="text-red-500">Failed to load data.</p>
+            ) : (
+              <ResponsiveContainer width="100%" height={450}>
+                <AreaChart
+                  data={productViews.map((p) => ({
+                    name: p.title,
+                    views: p.views,
+                  }))}
+                  margin={{ top: 10, right: 30, left: 0, bottom: 50 }} // leave space for x labels
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="name"
+                    angle={0}
+                    textAnchor="middle"
+                    interval={0}
+                    height={60}
+                    tick={{ fontSize: 12, fill: "#2d2d2d" }}
+                    tickFormatter={(value) =>
+                      value.length > 15 ? value.slice(0, 15) + "…" : value
+                    }
+                  />
+
+                  <YAxis
+                    ticks={[0, 5, 10, 20, 50, 60]} 
+                  />
+                  <Tooltip />
+                  <Area
+                    type="monotone"
+                    dataKey="views"
+                    stroke="hsl(var(--chart-1))"
+                    fill="hsl(var(--chart-1))"
+                    fillOpacity={0.4}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
           </CardContent>
         </Card>
       </main>

@@ -17,6 +17,7 @@ const viewerResetRouter = require("./api/authViewer/reset/auth.route");
 const viewerChangePasswordRouter = require("./api/viewer/changePassword/change.route");
 const viewerChangeNameRouter = require("./api/viewer/changeName/change.route");
 const getContentCardRouter = require("./api/getCard/content.route");
+const analytics = require("./api/analytics/analytics.route");
 
 
 
@@ -45,6 +46,7 @@ app.use("/viewer/reset", viewerResetRouter);
 app.use("/viewer/change", viewerChangePasswordRouter);
 app.use("/viewer/change", viewerChangeNameRouter);
 app.use("/viewer/getCard", getContentCardRouter);
+app.use("/viewer/analytics", analytics);
 
 
 
