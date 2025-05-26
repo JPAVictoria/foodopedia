@@ -42,5 +42,4 @@ foodopedia/
 
 - Content creation defaults to Draft status
 - Soft deletion is controlled with a `deleted: true` flag in the Content model (no enum-based deletion)
-- Media files are uploaded to `/uploads` and linked via URLs stored in a `media` table
 - Axios handles most form-level logic; TanStack Query is used for some mutations
