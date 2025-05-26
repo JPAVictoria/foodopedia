@@ -318,6 +318,7 @@ export default function Hero() {
           </div>
         </StyledBox>
       </Container>
+      <section id='feature'></section>
     </Box>
   );
 }

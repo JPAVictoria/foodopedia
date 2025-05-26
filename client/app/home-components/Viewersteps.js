@@ -62,6 +62,7 @@ export default function Viewersteps() {
         color: 'text.primary',
       }}
     >
+
       <Container
         sx={{
           position: 'relative',
@@ -115,6 +116,7 @@ export default function Viewersteps() {
           ))}
         </Grid>
       </Container>
+      <section id='faq'></section>
     </Box>
   );
 }

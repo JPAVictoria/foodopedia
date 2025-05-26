@@ -7,13 +7,6 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { useTheme } from '@mui/system';
-import AutoFixHighRoundedIcon from '@mui/icons-material/AutoFixHighRounded';
-import ConstructionRoundedIcon from '@mui/icons-material/ConstructionRounded';
-import QueryStatsRoundedIcon from '@mui/icons-material/QueryStatsRounded';
-import SettingsSuggestRoundedIcon from '@mui/icons-material/SettingsSuggestRounded';
-import SupportAgentRoundedIcon from '@mui/icons-material/SupportAgentRounded';
-import ThumbUpAltRoundedIcon from '@mui/icons-material/ThumbUpAltRounded';
 
 import LooksOneRoundedIcon from '@mui/icons-material/LooksOneRounded';
 import LooksTwoRoundedIcon from '@mui/icons-material/LooksTwoRounded';
@@ -84,8 +77,6 @@ const adminitems = [
 
 
 export default function Adminsteps() {
-   const theme = useTheme();
-    const isDark = theme.palette.mode === 'dark';
   return (
     <Box
       id="highlights"
@@ -93,7 +84,6 @@ export default function Adminsteps() {
         pt: { xs: 4, sm: 12 },
         pb: { xs: 8, sm: 16 },
         color: 'text.primary',
-        // bgcolor: 'grey.900',
       }}
     >
       <Container
@@ -149,6 +139,8 @@ export default function Adminsteps() {
           ))}
         </Grid>
       </Container>
+      <section id='viewer'></section>
+
     </Box>
   );
 }

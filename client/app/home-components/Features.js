@@ -10,9 +10,6 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 
-import DevicesRoundedIcon from '@mui/icons-material/DevicesRounded';
-import EdgesensorHighRoundedIcon from '@mui/icons-material/EdgesensorHighRounded';
-import ViewQuiltRoundedIcon from '@mui/icons-material/ViewQuiltRounded';
 import DashboardCustomizeRoundedIcon from '@mui/icons-material/DashboardCustomizeRounded';
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
 import ArtTrackRoundedIcon from '@mui/icons-material/ArtTrackRounded';
@@ -280,6 +277,8 @@ export default function Features() {
           </Card>
         </Box>
       </Box>
+      <section id='admin'></section>
+
     </Container>
   );
 }
