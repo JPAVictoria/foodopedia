@@ -33,16 +33,6 @@ export default function Hero() {
   return (
     <Box
       id="hero"
-      sx={(theme) => ({
-        width: "100%",
-        backgroundRepeat: "no-repeat",
-        backgroundImage:
-          "radial-gradient(ellipse 100% 50% at 50% -15%, #FF9800, transparent)",
-        ...theme.applyStyles("dark", {
-          backgroundImage:
-            "radial-gradient(ellipse 80% 50% at 50% -20%, #4CAF50 40%, transparent)",
-        }),
-      })}
     >
       <Container
         sx={{
