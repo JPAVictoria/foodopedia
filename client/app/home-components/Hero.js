@@ -278,8 +278,6 @@ export default function Hero() {
       marginLeft: "1rem",
       letterSpacing: "0.8px",
       lineHeight: "1.4",
-      color: "rgba(255, 255, 255, 0.95)",
-
     }}
   >
     A Better Way to Share Food Content
@@ -293,7 +291,6 @@ export default function Hero() {
       marginLeft: "1rem",
       lineHeight: "1.75",
       paddingRight: "120px",
-      color: "rgba(255, 255, 255, 0.75)", 
       fontWeight: 300,
     }}
   >
