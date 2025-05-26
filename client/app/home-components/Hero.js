@@ -6,6 +6,7 @@ import Container from "@mui/material/Container";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
+import { useTheme } from "@mui/material/styles";
 
 const StyledBox = styled("div")(({ theme }) => ({
   display: "flex",
@@ -22,11 +23,13 @@ const StyledBox = styled("div")(({ theme }) => ({
     marginTop: theme.spacing(10),
     height: 600,
   },
-  ...theme.applyStyles("dark", {
-  }),
+  ...theme.applyStyles("dark", {}),
 }));
 
 export default function Hero() {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
+
   return (
     <Box
       id="hero"
@@ -34,10 +37,10 @@ export default function Hero() {
         width: "100%",
         backgroundRepeat: "no-repeat",
         backgroundImage:
-          "radial-gradient(ellipse 100% 50% at 50% -15%, #FF9800, transparent)", // light green fading out
+          "radial-gradient(ellipse 100% 50% at 50% -15%, #FF9800, transparent)",
         ...theme.applyStyles("dark", {
           backgroundImage:
-            "radial-gradient(ellipse 80% 50% at 50% -20%, #4CAF50 40%, transparent)", // dark brown fading out
+            "radial-gradient(ellipse 80% 50% at 50% -20%, #4CAF50 40%, transparent)",
         }),
       })}
     >
@@ -98,18 +101,48 @@ export default function Hero() {
             sx={{ pt: 2, width: { xs: "100%", sm: "275px" } }}
           >
             <Button
-              variant="contained"
-              color="primary"
+              variant="outlined"
               size="small"
-              sx={{ minWidth: "fit-content" }}
+              sx={{
+                minWidth: "fit-content",
+                textTransform: "none",
+                px: 2,
+                py: 1,
+                borderRadius: 1,
+                backgroundColor: "transparent",
+                borderColor: isDark ? "#4CAF50" : "#B0B0B0", 
+                color: isDark ? "#4CAF50" : "text.primary",
+
+                "&:hover": {
+                  borderColor: "#4CAF50",
+                  color: "#4CAF50",
+                  backgroundColor: "transparent",
+                },
+              }}
             >
-              Join as Admin!
+              Join as Admin
             </Button>
+
             <Button
-              variant="contained"
-              color="primary"
+              variant="outlined"
               size="small"
-              sx={{ minWidth: "fit-content" }}
+              sx={{
+                minWidth: "fit-content",
+                textTransform: "none",
+                px: 2,
+                py: 1,
+                borderRadius: 1,
+                ml: 2,
+                backgroundColor: "transparent",
+                borderColor: isDark ? "#FF9800" : "#B0B0B0", 
+                color: isDark ? "#FF9800" : "text.primary",
+
+                "&:hover": {
+                  borderColor: "#FF9800",
+                  color: "#FF9800",
+                  backgroundColor: "transparent",
+                },
+              }}
             >
               Join as Viewer!
             </Button>
@@ -227,10 +260,10 @@ export default function Hero() {
               display: "flex",
               flexDirection: "column",
               alignItems: "flex-start",
-              justifyContent: "center", 
+              justifyContent: "center",
               padding: "16px",
               boxSizing: "border-box",
-              textAlign: "center", 
+              textAlign: "center",
             }}
           >
             <div
@@ -241,8 +274,8 @@ export default function Hero() {
                 width: "100%",
                 maxWidth: "600px",
                 textAlign: "left",
-                letterSpacing: "0.5px", 
-                lineHeight: "1.6", 
+                letterSpacing: "0.5px",
+                lineHeight: "1.6",
               }}
             >
               A Better Way to Share Food Content
@@ -251,9 +284,9 @@ export default function Hero() {
               style={{
                 textAlign: "left",
                 fontSize: "1rem",
-                letterSpacing: "0.5px", 
+                letterSpacing: "0.5px",
                 lineHeight: "1.6",
-                paddingRight: "120px", 
+                paddingRight: "120px",
               }}
             >
               <p>
@@ -265,8 +298,8 @@ export default function Hero() {
                 side that showcases it all in real time. Built with Express.js,
                 Next.js, PostgreSQL, and a modern UI toolkit, it&apos;s fast,
                 scalable, and tailored for dynamic food content delivery. From
-                kitchen stories to recipe databases, if it&apos;s edible, it&apos;s
-                editable.
+                kitchen stories to recipe databases, if it&apos;s edible,
+                it&apos;s editable.
               </p>
             </div>
           </div>
