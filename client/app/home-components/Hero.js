@@ -254,55 +254,66 @@ export default function Hero() {
             </div>
           </div>
 
-          <div
-            style={{
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-start",
-              justifyContent: "center",
-              padding: "16px",
-              boxSizing: "border-box",
-              textAlign: "center",
-            }}
-          >
-            <div
-              style={{
-                fontSize: "40px",
-                fontWeight: "bold",
-                marginBottom: "1rem",
-                width: "100%",
-                maxWidth: "600px",
-                textAlign: "left",
-                letterSpacing: "0.5px",
-                lineHeight: "1.6",
-              }}
-            >
-              A Better Way to Share Food Content
-            </div>
-            <div
-              style={{
-                textAlign: "left",
-                fontSize: "1rem",
-                letterSpacing: "0.5px",
-                lineHeight: "1.6",
-                paddingRight: "120px",
-              }}
-            >
-              <p>
-                Our food-focused content management system makes it effortless
-                to deliver mouthwatering content to your audience. Designed with
-                a clear separation of roles, the platform features a robust
-                admin dashboard—where content creators can manage, publish, and
-                update food-related entries—and a sleek, user-friendly viewer
-                side that showcases it all in real time. Built with Express.js,
-                Next.js, PostgreSQL, and a modern UI toolkit, it&apos;s fast,
-                scalable, and tailored for dynamic food content delivery. From
-                kitchen stories to recipe databases, if it&apos;s edible,
-                it&apos;s editable.
-              </p>
-            </div>
-          </div>
+<div
+  style={{
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    justifyContent: "center",
+    padding: "16px",
+    boxSizing: "border-box",
+    textAlign: "center",
+  }}
+>
+  <h1
+    style={{
+      fontSize: "40px",
+      fontWeight: 600,
+      marginBottom: "1rem",
+      marginTop: "-3rem",
+      width: "100%",
+      maxWidth: "550px",
+      textAlign: "left",
+      marginLeft: "1rem",
+      letterSpacing: "0.8px",
+      lineHeight: "1.4",
+      color: "rgba(255, 255, 255, 0.95)",
+
+    }}
+  >
+    A Better Way to Share Food Content
+  </h1>
+
+  <div
+    style={{
+      textAlign: "justify",
+      fontSize: "13.5px",
+      letterSpacing: "0.4px",
+      marginLeft: "1rem",
+      lineHeight: "1.75",
+      paddingRight: "120px",
+      color: "rgba(255, 255, 255, 0.75)", 
+      fontWeight: 300,
+    }}
+  >
+    <p>
+      Our food-focused content management system makes it effortless
+      to deliver mouthwatering content to your audience. Designed with
+      a clear separation of roles, the platform features a robust admin
+      dashboard—where content creators can manage, publish, and update
+      food-related entries—and a sleek, user-friendly viewer side that
+      showcases it all in real time.
+    </p>
+    <br></br>
+    <p>
+      Built with Express.js, Next.js, PostgreSQL, and a modern UI toolkit,
+      it’s fast, scalable, and tailored for dynamic food content delivery.
+      From kitchen stories to recipe databases, if it’s edible, it’s editable.
+    </p>
+  </div>
+</div>
+
         </StyledBox>
       </Container>
     </Box>
