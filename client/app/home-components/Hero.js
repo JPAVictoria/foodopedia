@@ -110,7 +110,7 @@ export default function Hero() {
                 py: 1,
                 borderRadius: 1,
                 backgroundColor: "transparent",
-                borderColor: isDark ? "#4CAF50" : "#B0B0B0", 
+                borderColor: isDark ? "#4CAF50" : "#B0B0B0",
                 color: isDark ? "#4CAF50" : "text.primary",
 
                 "&:hover": {
@@ -119,10 +119,12 @@ export default function Hero() {
                   backgroundColor: "transparent",
                 },
               }}
+              onClick={() => {
+                window.location.href = "/admin/login";
+              }}
             >
               Join as Admin
             </Button>
-
             <Button
               variant="outlined"
               size="small"
@@ -134,7 +136,7 @@ export default function Hero() {
                 borderRadius: 1,
                 ml: 2,
                 backgroundColor: "transparent",
-                borderColor: isDark ? "#FF9800" : "#B0B0B0", 
+                borderColor: isDark ? "#FF9800" : "#B0B0B0",
                 color: isDark ? "#FF9800" : "text.primary",
 
                 "&:hover": {
@@ -142,6 +144,9 @@ export default function Hero() {
                   color: "#FF9800",
                   backgroundColor: "transparent",
                 },
+              }}
+              onClick={() => {
+                window.location.href = "/viewer/login";
               }}
             >
               Join as Viewer!
@@ -254,63 +259,63 @@ export default function Hero() {
             </div>
           </div>
 
-<div
-  style={{
-    flex: 1,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    justifyContent: "center",
-    padding: "16px",
-    boxSizing: "border-box",
-    textAlign: "center",
-  }}
->
-  <h1
-    style={{
-      fontSize: "40px",
-      fontWeight: 600,
-      marginBottom: "1rem",
-      marginTop: "-3rem",
-      width: "100%",
-      maxWidth: "550px",
-      textAlign: "left",
-      marginLeft: "1rem",
-      letterSpacing: "0.8px",
-      lineHeight: "1.4",
-    }}
-  >
-    A Better Way to Share Food Content
-  </h1>
+          <div
+            style={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-start",
+              justifyContent: "center",
+              padding: "16px",
+              boxSizing: "border-box",
+              textAlign: "center",
+            }}
+          >
+            <h1
+              style={{
+                fontSize: "40px",
+                fontWeight: 600,
+                marginBottom: "1rem",
+                marginTop: "-3rem",
+                width: "100%",
+                maxWidth: "550px",
+                textAlign: "left",
+                marginLeft: "1rem",
+                letterSpacing: "0.8px",
+                lineHeight: "1.4",
+              }}
+            >
+              A Better Way to Share Food Content
+            </h1>
 
-  <div
-    style={{
-      textAlign: "justify",
-      fontSize: "13.5px",
-      letterSpacing: "0.4px",
-      marginLeft: "1rem",
-      lineHeight: "1.75",
-      paddingRight: "120px",
-      fontWeight: 300,
-    }}
-  >
-    <p>
-      Our food-focused content management system makes it effortless
-      to deliver mouthwatering content to your audience. Designed with
-      a clear separation of roles, the platform features a robust admin
-      dashboard—where content creators can manage, publish, and update
-      food-related entries—and a sleek, user-friendly viewer side that
-      showcases it all in real time.
-    </p>
-    <br></br>
-    <p>
-      Built with Express.js, Next.js, PostgreSQL, and a modern UI toolkit,
-      it’s fast, scalable, and tailored for dynamic food content delivery.
-      From kitchen stories to recipe databases, if it’s edible, it’s editable.
-    </p>
-  </div>
-</div>
-
+            <div
+              style={{
+                textAlign: "justify",
+                fontSize: "13.5px",
+                letterSpacing: "0.4px",
+                marginLeft: "1rem",
+                lineHeight: "1.75",
+                paddingRight: "120px",
+                fontWeight: 300,
+              }}
+            >
+              <p>
+                Our food-focused content management system makes it effortless
+                to deliver mouthwatering content to your audience. Designed with
+                a clear separation of roles, the platform features a robust
+                admin dashboard—where content creators can manage, publish, and
+                update food-related entries—and a sleek, user-friendly viewer
+                side that showcases it all in real time.
+              </p>
+              <br></br>
+              <p>
+                Built with Express.js, Next.js, PostgreSQL, and a modern UI
+                toolkit, it’s fast, scalable, and tailored for dynamic food
+                content delivery. From kitchen stories to recipe databases, if
+                it’s edible, it’s editable.
+              </p>
+            </div>
+          </div>
         </StyledBox>
       </Container>
     </Box>
