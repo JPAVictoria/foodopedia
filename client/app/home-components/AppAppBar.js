@@ -31,7 +31,7 @@ export default function AppAppBar() {
     ? `rgba(${theme.vars.palette.background.defaultChannel} / 0.4)`
     : alpha(theme.palette.background.default, 0.4),
   boxShadow: (theme.vars || theme).shadows[1],
-  padding: '2px 10px',
+  padding: '2px 30px',
 }));
   const [open, setOpen] = React.useState(false);
 
@@ -50,8 +50,7 @@ export default function AppAppBar() {
         mt: 'calc(var(--template-frame-height, 0px) + 28px)',
       }}
     >
-      {/*previous lg, lg is default*/}
-      <Container maxWidth="xl">
+      <Container maxWidth="md">
         <StyledToolbar variant="dense" disableGutters>
           <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', px: 0 }}>
             <Sitemark />
@@ -83,12 +82,7 @@ export default function AppAppBar() {
               alignItems: 'center',
             }}
           >
-            {/* <Button color="primary" variant="text" size="small">
-              Sign in
-            </Button> */}
-            <Button color="primary" variant="contained" size="small">
-              Sign in
-            </Button>
+
             <ColorModeIconDropdown />
           </Box>
           <Box sx={{ display: { xs: 'flex', md: 'none' }, gap: 1 }}>
