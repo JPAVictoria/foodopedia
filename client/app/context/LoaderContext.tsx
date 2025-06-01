@@ -1,4 +1,4 @@
-// src/app/context/LoadingContext.tsx
+"use client"
 import { createContext, useState, useContext, ReactNode } from 'react';
 import { CircularProgress } from '@mui/material'; 
 
