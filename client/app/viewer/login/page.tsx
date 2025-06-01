@@ -59,7 +59,10 @@ export default function Login() {
 
       if (token && viewer) {
         Cookies.set("token", token, { expires: 1 });
-        localStorage.setItem("user", JSON.stringify({ ...viewer, role: "viewer" }));
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ ...viewer, role: "viewer" })
+        );
         openSnackbar("Login successful!", "success");
 
         setTimeout(() => {
@@ -182,6 +185,17 @@ export default function Login() {
             </Link>
           </div>
         </form>
+      </div>
+      <div className="fixed bottom-4 w-full flex justify-center">
+        <Link href="/">
+          <Button
+            variant="link"
+            className="text-[#3E2723] cursor-pointer"
+            disabled={isDisabled}
+          >
+            Back to home
+          </Button>
+        </Link>
       </div>
     </div>
   );

@@ -61,7 +61,10 @@ export default function Login() {
 
       if (token && admin) {
         Cookies.set("token", token, { expires: 1 });
-        localStorage.setItem("user", JSON.stringify({ ...admin, role: "admin" })); 
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ ...admin, role: "admin" })
+        );
         openSnackbar("Login successful!", "success");
 
         setSubmitted(true);
@@ -176,6 +179,17 @@ export default function Login() {
             </Link>
           </div>
         </form>
+      </div>
+      <div className="fixed bottom-4 w-full flex justify-center">
+        <Link href="/">
+          <Button
+            variant="link"
+            className="text-[#3E2723] cursor-pointer"
+            disabled={isDisabled}
+          >
+            Back to home
+          </Button>
+        </Link>
       </div>
     </div>
   );
