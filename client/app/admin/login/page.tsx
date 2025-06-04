@@ -8,7 +8,6 @@ import { useRouter } from "next/navigation";
 import { useSnackbar } from "@/app/context/SnackbarContext";
 import { useLoginStore } from "@/app/stores/useLoginStore";
 import { useLoading } from "@/app/context/LoaderContext";
-import Cookies from "js-cookie";
 import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
 import { AnimatedGridPattern } from "@/components/magicui/animated-grid-pattern";
@@ -38,50 +37,52 @@ export default function Login() {
     };
   }, [resetLoginForm]);
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
 
-    if (!email || !password) {
-      openSnackbar("Email and password are required.", "error");
-      return;
-    }
+  if (!email || !password) {
+    openSnackbar("Email and password are required.", "error");
+    return;
+  }
 
-    setLoading(true);
+  setLoading(true);
 
-    try {
-      const response = await axios.post(
-        "http://localhost:5000/admin/login/login",
-        {
-          email,
-          password,
-        }
-      );
-
-      const { token, admin } = response.data;
-
-      if (token && admin) {
-        Cookies.set("token", token, { expires: 1 });
-        localStorage.setItem(
-          "user",
-          JSON.stringify({ ...admin, role: "admin" })
-        );
-        openSnackbar("Login successful!", "success");
-
-        setSubmitted(true);
-        setLoading(true);
-        setTimeout(() => {
-          router.push("/admin");
-        }, 1000);
+  try {
+    const response = await axios.post(
+      "http://localhost:5000/admin/login/login",
+      {
+        email,
+        password,
+      },
+      {
+        withCredentials: true, // Important: This sends cookies
       }
-    } catch (err) {
-      setLoading(false);
-      const msg = axios.isAxiosError(err)
-        ? err.response?.data?.message || "Invalid email or password."
-        : "An unexpected error occurred.";
-      openSnackbar(msg, "error");
-    } finally {
+    );
+
+    const { admin } = response.data; // No token in response anymore
+
+    if (admin) {
+      // Remove the Cookies.set line - cookie is set by server
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ ...admin, role: "admin" })
+      );
+      openSnackbar("Login successful!", "success");
+
+      setSubmitted(true);
+      setLoading(true);
+      setTimeout(() => {
+        router.push("/admin");
+      }, 1000);
     }
-  };
+  } catch (err) {
+    setLoading(false);
+    const msg = axios.isAxiosError(err)
+      ? err.response?.data?.message || "Invalid email or password."
+      : "An unexpected error occurred.";
+    openSnackbar(msg, "error");
+  }
+};
 
   const isDisabled = loading || submitted;
 
